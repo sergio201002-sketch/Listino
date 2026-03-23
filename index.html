@@ -683,74 +683,82 @@ const GAS_URL = 'https://script.google.com/macros/s/AKfycbw8-qqYu9X9weg-twjfNBqP
 
 // ── SINCRONIZZAZIONE GOOGLE SHEETS ────────────────────────────────────────────
 let syncTimer = null;
-let syncStatus = 'idle'; // idle | saving | saved | error
 
-function setSyncStatus(s, msg) {
-  syncStatus = s;
+function setSyncStatus(s) {
   const el = document.getElementById('sync-status');
   if (!el) return;
-  const icons = { idle:'', saving:'⏳', saved:'☁️ Salvato', error:'⚠️ Offline' };
-  el.textContent = icons[s] || msg || '';
+  const map = { idle:'', saving:'⏳', saved:'☁️ Salvato', error:'⚠️ Offline' };
+  el.textContent = map[s] || '';
   el.className = 'sync-status sync-' + s;
 }
 
-// Salva su localStorage (immediato) + Google Sheets (con ritardo 1.5s)
+// Chiamata JSONP per aggirare CORS con Google Apps Script
+function gasCall(params, onSuccess, onError) {
+  const cbName = 'gas_cb_' + Date.now();
+  const url = GAS_URL + '?' + Object.entries(params).map(([k,v]) => k + '=' + encodeURIComponent(v)).join('&') + '&callback=' + cbName;
+  const script = document.createElement('script');
+  let done = false;
+  window[cbName] = function(data) {
+    done = true;
+    delete window[cbName];
+    document.body.removeChild(script);
+    if (data && data.ok) onSuccess(data);
+    else onError(data);
+  };
+  script.onerror = function() {
+    if (!done) { done = true; delete window[cbName]; document.body.removeChild(script); onError(); }
+  };
+  setTimeout(function() {
+    if (!done) { done = true; delete window[cbName]; try { document.body.removeChild(script); } catch(e){} onError(); }
+  }, 8000);
+  script.src = url;
+  document.body.appendChild(script);
+}
+
 function saveClients() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(clients)); } catch(e) {}
-  // Salvataggio remoto con debounce
   clearTimeout(syncTimer);
   setSyncStatus('saving');
   syncTimer = setTimeout(syncToSheets, 1500);
 }
 
 function syncToSheets() {
-  const data = encodeURIComponent(JSON.stringify(clients));
-  fetch(`${GAS_URL}?action=save&data=${data}`)
-    .then(r => r.json())
-    .then(r => {
-      if (r.ok) setSyncStatus('saved');
-      else setSyncStatus('error');
-    })
-    .catch(() => setSyncStatus('error'));
+  gasCall(
+    { action: 'save', data: JSON.stringify(clients) },
+    function() { setSyncStatus('saved'); },
+    function() { setSyncStatus('error'); }
+  );
 }
 
-// Carica: prima localStorage (veloce), poi Google Sheets (aggiornato)
 function loadClients() {
-  // 1. Carica subito dal localStorage per mostrare qualcosa
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) clients = JSON.parse(raw);
   } catch(e) { clients = {}; }
 
-  // 2. Poi carica da Google Sheets (può avere dati più recenti da altri dispositivi)
   setSyncStatus('saving');
-  fetch(`${GAS_URL}?action=load`)
-    .then(r => r.json())
-    .then(r => {
-      if (r.ok && r.data && Object.keys(r.data).length > 0) {
-        // Unisci: prendi il dato più recente per ogni cliente
+  gasCall(
+    { action: 'load' },
+    function(r) {
+      if (r.data && Object.keys(r.data).length > 0) {
         const remote = r.data;
         Object.keys(remote).forEach(id => {
           if (!clients[id]) {
             clients[id] = remote[id];
           } else {
-            // Tieni quello con più ordini (dato più completo)
-            const localOrders = clients[id].orders?.length || 0;
+            const localOrders  = clients[id].orders?.length || 0;
             const remoteOrders = remote[id].orders?.length || 0;
             if (remoteOrders > localOrders) clients[id] = remote[id];
           }
         });
-        // Salva la versione unita su localStorage
         try { localStorage.setItem(STORAGE_KEY, JSON.stringify(clients)); } catch(e) {}
       }
       setSyncStatus('saved');
-      // Aggiorna la UI se siamo sulla pagina clienti o statistiche
       const storPage = document.getElementById('page-storico');
       if (storPage && storPage.classList.contains('active')) renderClientList();
-    })
-    .catch(() => {
-      setSyncStatus('error');
-    });
+    },
+    function() { setSyncStatus('error'); }
+  );
 }
 
 // ── UTILS ─────────────────────────────────────────────────────────────────────
