@@ -321,7 +321,7 @@ header {
 .storico-page { max-width: 1200px; margin: 0 auto; padding: 28px 32px; }
 
 .storico-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
-.storico-header h2 { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; }
+.storico-header h2 { font-family: 'Barlow', 'Inter', sans-serif; font-size: 26px; font-weight: 800; letter-spacing: 0.03em; }
 .btn-new-client { display: flex; align-items: center; gap: 6px; background: var(--red); color: white; border: none; border-radius: 6px; padding: 9px 18px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
 .btn-new-client:hover { background: var(--red-d); }
 
@@ -407,7 +407,7 @@ header {
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: 20px; flex-wrap: wrap; gap: 10px;
 }
-.stats-h2 { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; }
+.stats-h2 { font-family: 'Barlow', 'Inter', sans-serif; font-size: 24px; font-weight: 800; letter-spacing: 0.03em; }
 .stats-sub { font-size: 12px; color: var(--mid); }
 
 .year-pills { display: flex; gap: 4px; flex-wrap: wrap; }
@@ -429,8 +429,9 @@ header {
   box-shadow: var(--shadow);
 }
 .kpi-card.kpi-green { border-color: rgba(26,122,60,0.2); background: var(--green-l); }
-.kpi-icon { font-size: 22px; margin-bottom: 2px; }
-.kpi-val { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: var(--dark); }
+.kpi-icon { font-size: 22px; margin-bottom: 6px; display: flex; justify-content: center; }
+.kpi-icon svg { display: block; }
+.kpi-val { font-family: 'Barlow', 'Inter', sans-serif; font-size: 26px; font-weight: 700; color: var(--dark); letter-spacing: 0.01em; }
 .kpi-label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mid); text-align: center; }
 
 /* Griglia grafici */
@@ -779,22 +780,52 @@ header {
     <!-- KPI cards -->
     <div class="kpi-row">
       <div class="kpi-card">
-        <div class="kpi-icon">📦</div>
+        <div class="kpi-icon">
+          <!-- Ordini: scontrino/ricevuta -->
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 4h16a1 1 0 011 1v19l-3-2-3 2-3-2-3 2-3-2-3 2V5a1 1 0 011-1z" stroke="#C8102E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="10" y1="11" x2="18" y2="11" stroke="#C8102E" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="10" y1="15" x2="18" y2="15" stroke="#C8102E" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="10" y1="19" x2="14" y2="19" stroke="#C8102E" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
         <div class="kpi-val" id="kpi-ordini">0</div>
         <div class="kpi-label">Ordini totali</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-icon">👥</div>
+        <div class="kpi-icon">
+          <!-- Clienti: due persone -->
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="10" cy="9" r="4" stroke="#C8102E" stroke-width="1.6"/>
+            <path d="M2 25c0-4.97 3.58-9 8-9" stroke="#C8102E" stroke-width="1.6" stroke-linecap="round"/>
+            <circle cx="19.5" cy="9" r="3" stroke="#C8102E" stroke-width="1.4"/>
+            <path d="M25.5 25c0-3.86-2.69-7-6-7" stroke="#C8102E" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+        </div>
         <div class="kpi-val" id="kpi-clienti">0</div>
         <div class="kpi-label">Clienti attivi</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-icon">📐</div>
+        <div class="kpi-icon">
+          <!-- Mq: griglia piastrelle -->
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3" y="3" width="10" height="10" rx="1.5" fill="#C8102E" fill-opacity="0.14" stroke="#C8102E" stroke-width="1.5"/>
+            <rect x="15" y="3" width="10" height="10" rx="1.5" stroke="#C8102E" stroke-width="1.5"/>
+            <rect x="3" y="15" width="10" height="10" rx="1.5" stroke="#C8102E" stroke-width="1.5"/>
+            <rect x="15" y="15" width="10" height="10" rx="1.5" stroke="#C8102E" stroke-width="1.5"/>
+          </svg>
+        </div>
         <div class="kpi-val" id="kpi-mq">0</div>
         <div class="kpi-label">Mq totali</div>
       </div>
       <div class="kpi-card kpi-green">
-        <div class="kpi-icon">💰</div>
+        <div class="kpi-icon">
+          <!-- Fatturato: euro in cerchio -->
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="14" cy="14" r="11" stroke="#1A7A3C" stroke-width="1.6"/>
+            <path d="M18 10.5A6 6 0 0011 15M8.5 12.5H17M8.5 16H17" stroke="#1A7A3C" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+        </div>
         <div class="kpi-val" id="kpi-fatturato">€ 0</div>
         <div class="kpi-label">Fatturato scontato B</div>
       </div>
