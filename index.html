@@ -201,6 +201,88 @@ header {
 .cp-close { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: white; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
 .cp-close:hover { background: rgba(255,255,255,0.18); }
 .cp-stripe { height: 3px; background: var(--red); }
+
+/* ── CART SEARCH ── */
+.cp-search-wrap {
+  padding: 12px 16px 10px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  position: relative;
+}
+.cp-search-box {
+  display: flex; align-items: center; gap: 8px;
+  background: white; border: 1.5px solid var(--border);
+  border-radius: 8px; padding: 7px 12px;
+  transition: border-color 0.15s;
+}
+.cp-search-box:focus-within { border-color: var(--red); }
+.cp-search-box svg { color: var(--mid); flex-shrink: 0; }
+.cp-search-input {
+  flex: 1; border: none; outline: none;
+  font-family: 'Inter', sans-serif; font-size: 13px; color: var(--dark);
+  background: transparent;
+}
+.cp-search-input::placeholder { color: var(--light); }
+.cp-search-clear {
+  background: none; border: none; cursor: pointer;
+  color: var(--light); font-size: 14px; padding: 0; line-height: 1;
+  display: none;
+}
+.cp-search-clear.visible { display: block; }
+.cp-search-results {
+  display: none;
+  margin-top: 8px;
+  background: white; border: 1px solid var(--border);
+  border-radius: 8px; overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+.cp-search-results.visible { display: block; }
+.cp-sr-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px;
+  cursor: pointer; transition: background 0.12s;
+  border-bottom: 1px solid var(--border);
+}
+.cp-sr-item:last-child { border-bottom: none; }
+.cp-sr-item:hover { background: var(--red-l); }
+.cp-sr-item.already-in { background: var(--green-l); }
+.cp-sr-code {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.07em;
+  background: var(--dark); color: white;
+  padding: 2px 6px; border-radius: 4px; flex-shrink: 0;
+  font-family: 'Inter', monospace;
+}
+.cp-sr-item.already-in .cp-sr-code { background: var(--green); }
+.cp-sr-info { flex: 1; min-width: 0; }
+.cp-sr-series { font-size: 11px; font-weight: 600; color: var(--dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cp-sr-detail { font-size: 10px; color: var(--mid); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cp-sr-price { font-size: 12px; font-weight: 700; color: var(--red); flex-shrink: 0; }
+.cp-sr-mq-wrap {
+  display: flex; align-items: center; gap: 2px;
+  background: var(--bg); border: 1.5px solid var(--border);
+  border-radius: 6px; overflow: hidden; flex-shrink: 0;
+}
+.cp-sr-mq-wrap:focus-within { border-color: var(--red); }
+.cp-sr-mq {
+  width: 44px; border: none; outline: none; background: transparent;
+  font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700;
+  color: var(--dark); text-align: center; padding: 5px 4px;
+}
+.cp-sr-mq-unit {
+  font-size: 10px; color: var(--mid); font-weight: 600;
+  padding-right: 5px; white-space: nowrap;
+}
+.cp-sr-add {
+  width: 28px; height: 28px; border-radius: 6px;
+  background: var(--red); color: white; border: none;
+  font-size: 18px; line-height: 1; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: background 0.15s;
+}
+.cp-sr-add:hover { background: var(--red-d); }
+.cp-sr-item.already-in .cp-sr-add { background: var(--green); font-size: 13px; }
+.cp-sr-none { padding: 14px 12px; font-size: 12px; color: var(--mid); text-align: center; }
+
 .cp-items { flex: 1; overflow-y: auto; padding: 14px 18px; display: flex; flex-direction: column; gap: 8px; }
 .ci { background: var(--bg); border: 1px solid var(--border); border-radius: 7px; padding: 11px 13px; display: flex; align-items: flex-start; gap: 10px; }
 .ci-code { background: var(--dark); color: white; border-radius: 5px; padding: 5px 9px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 800; white-space: nowrap; flex-shrink: 0; }
@@ -774,6 +856,27 @@ header {
     <button class="cp-close" onclick="closeCart()">✕</button>
   </div>
   <div class="cp-stripe"></div>
+
+  <!-- SEARCH BAR nel carrello -->
+  <div class="cp-search-wrap">
+    <div class="cp-search-box">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <circle cx="6" cy="6" r="4.5" stroke="#6B6B6B" stroke-width="1.4"/>
+        <line x1="9.5" y1="9.5" x2="13" y2="13" stroke="#6B6B6B" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      <input
+        class="cp-search-input"
+        id="cp-search-input"
+        type="text"
+        placeholder="Cerca per codice o serie…"
+        autocomplete="off"
+        oninput="cartSearch(this.value)"
+      />
+      <button class="cp-search-clear" id="cp-search-clear" onclick="cartSearchClear()">✕</button>
+    </div>
+    <div class="cp-search-results" id="cp-search-results"></div>
+  </div>
+
   <div class="cp-items" id="cp-items">
     <div class="cart-empty"><div class="ei">🛒</div><p>Il carrello è vuoto</p></div>
   </div>
@@ -1282,8 +1385,92 @@ function updateCartUI(){
   }).join('\n');
 }
 
-function openCart(){ $('overlay').classList.add('open'); $('cp').classList.add('open'); }
+function openCart(){
+  $('overlay').classList.add('open');
+  $('cp').classList.add('open');
+  // Pulisce ricerca ogni volta che si apre
+  cartSearchClear();
+  setTimeout(()=>{ const inp=$('cp-search-input'); if(inp) inp.focus(); }, 200);
+}
 function closeCart(){ $('overlay').classList.remove('open'); $('cp').classList.remove('open'); }
+
+/* ── CART SEARCH ─────────────────────────────────── */
+function cartSearch(q){
+  const clearBtn = $('cp-search-clear');
+  const resultsEl = $('cp-search-results');
+  q = q.trim();
+  if(clearBtn) clearBtn.classList.toggle('visible', q.length > 0);
+  if(!q){ resultsEl.classList.remove('visible'); resultsEl.innerHTML=''; return; }
+
+  const ql = q.toLowerCase();
+  // Cerca per codice (priorità) o serie o colore
+  const matches = PRODUCTS.filter(p =>
+    p.code.toLowerCase().includes(ql) ||
+    p.series.toLowerCase().includes(ql) ||
+    (p.color && p.color.toLowerCase().includes(ql))
+  ).slice(0, 10);
+
+  if(!matches.length){
+    resultsEl.innerHTML = '<div class="cp-sr-none">Nessun prodotto trovato</div>';
+    resultsEl.classList.add('visible');
+    return;
+  }
+
+  resultsEl.innerHTML = matches.map(p => {
+    const already = inCart(p.code);
+    const detail = [p.size, p.finish, p.color].filter(Boolean).join(' · ');
+    const savedMq = mqDraft[p.code] || '';
+    const mqField = already
+      ? ''
+      : `<div class="cp-sr-mq-wrap">
+           <input class="cp-sr-mq" type="text" inputmode="decimal"
+             id="csr-mq-${p.code}" placeholder="mq"
+             value="${savedMq}"
+             onclick="event.stopPropagation()"
+             onkeydown="if(event.key==='Enter'){cartSearchAdd('${p.code}',event)}"
+           />
+           <span class="cp-sr-mq-unit">m²</span>
+         </div>`;
+    return `<div class="cp-sr-item${already?' already-in':''}" data-code="${p.code}">
+      <span class="cp-sr-code">${p.code}</span>
+      <div class="cp-sr-info">
+        <div class="cp-sr-series">${p.series}</div>
+        <div class="cp-sr-detail">${detail}</div>
+      </div>
+      <span class="cp-sr-price">€${p.price!=null?p.price.toFixed(2):'—'}</span>
+      ${mqField}
+      <button class="cp-sr-add" onclick="cartSearchAdd('${p.code}',event)" title="${already?'Rimuovi dal carrello':'Aggiungi al carrello'}">
+        ${already ? '✓' : '+'}
+      </button>
+    </div>`;
+  }).join('');
+  resultsEl.classList.add('visible');
+}
+
+function cartSearchAdd(code, e){
+  e.stopPropagation();
+  if(inCart(code)){
+    removeCart(code);
+  } else {
+    // Leggi i mq dall'input nel risultato
+    const mqInput = document.getElementById('csr-mq-' + code);
+    const raw = mqInput ? mqInput.value.replace(',','.') : '';
+    const mq = parseFloat(raw) || 1;
+    mqDraft[code] = mq;
+    addCart(code);
+  }
+  // Aggiorna la UI dei risultati senza chiudere la ricerca
+  cartSearch($('cp-search-input').value);
+}
+
+function cartSearchClear(){
+  const inp = $('cp-search-input');
+  const clearBtn = $('cp-search-clear');
+  const resultsEl = $('cp-search-results');
+  if(inp) inp.value = '';
+  if(clearBtn) clearBtn.classList.remove('visible');
+  if(resultsEl){ resultsEl.classList.remove('visible'); resultsEl.innerHTML=''; }
+}
 
 function copyCart(){
   navigator.clipboard.writeText($('cp-output').textContent).then(()=>{
