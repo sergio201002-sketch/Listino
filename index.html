@@ -398,10 +398,10 @@ header {
 .modal-input { width: 100%; border: 1.5px solid var(--border); border-radius: 6px; padding: 10px 14px; font-family: 'Inter', sans-serif; font-size: 14px; color: var(--dark); margin-bottom: 16px; }
 .modal-input:focus { outline: none; border-color: var(--red); }
 .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
-.btn-modal-cancel { background: none; border: 1.5px solid var(--border); color: var(--mid); border-radius: 6px; padding: 8px 16px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; }
+.btn-modal-cancel { background: none; border: 1.5px solid var(--border); color: var(--mid); border-radius: 7px; padding: 11px 18px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; min-height: 44px; -webkit-tap-highlight-color: rgba(0,0,0,0.1); touch-action: manipulation; }
 .btn-modal-cancel:hover { border-color: var(--mid); color: var(--dark); }
-.btn-modal-ok { background: var(--red); color: white; border: none; border-radius: 6px; padding: 8px 20px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
-.btn-modal-ok:hover { background: var(--red-d); }
+.btn-modal-ok { background: var(--red); color: white; border: none; border-radius: 7px; padding: 11px 22px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: background 0.2s; min-height: 44px; -webkit-tap-highlight-color: rgba(255,255,255,0.3); touch-action: manipulation; }
+.btn-modal-ok:hover, .btn-modal-ok:active { background: var(--red-d); }
 
 /* ── STATISTICHE ─────────────────────────────────────── */
 .stats-page { max-width: 1200px; margin: 0 auto; padding: 24px 32px; }
@@ -1065,14 +1065,44 @@ function _stampClientsMeta(){
   _lastSavedAt = clients._meta.lastSaved;
 }
 
-function saveClients() {
+function saveClients(opts) {
+  opts = opts || {};
   _localDirty = true;
   _stampClientsMeta();
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(clients)); } catch(e) {}
   clearTimeout(syncTimer);
   setSyncStatus('saving');
-  syncTimer = setTimeout(syncToSheets, 1500);
+  // Per ordini importanti: flush immediato (no debounce)
+  // Per modifiche minori: debounce 1.5s
+  syncTimer = setTimeout(syncToSheets, opts.immediate ? 0 : 1500);
 }
+
+// Custom confirm modal — pin sicuro su mobile
+function listinoConfirm(message, onYes){
+  let m = document.getElementById('listino-confirm');
+  if(!m){
+    m = document.createElement('div');
+    m.id = 'listino-confirm';
+    m.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);display:none;align-items:center;justify-content:center;z-index:99999;padding:18px;font-family:Inter,sans-serif;';
+    m.innerHTML = `<div style="background:#fff;border-radius:12px;max-width:380px;width:100%;padding:22px;box-shadow:0 10px 40px rgba(0,0,0,0.3)">
+      <div id="lc-title" style="font-size:15px;font-weight:700;color:#1A1A1A;margin-bottom:8px">Confermi?</div>
+      <div id="lc-msg" style="color:#6B6B6B;font-size:13px;line-height:1.5;margin-bottom:18px"></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button id="lc-no" style="background:none;border:1.5px solid #E5E5E5;color:#6B6B6B;border-radius:7px;padding:11px 18px;font-family:Inter,sans-serif;font-size:13px;font-weight:600;cursor:pointer;min-height:44px;-webkit-tap-highlight-color:rgba(0,0,0,0.1);touch-action:manipulation">Annulla</button>
+        <button id="lc-yes" style="background:#C8102E;color:#fff;border:none;border-radius:7px;padding:11px 22px;font-family:Inter,sans-serif;font-size:13px;font-weight:700;cursor:pointer;min-height:44px;-webkit-tap-highlight-color:rgba(255,255,255,0.3);touch-action:manipulation">Conferma</button>
+      </div>
+    </div>`;
+    document.body.appendChild(m);
+  }
+  document.getElementById('lc-msg').textContent = message;
+  m.style.display = 'flex';
+  const yes = document.getElementById('lc-yes');
+  const no  = document.getElementById('lc-no');
+  const cleanup = ()=>{ m.style.display='none'; yes.onclick=null; no.onclick=null; };
+  yes.onclick = ()=>{ cleanup(); if(onYes) onYes(); };
+  no.onclick  = cleanup;
+}
+window.listinoConfirm = listinoConfirm;
 
 function syncToSheets() {
   // Quando spediamo lo stato, lo stampiamo come "appena salvato"
@@ -1168,13 +1198,19 @@ function showSyncToast(msg){
   if(!t){
     t = document.createElement('div');
     t.id = 'sync-toast';
-    t.style.cssText = 'position:fixed;top:70px;right:18px;background:#1A1A1A;color:#fff;padding:9px 16px;border-radius:8px;font-family:Inter,sans-serif;font-size:12px;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,0.25);z-index:9999;opacity:0;transition:opacity 0.2s;pointer-events:none;';
     document.body.appendChild(t);
   }
+  // Su mobile (schermo stretto) il toast appare in basso al centro; su desktop in alto a destra
+  const isMobile = window.innerWidth < 700;
+  t.style.cssText = isMobile
+    ? 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1A1A1A;color:#fff;padding:13px 22px;border-radius:9px;font-family:Inter,sans-serif;font-size:14px;font-weight:600;box-shadow:0 4px 18px rgba(0,0,0,0.35);z-index:99999;opacity:0;transition:opacity 0.2s;pointer-events:none;max-width:90%;text-align:center;'
+    : 'position:fixed;top:70px;right:18px;background:#1A1A1A;color:#fff;padding:11px 18px;border-radius:8px;font-family:Inter,sans-serif;font-size:13px;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,0.25);z-index:99999;opacity:0;transition:opacity 0.2s;pointer-events:none;';
   t.textContent = msg;
+  // Forza reflow per ri-applicare l'opacity transition
+  void t.offsetWidth;
   t.style.opacity = '1';
   clearTimeout(t._h);
-  t._h = setTimeout(()=>{ t.style.opacity = '0'; }, 1800);
+  t._h = setTimeout(()=>{ t.style.opacity = '0'; }, 2400);
 }
 
 // ── REFRESH AUTOMATICO ─────────────────────────────────────────────────────────
@@ -1683,23 +1719,37 @@ function saveOrder(){
     if(!clients[clientId]){ alert('Cliente non trovato.'); return; }
     const cartValido = cart.filter(x => x && x.product && x.product.code);
     if(!cartValido.length){ alert('Il carrello è vuoto.'); return; }
-    const items = cartValido.map(({product:p, mq}) => ({
-      code: p.code,
-      series: p.series,
-      color: p.color,
-      finish: p.finish,
-      size: p.size,
-      mq: mq,
-      price: p.price,
-      m2_pallet: p.m2_pallet || null,
-      prezzo_unit: prezzoCorretto(p, mq)
-    }));
-    clients[clientId].orders.push({ id:uid(), date:Date.now(), items });
-    saveClients();
-    closeModal('modal-save-order');
-    closeCart();
-    clearCart();
-    alert('Ordine salvato per ' + clients[clientId].name + '!');
+    const cliName = clients[clientId].name;
+    const numItems = cartValido.length;
+    const totMq = cartValido.reduce((n,x)=>n+(parseFloat(x.mq)||0),0);
+    listinoConfirm(
+      `Stai per salvare un ordine per "${cliName}" con ${numItems} articoli (${totMq.toFixed(2)} m\u00b2). Continuare?`,
+      ()=>{
+        try {
+          const items = cartValido.map(({product:p, mq}) => ({
+            code: p.code,
+            series: p.series,
+            color: p.color,
+            finish: p.finish,
+            size: p.size,
+            mq: mq,
+            price: p.price,
+            m2_pallet: p.m2_pallet || null,
+            prezzo_unit: prezzoCorretto(p, mq)
+          }));
+          clients[clientId].orders.push({ id:uid(), date:Date.now(), items });
+          // Sync immediato sul cloud (no debounce)
+          saveClients({immediate:true});
+          closeModal('modal-save-order');
+          closeCart();
+          clearCart();
+          showSyncToast('\u2713 Ordine salvato per ' + cliName);
+        } catch(err) {
+          alert('Errore nel salvataggio: ' + err.message);
+          console.error(err);
+        }
+      }
+    );
   } catch(err) {
     alert('Errore nel salvataggio: ' + err.message);
     console.error(err);
