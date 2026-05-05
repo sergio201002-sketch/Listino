@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>Listino Emilgroup 2026</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700;800&family=Barlow:wght@600;700;800&display=swap');
@@ -673,6 +676,9 @@ header {
   </div>
   <div class="header-right">
     <span class="sync-status sync-idle" id="sync-status"></span>
+    <button id="manual-refresh-btn" onclick="manualRefresh()" title="Aggiorna dal cloud" style="background:rgba(255,255,255,0.08);border:none;border-radius:5px;padding:7px 9px;cursor:pointer;color:rgba(255,255,255,0.7);display:flex;align-items:center;justify-content:center;transition:all 0.15s;-webkit-tap-highlight-color:rgba(255,255,255,0.2);touch-action:manipulation;min-width:32px;min-height:32px;" onmouseover="this.style.background='rgba(255,255,255,0.16)';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.7)'">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+    </button>
     <nav class="nav-tabs">
       <button class="nav-tab active" onclick="showPage('listino',this)">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1038,7 +1044,30 @@ function gasCall(params, onSuccess, onError) {
   document.body.appendChild(script);
 }
 
+// ID univoco di sessione (per distinguere PC e telefono)
+let _sessionId = (function(){
+  try {
+    let sid = sessionStorage.getItem('_listinoSessId');
+    if(!sid){ sid = 'sess_' + Date.now().toString(36) + Math.random().toString(36).slice(2,8); sessionStorage.setItem('_listinoSessId', sid); }
+    return sid;
+  } catch(_){ return 'sess_' + Math.random().toString(36).slice(2,10); }
+})();
+let _localDirty = false;             // c'e' una modifica locale non ancora sincronizzata
+let _lastSavedAt = 0;                // timestamp ultima save locale
+let _lastPullAt = 0;                 // timestamp ultimo pull dal server
+
+function _stampClientsMeta(){
+  // Inietta un blocco _meta nel JSON che mandiamo al server
+  // (chiave speciale: non e' un cliente reale)
+  if(!clients._meta) clients._meta = {};
+  clients._meta.lastSaved = Date.now();
+  clients._meta.session = _sessionId;
+  _lastSavedAt = clients._meta.lastSaved;
+}
+
 function saveClients() {
+  _localDirty = true;
+  _stampClientsMeta();
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(clients)); } catch(e) {}
   clearTimeout(syncTimer);
   setSyncStatus('saving');
@@ -1046,43 +1075,164 @@ function saveClients() {
 }
 
 function syncToSheets() {
+  // Quando spediamo lo stato, lo stampiamo come "appena salvato"
+  _stampClientsMeta();
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(clients)); } catch(e) {}
   gasCall(
     { action: 'save', data: JSON.stringify(clients) },
-    function() { setSyncStatus('saved'); },
+    function() {
+      _localDirty = false;
+      setSyncStatus('saved');
+    },
     function() { setSyncStatus('error'); }
   );
 }
 
-function loadClients() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) clients = JSON.parse(raw);
-  } catch(e) { clients = {}; }
+// ── MERGE INTELLIGENTE ────────────────────────────────────────────────────────
+// Confronta remoto e locale; se il remoto e' piu' recente, lo applichiamo.
+// Se ci sono modifiche locali pendenti, NON sovrascriviamo (le flushiamo invece).
+function _applyRemote(remote){
+  if(!remote || typeof remote !== 'object') return false;
+  const remoteMeta = remote._meta || {};
+  const localMeta = clients._meta || {};
+  // Se il remoto viene dalla nostra stessa sessione e non e' piu' recente, ignora (echo)
+  if(remoteMeta.session === _sessionId && (remoteMeta.lastSaved||0) <= (localMeta.lastSaved||0)) return false;
+  // Se ci sono modifiche locali NON ancora sincronizzate, non sovrascrivere:
+  // riprogramma una sync e tieni il locale.
+  if(_localDirty){
+    clearTimeout(syncTimer);
+    syncTimer = setTimeout(syncToSheets, 200);
+    return false;
+  }
+  // Decidi: prendi il remoto se e' piu' recente, oppure se ha piu' clienti/ordini totali
+  const remoteCount = Object.keys(remote).filter(k=>k!=='_meta').length;
+  const localCount  = Object.keys(clients).filter(k=>k!=='_meta').length;
+  const remoteOrders = Object.keys(remote).filter(k=>k!=='_meta').reduce((n,k)=>n+(remote[k].orders?.length||0),0);
+  const localOrders  = Object.keys(clients).filter(k=>k!=='_meta').reduce((n,k)=>n+(clients[k].orders?.length||0),0);
+  const remoteIsNewer = (remoteMeta.lastSaved||0) > (localMeta.lastSaved||0);
+  if(remoteIsNewer || remoteCount > localCount || remoteOrders > localOrders){
+    // Backup difensivo prima di sovrascrivere
+    try { localStorage.setItem(STORAGE_KEY + '_backup', JSON.stringify(clients)); } catch(e){}
+    clients = remote;
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(clients)); } catch(e){}
+    return true;
+  }
+  return false;
+}
+
+function loadClients(opts) {
+  opts = opts || {};
+  const isInitial = !opts.background;
+  if(isInitial){
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) clients = JSON.parse(raw);
+    } catch(e) { clients = {}; }
+  }
 
   setSyncStatus('saving');
   gasCall(
     { action: 'load' },
     function(r) {
+      _lastPullAt = Date.now();
+      let changed = false;
       if (r.data && Object.keys(r.data).length > 0) {
-        const remote = r.data;
-        Object.keys(remote).forEach(id => {
-          if (!clients[id]) {
-            clients[id] = remote[id];
-          } else {
-            const localOrders  = clients[id].orders?.length || 0;
-            const remoteOrders = remote[id].orders?.length || 0;
-            if (remoteOrders > localOrders) clients[id] = remote[id];
-          }
-        });
-        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(clients)); } catch(e) {}
+        changed = _applyRemote(r.data);
       }
-      setSyncStatus('saved');
-      const storPage = document.getElementById('page-storico');
-      if (storPage && storPage.classList.contains('active')) renderClientList();
+      setSyncStatus(_localDirty ? 'saving' : 'saved');
+      // Se e' cambiato qualcosa, ridisegna la pagina attiva
+      if(changed){
+        const storPage = document.getElementById('page-storico');
+        if (storPage && storPage.classList.contains('active')) renderClientList();
+        // Se siamo dentro al dettaglio di un cliente, ridisegnalo
+        if (typeof selectedClient !== 'undefined' && selectedClient && clients[selectedClient]){
+          if (typeof renderOrderDetail === 'function') {
+            try { renderOrderDetail(); } catch(_){}
+          }
+        }
+        if(opts.feedback) showSyncToast('Aggiornato');
+      } else if(opts.feedback){
+        showSyncToast('Gia\u0300 aggiornato');
+      }
     },
-    function() { setSyncStatus('error'); }
+    function() {
+      setSyncStatus('error');
+      if(opts.feedback) showSyncToast('Errore di rete');
+    }
   );
 }
+
+// Mini-toast per il feedback del refresh manuale
+function showSyncToast(msg){
+  let t = document.getElementById('sync-toast');
+  if(!t){
+    t = document.createElement('div');
+    t.id = 'sync-toast';
+    t.style.cssText = 'position:fixed;top:70px;right:18px;background:#1A1A1A;color:#fff;padding:9px 16px;border-radius:8px;font-family:Inter,sans-serif;font-size:12px;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,0.25);z-index:9999;opacity:0;transition:opacity 0.2s;pointer-events:none;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(t._h);
+  t._h = setTimeout(()=>{ t.style.opacity = '0'; }, 1800);
+}
+
+// ── REFRESH AUTOMATICO ─────────────────────────────────────────────────────────
+// Polling periodico mentre la pagina e' visibile
+let _pollTimer = null;
+function _startPolling(){
+  if(_pollTimer) return;
+  _pollTimer = setInterval(()=>{
+    if(document.visibilityState === 'visible'){
+      // Se ci sono modifiche locali, prima flusha; altrimenti pull
+      if(_localDirty){ clearTimeout(syncTimer); syncTimer = setTimeout(syncToSheets, 0); }
+      else { loadClients({background:true}); }
+    }
+  }, 25000); // ogni 25s
+}
+function _stopPolling(){ if(_pollTimer){ clearInterval(_pollTimer); _pollTimer = null; } }
+
+// Quando la pagina torna visibile (es. telefono sbloccato), pull immediato
+function _onVisibilityChange(){
+  if(document.visibilityState === 'visible'){
+    // Throttle: massimo 1 pull ogni 3s
+    if(Date.now() - _lastPullAt < 3000) return;
+    loadClients({background:true});
+    _startPolling();
+  } else {
+    // Pagina nascosta: flusha eventuali modifiche pendenti
+    if(_localDirty){ clearTimeout(syncTimer); syncToSheets(); }
+    _stopPolling();
+  }
+}
+document.addEventListener('visibilitychange', _onVisibilityChange);
+window.addEventListener('focus', ()=>{
+  if(Date.now() - _lastPullAt < 3000) return;
+  loadClients({background:true});
+});
+window.addEventListener('pageshow', ()=>{
+  if(Date.now() - _lastPullAt < 3000) return;
+  loadClients({background:true});
+});
+window.addEventListener('beforeunload', ()=>{
+  if(_localDirty){
+    // Best effort: spara il save
+    try {
+      _stampClientsMeta();
+      // Sync save a Google Apps Script in beforeunload e' fragile; almeno il localStorage e' garantito
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(clients));
+      // Tentativo di network save (potrebbe non completarsi)
+      const url = GAS_URL + '?action=save&data=' + encodeURIComponent(JSON.stringify(clients));
+      navigator.sendBeacon ? navigator.sendBeacon(url) : fetch(url, {method:'GET',keepalive:true}).catch(()=>{});
+    } catch(_){}
+  }
+});
+
+// Pulsante manuale "Aggiorna ora"
+function manualRefresh(){
+  loadClients({background:true, feedback:true});
+}
+window.manualRefresh = manualRefresh;
 
 // ── UTILS ─────────────────────────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
@@ -2340,6 +2490,7 @@ function renderClientStats() {
 // ── INIT ──────────────────────────────────────────────────────────────────────
 loadClients();
 render();
+_startPolling();
 </script>
 </body>
 </html>
