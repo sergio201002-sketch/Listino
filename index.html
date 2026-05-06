@@ -361,8 +361,8 @@ header {
 .od-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
 .od-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; }
 .od-actions { display: flex; gap: 8px; }
-.btn-del-client { background: none; border: 1.5px solid var(--border); color: var(--mid); border-radius: 5px; padding: 6px 12px; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
-.btn-del-client:hover { border-color: var(--red); color: var(--red); }
+.btn-del-client { background: none; border: 1.5px solid var(--border); color: var(--mid); border-radius: 5px; padding: 8px 14px; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s; min-height: 38px; min-width: 80px; -webkit-tap-highlight-color: rgba(200,16,46,0.2); touch-action: manipulation; }
+.btn-del-client:hover, .btn-del-client:active { border-color: var(--red); color: var(--red); background: var(--red-l); }
 
 .orders-list { padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
 
@@ -530,8 +530,8 @@ header {
 .esp-count{font-size:10px;color:var(--light);}
 .btn-add-campione{background:var(--white);border:1.5px solid var(--border);color:var(--mid);border-radius:5px;padding:5px 12px;font-family:'Inter',sans-serif;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;}
 .btn-add-campione:hover{border-color:var(--red);color:var(--red);}
-.btn-del-esp{background:none;border:none;color:var(--light);font-size:13px;cursor:pointer;padding:4px;border-radius:4px;flex-shrink:0;}
-.btn-del-esp:hover{color:var(--red);background:var(--red-l);}
+.btn-del-esp{background:none;border:1.5px solid transparent;color:var(--mid);font-size:14px;cursor:pointer;padding:8px 11px;border-radius:6px;flex-shrink:0;min-width:40px;min-height:40px;display:inline-flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:rgba(200,16,46,0.25);touch-action:manipulation;}
+.btn-del-esp:hover,.btn-del-esp:active{color:var(--red);background:var(--red-l);border-color:var(--red);}
 .esp-items-wrap{padding:10px 14px;}
 .esp-add-bar{display:flex;gap:8px;margin-bottom:12px;}
 .esp-search-wrap{position:relative;flex:1;}
@@ -569,8 +569,8 @@ header {
 .camp-plain-info{font-weight:400;color:var(--mid);font-size:11px;}
 .camp-note-input{border:1.5px solid var(--border);border-radius:4px;padding:4px 8px;font-family:'Inter',sans-serif;font-size:11px;width:130px;outline:none;background:var(--bg);}
 .camp-note-input:focus{border-color:var(--red);background:white;}
-.btn-del-camp{background:none;border:none;color:var(--light);font-size:12px;cursor:pointer;padding:4px;border-radius:4px;}
-.btn-del-camp:hover{color:var(--red);background:var(--red-l);}
+.btn-del-camp{background:none;border:1.5px solid transparent;color:var(--mid);font-size:13px;cursor:pointer;padding:7px 10px;border-radius:5px;min-width:36px;min-height:36px;display:inline-flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:rgba(200,16,46,0.25);touch-action:manipulation;}
+.btn-del-camp:hover,.btn-del-camp:active{color:var(--red);background:var(--red-l);border-color:var(--red);}
 .esp-no-items{color:var(--light);font-size:12px;padding:12px 0;text-align:center;}
 .camp-text-wrap{margin-top:10px;border-top:1px dashed var(--border);padding-top:10px;}
 /* Status campione */
@@ -644,13 +644,13 @@ header {
     align-items: center;
     gap: 6px;
   }
-  /* Mobile order: cart LEFT, then sync-status + refresh, nav-tabs + account + settings RIGHT */
-  .cart-btn      { order: 1; margin-right: auto; padding: 8px 12px; gap: 5px; }
-  .sync-status   { order: 2; display: inline-block; font-size: 9px; padding: 2px 6px; }
-  #manual-refresh-btn { order: 3; }
-  .nav-tabs      { order: 4; gap: 2px; }
-  #account-hbtn  { order: 5; }
-  #settings-hbtn { order: 6; }
+  /* Mobile: account/impostazioni/refresh A SINISTRA, carrello + tab A DESTRA */
+  #manual-refresh-btn { order: 1; }
+  #account-hbtn  { order: 2; }
+  #settings-hbtn { order: 3; }
+  .sync-status   { order: 4; display: inline-block; font-size: 9px; padding: 2px 6px; margin-right: auto; }
+  .nav-tabs      { order: 5; gap: 2px; }
+  .cart-btn      { order: 6; padding: 8px 12px; gap: 5px; }
   .nav-tab { padding: 7px 10px; gap: 4px; }
   .tab-label { display: none; }
   .cart-label { display: none; }
@@ -2781,20 +2781,27 @@ function copyOrderText(orderId){
 }
 
 function deleteOrder(clientId, orderId){
-  if(!confirm('Eliminare questo ordine?')) return;
-  clients[clientId].orders=clients[clientId].orders.filter(o=>o.id!==orderId);
-  saveClients();
-  renderOrderDetail();
-  renderClientList();
+  listinoConfirm('Eliminare questo ordine?\n\nL\'operazione non si può annullare.', function(){
+    clients[clientId].orders=clients[clientId].orders.filter(o=>o.id!==orderId);
+    saveClients({immediate:true});
+    renderOrderDetail();
+    renderClientList();
+  });
 }
 
 function deleteClient(id){
-  if(!confirm(`Eliminare il cliente "${clients[id].name}" e tutti i suoi ordini?`)) return;
-  delete clients[id];
-  selectedClient=null;
-  saveClients();
-  renderClientList();
-  renderOrderDetail();
+  if(!clients[id]) return;
+  var nm = clients[id].name || 'cliente';
+  var ord = (clients[id].orders||[]).length;
+  var esp = (clients[id].espositori||[]).length;
+  var msg = 'Eliminare il cliente "' + nm + '"?\n\nVerranno eliminati anche ' + ord + ' ordin' + (ord===1?'e':'i') + ' e ' + esp + ' espositor' + (esp===1?'e':'i') + '.\nL\'operazione non si può annullare.';
+  listinoConfirm(msg, function(){
+    delete clients[id];
+    selectedClient=null;
+    saveClients({immediate:true});
+    renderClientList();
+    renderOrderDetail();
+  });
 }
 
 
@@ -3006,9 +3013,16 @@ function _finRen(cid,eid){
   saveClients();
 }
 function _delEsp(cid,eid){
-  if(!confirm('Eliminare questo espositore?'))return;
-  clients[cid].espositori=_getEsps(cid).filter(function(e){return e.id!==eid;});
-  saveClients();renderOrderDetail();
+  if(!clients[cid]) return;
+  var e = _getEsps(cid).find(function(x){return x.id===eid;});
+  var nm = (e && e.name) ? e.name : 'questo espositore';
+  var n = (e && e.items) ? e.items.length : 0;
+  var msg = 'Eliminare l\'espositore "' + nm + '"?\n\n' + (n>0 ? 'Contiene ' + n + ' campion' + (n===1?'e':'i') + ' che andranno persi.\n' : '') + 'L\'operazione non si può annullare.';
+  listinoConfirm(msg, function(){
+    clients[cid].espositori=_getEsps(cid).filter(function(e){return e.id!==eid;});
+    saveClients({immediate:true});
+    renderOrderDetail();
+  });
 }
 function _saveNote(cid,eid,txt){
   var e=_getEsps(cid).find(function(x){return x.id===eid;});
@@ -3065,12 +3079,13 @@ function _updNote(cid,eid,iid,note){
 function _delCamp(cid,eid,iid){
   var e=_getEsps(cid).find(function(x){return x.id===eid;});
   if(!e)return;
-  e.items=e.items.filter(function(i){return i.id!==iid;});
-  saveClients();
-  var el=document.getElementById('esrci-'+eid);
-  if(el){var h=e.items.length?'':'<div class="esp-no-items">Nessun campione.</div>';e.items.forEach(function(it){h+=_renderCamp(cid,eid,it);});el.innerHTML=h;}
-  var cnt=document.getElementById('espc-'+eid);
-  if(cnt)cnt.textContent=e.items.length+' campion'+(e.items.length===1?'e':'i');
+  var it = e.items.find(function(x){return x.id===iid;});
+  var label = it ? ((it.code||'') + (it.color?' · '+it.color:'')) : 'questo campione';
+  listinoConfirm('Rimuovere il campione "' + label + '" dall\'espositore?', function(){
+    e.items=e.items.filter(function(i){return i.id!==iid;});
+    saveClients({immediate:true});
+    renderOrderDetail();
+  });
 }
 document.addEventListener('click',function(e){
   document.querySelectorAll('.esp-search-results').forEach(function(el){
