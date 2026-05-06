@@ -630,7 +630,7 @@ header {
     justify-content: space-between;
     gap: 6px;
   }
-  .sync-status { display: none; }
+  .sync-status { display: inline-block; font-size: 9px; padding: 2px 6px; }
   .nav-tab { padding: 7px 10px; gap: 4px; }
   .tab-label { display: none; }
   .cart-btn { padding: 7px 11px; gap: 5px; }
@@ -1016,9 +1016,14 @@ let syncTimer = null;
 function setSyncStatus(s) {
   const el = document.getElementById('sync-status');
   if (!el) return;
-  const map = { idle:'', saving:'⏳', saved:'☁️ Salvato', error:'⚠️ Offline' };
+  const map = { idle:'', saving:'\u23F3 Sync...', saved:'\u2601\uFE0F OK', error:'\u26A0\uFE0F Offline' };
   el.textContent = map[s] || '';
   el.className = 'sync-status sync-' + s;
+  // Aggiungi tooltip con timestamp ultimo pull
+  if(_lastPullAt){
+    const t = new Date(_lastPullAt).toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+    el.title = 'Ultimo aggiornamento dal cloud: ' + t;
+  }
 }
 
 // Chiamata JSONP per aggirare CORS con Google Apps Script
@@ -1264,9 +1269,28 @@ window.addEventListener('beforeunload', ()=>{
   }
 });
 
-// Pulsante manuale "Aggiorna ora"
+// Pulsante manuale "Aggiorna ora" — chiede conferma prima
 function manualRefresh(){
-  loadClients({background:true, feedback:true});
+  const lastSyncStr = _lastPullAt
+    ? new Date(_lastPullAt).toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit', second:'2-digit'})
+    : 'mai';
+  const dirtyMsg = _localDirty
+    ? '\n\u26A0\uFE0F Hai modifiche locali non ancora sincronizzate. Verranno salvate prima dell\'aggiornamento.'
+    : '';
+  listinoConfirm(
+    `Vuoi scaricare le ultime modifiche dal cloud?\n\nUltimo aggiornamento: ${lastSyncStr}${dirtyMsg}`,
+    ()=>{
+      // Se ci sono modifiche locali, prima flusha
+      if(_localDirty){
+        clearTimeout(syncTimer);
+        syncToSheets();
+        // Aspetta un secondo poi pulla
+        setTimeout(()=>loadClients({background:true, feedback:true}), 1200);
+      } else {
+        loadClients({background:true, feedback:true});
+      }
+    }
+  );
 }
 window.manualRefresh = manualRefresh;
 
