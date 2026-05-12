@@ -297,8 +297,20 @@ header {
 .ci-desc { font-size: 11px; color: var(--mid); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ci-right { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; flex-shrink: 0; }
 .ci-mq { font-size: 14px; font-weight: 700; color: var(--dark); }
-.ci-tot { font-size: 11px; font-weight: 600; color: var(--green); }
-.ci-del { background: none; border: none; color: var(--light); cursor: pointer; font-size: 12px; padding: 2px; transition: color 0.15s; }
+.ci-tot { font-size: 12px; font-weight: 700; color: var(--green); }
+.ci-unit-info { font-size: 10px; color: var(--mid); font-family: 'JetBrains Mono','Inter',monospace; }
+.ci-del { background: none; border: none; color: var(--light); cursor: pointer; font-size: 12px; padding: 2px; transition: color 0.15s; min-width: 28px; min-height: 28px; }
+/* Sconto per singolo prodotto */
+.ci-disc-row { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--border); }
+.ci-disc-label { font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mid); margin-right: 2px; }
+.ci-disc-btn { background: var(--white); border: 1px solid var(--border); color: var(--mid); border-radius: 4px; padding: 4px 8px; font-family: 'Inter', sans-serif; font-size: 10.5px; font-weight: 700; cursor: pointer; transition: all 0.12s; min-height: 28px; -webkit-tap-highlight-color: rgba(200,16,46,0.15); touch-action: manipulation; }
+.ci-disc-btn:hover { border-color: var(--red); color: var(--red); }
+.ci-disc-btn.active { background: var(--red); color: #fff; border-color: var(--red); }
+.ci-disc-custom-wrap { margin-top: 6px; }
+.ci-disc-custom-input { width: 100%; border: 1.5px solid var(--border); border-radius: 5px; padding: 7px 10px; font-family: 'JetBrains Mono','Inter',monospace; font-size: 12px; min-height: 32px; }
+.ci-disc-custom-input:focus { outline: none; border-color: var(--red); }
+/* Totale carrello nel footer */
+.cp-totals { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 12px; background: var(--bg); border-radius: 7px; font-size: 12px; color: var(--mid); }
 .ci-del:hover { color: var(--red); }
 .cp-footer { border-top: 1px solid var(--border); padding: 14px 18px 20px; display: flex; flex-direction: column; gap: 10px; }
 .output-lbl { font-size: 9px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--light); margin-bottom: 5px; }
@@ -403,6 +415,29 @@ header {
 .modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; }
 #modal-save-esp { z-index: 350; }
 #modal-save-order { z-index: 350; }
+.disc-options { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px; }
+.disc-opt { cursor: pointer; -webkit-tap-highlight-color: rgba(200,16,46,0.15); touch-action: manipulation; }
+.disc-opt input { position: absolute; opacity: 0; pointer-events: none; }
+.disc-pill {
+  display: flex; align-items: center; justify-content: center;
+  border: 1.5px solid var(--border); background: var(--white);
+  color: var(--mid); border-radius: 7px;
+  padding: 10px 8px; font-size: 12px; font-weight: 700;
+  transition: all 0.15s;
+  min-height: 44px;
+  text-align: center;
+  line-height: 1.2;
+}
+.disc-opt input:checked + .disc-pill {
+  background: var(--red); color: white; border-color: var(--red);
+  box-shadow: 0 2px 6px rgba(200,16,46,0.25);
+}
+.disc-opt:hover .disc-pill { border-color: var(--red); color: var(--red); }
+.disc-opt input:checked:hover + .disc-pill { color: white; }
+@media (max-width: 460px){
+  .disc-options { grid-template-columns: 1fr 1fr; }
+  .disc-pill { font-size: 11.5px; padding: 9px 6px; }
+}
 .modal-bg.open { display: flex; }
 .modal { background: white; border-radius: 12px; padding: 28px; width: min(400px, 90vw); box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
 .modal h3 { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; margin-bottom: 16px; }
@@ -490,6 +525,44 @@ header {
 
 .client-stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-top: 16px; }
 .cs-card { background: var(--bg); border-radius: 8px; padding: 14px 16px; }
+/* Riepilogo ordini dettagliato */
+.orders-recap { margin-top: 16px; background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+.orders-recap-title { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mid); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.orders-recap-list { display: flex; flex-direction: column; gap: 10px; max-height: 540px; overflow-y: auto; padding-right: 4px; }
+.order-recap-card { border: 1px solid var(--border); border-radius: 8px; background: var(--white); transition: box-shadow 0.15s; }
+.order-recap-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+.order-recap-head { display: grid; grid-template-columns: auto 1fr auto auto auto; gap: 12px; align-items: center; padding: 10px 14px; background: var(--bg); border-radius: 8px 8px 0 0; cursor: pointer; -webkit-tap-highlight-color: rgba(200,16,46,0.1); touch-action: manipulation; }
+.order-recap-card.collapsed .order-recap-head { border-radius: 8px; }
+.order-recap-toggle { width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; color: var(--mid); transition: transform 0.18s; flex-shrink: 0; }
+.order-recap-card.collapsed .order-recap-toggle { transform: rotate(-90deg); }
+.order-recap-date { font-family: 'JetBrains Mono', 'Inter', monospace; font-size: 12px; font-weight: 700; color: var(--dark); }
+.order-recap-time { font-size: 10px; color: var(--mid); margin-left: 6px; font-family: 'JetBrains Mono', 'Inter', monospace; }
+.order-recap-meta { font-size: 11px; color: var(--mid); }
+.order-recap-mq { font-family: 'JetBrains Mono', 'Inter', monospace; font-size: 12px; font-weight: 700; color: var(--dark); white-space: nowrap; }
+.order-recap-tot { font-family: 'JetBrains Mono', 'Inter', monospace; font-size: 13px; font-weight: 800; color: var(--green); white-space: nowrap; }
+.order-recap-items { display: flex; flex-direction: column; padding: 4px 0 6px 0; border-top: 1px solid var(--border); }
+.order-recap-card.collapsed .order-recap-items { display: none; }
+.order-recap-item { display: grid; grid-template-columns: 90px 1fr auto auto; gap: 10px; align-items: center; padding: 7px 14px; border-bottom: 1px dashed var(--border); font-size: 11.5px; }
+.order-recap-item:last-child { border-bottom: none; }
+.ori-code { font-family: 'JetBrains Mono', 'Inter', monospace; font-size: 11px; font-weight: 700; color: var(--dark); }
+.ori-desc { color: var(--mid); line-height: 1.35; }
+.ori-desc strong { color: var(--dark); font-weight: 700; }
+.ori-mq { font-family: 'JetBrains Mono', 'Inter', monospace; font-weight: 700; color: var(--dark); white-space: nowrap; }
+.ori-tot { font-family: 'JetBrains Mono', 'Inter', monospace; font-weight: 700; color: var(--green); white-space: nowrap; min-width: 70px; text-align: right; }
+.orders-recap-footer { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 14px 4px 14px; margin-top: 6px; border-top: 2px solid var(--border); font-size: 12px; }
+.orders-recap-footer .lbl { font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--mid); font-size: 11px; }
+.orders-recap-footer .val { font-family: 'JetBrains Mono', 'Inter', monospace; font-weight: 800; color: var(--dark); }
+.orders-recap-footer .val.green { color: var(--green); }
+.orders-recap-actions { display: flex; gap: 8px; }
+.recap-mini-btn { background: none; border: 1px solid var(--border); color: var(--mid); border-radius: 5px; padding: 5px 10px; font-family: 'Inter', sans-serif; font-size: 10.5px; font-weight: 600; cursor: pointer; transition: all 0.15s; -webkit-tap-highlight-color: rgba(0,0,0,0.1); touch-action: manipulation; }
+.recap-mini-btn:hover { border-color: var(--red); color: var(--red); }
+@media (max-width: 700px){
+  .order-recap-head { grid-template-columns: auto 1fr auto; }
+  .order-recap-mq, .order-recap-tot { grid-column: 2 / -1; text-align: right; font-size: 11.5px; }
+  .order-recap-mq { display: none; }
+  .order-recap-item { grid-template-columns: 80px 1fr auto; gap: 8px; padding: 6px 12px; font-size: 11px; }
+  .order-recap-item .ori-mq { display: none; }
+}
 .cs-card-title { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mid); margin-bottom: 10px; }
 
 /* Mini bar chart mese per mese cliente */
@@ -907,10 +980,11 @@ window.FIREBASE_CONFIG = {
       </div>
       <div class="kpi-card kpi-green">
         <div class="kpi-icon">
-          <!-- Fatturato: euro in cerchio -->
+          <!-- Fatturato: simbolo euro minimal -->
           <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="14" cy="14" r="11" stroke="#1A7A3C" stroke-width="1.6"/>
-            <path d="M18 10.5A6 6 0 0011 15M8.5 12.5H17M8.5 16H17" stroke="#1A7A3C" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M19 8.5C17.6 7 15.7 6 13.5 6 9.4 6 6 9.6 6 14s3.4 8 7.5 8c2.2 0 4.1-1 5.5-2.5" stroke="#1A7A3C" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+            <line x1="4" y1="12" x2="16" y2="12" stroke="#1A7A3C" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="4" y1="16" x2="15" y2="16" stroke="#1A7A3C" stroke-width="1.8" stroke-linecap="round"/>
           </svg>
         </div>
         <div class="kpi-val" id="kpi-fatturato">€ 0</div>
@@ -999,6 +1073,10 @@ window.FIREBASE_CONFIG = {
     <div class="cart-empty"><div class="ei">🛒</div><p>Il carrello è vuoto</p></div>
   </div>
   <div class="cp-footer" id="cp-footer" style="display:none">
+    <div class="cp-totals" id="cp-totals">
+      <span>Totale: <strong id="cp-tot-mq" style="color:var(--dark);font-family:'JetBrains Mono','Inter',monospace">— mq</strong></span>
+      <span class="cp-tot-val-wrap"><strong id="cp-tot-val" style="color:var(--green);font-family:'JetBrains Mono','Inter',monospace;font-size:14px">€ —</strong></span>
+    </div>
     <div>
       <div class="output-lbl">Testo da copiare</div>
       <div class="cp-output" id="cp-output"></div>
@@ -1029,7 +1107,7 @@ window.FIREBASE_CONFIG = {
 <div class="modal-bg" id="modal-save-order">
   <div class="modal">
     <h3>Salva ordine</h3>
-    <p style="font-size:12px;color:var(--mid);margin-bottom:14px">Scegli il cliente a cui associare questo ordine:</p>
+    <p style="font-size:12px;color:var(--mid);margin-bottom:14px">Scegli il cliente a cui associare questo ordine. Gli sconti per singolo prodotto impostati nel carrello verranno mantenuti.</p>
     <select class="modal-input" id="save-order-client" style="padding:10px 14px"></select>
     <div class="modal-actions">
       <button class="btn-modal-cancel" onclick="closeModal('modal-save-order')">Annulla</button>
@@ -1122,6 +1200,11 @@ window.FIREBASE_CONFIG = {
       <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;color:#6B6B6B;letter-spacing:0.06em;text-transform:uppercase">Tipo<select id="pe-type" style="border:1.5px solid #E5E5E5;border-radius:6px;padding:9px 11px;font-family:Inter,sans-serif;font-size:13px;background:#fff"><option value="fondo">Fondo</option><option value="speciale">Speciale</option></select></label>
       <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;color:#6B6B6B;letter-spacing:0.06em;text-transform:uppercase">Prezzo €/mq<input id="pe-price" type="number" step="0.01" min="0" style="border:1.5px solid #E5E5E5;border-radius:6px;padding:9px 11px;font-family:Inter,sans-serif;font-size:13px"/></label>
       <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;color:#6B6B6B;letter-spacing:0.06em;text-transform:uppercase;grid-column:1/-1">m²/pallet (opzionale)<input id="pe-m2pal" type="number" step="0.01" min="0" style="border:1.5px solid #E5E5E5;border-radius:6px;padding:9px 11px;font-family:Inter,sans-serif;font-size:13px"/></label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;color:#6B3FA0;letter-spacing:0.06em;text-transform:uppercase;grid-column:1/-1">
+        Decoro / sottoserie (opzionale)
+        <input id="pe-subseries" placeholder="es. VARIEE, RIBBED, FANTASIA..." style="border:1.5px solid #D0B8E8;border-radius:6px;padding:9px 11px;font-family:Inter,sans-serif;font-size:13px;text-transform:uppercase;background:#FAF7FD;color:#6B3FA0;font-weight:700;letter-spacing:0.05em"/>
+        <span style="font-size:10px;color:#9876B8;font-weight:500;letter-spacing:0;text-transform:none;line-height:1.3">È il tag viola che appare sotto la serie (es. "VARIEE" su Unique Bourgogne). Lascia vuoto se non è un decoro.</span>
+      </label>
     </div>
     <datalist id="pe-brand-list"></datalist>
     <datalist id="pe-series-list"></datalist>
@@ -1882,7 +1965,7 @@ function renderSettingsList(){
       return '<div class="settings-row">'
         + '<div style="font-family:monospace;font-size:11.5px;color:'+(isRem?'#ADADAD':'#1A1A1A')+';text-decoration:'+(isRem?'line-through':'none')+'">'+_esc(p.code||'')+'</div>'
         + '<div style="font-weight:700;color:#1A1A1A">'+_esc(p.brand||'')+'</div>'
-        + '<div><div style="font-weight:600">'+_esc(p.series||'')+'</div><div style="font-size:11px;color:#6B6B6B">'+_esc(p.color||'')+'</div></div>'
+        + '<div><div style="font-weight:600">'+_esc(p.series||'')+(p.subseries?' <span style="background:#F3EEF8;color:#6B3FA0;border:1px solid #D0B8E8;border-radius:6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;padding:1px 6px;margin-left:4px">'+_esc(p.subseries)+'</span>':'')+'</div><div style="font-size:11px;color:#6B6B6B">'+_esc(p.color||'')+'</div></div>'
         + '<div>'+_esc(p.size||'')+'</div>'
         + '<div>'+_esc(p.finish||'')+'</div>'
         + '<div>'+(p.type==='speciale'?'<span class="pill pill-special">SPEC</span>':'<span class="pill pill-fondo">Fondo</span>')+'</div>'
@@ -1944,6 +2027,7 @@ function openProductEdit(code, isNew){
   document.getElementById('pe-type').value   = (p && p.type) || 'fondo';
   document.getElementById('pe-price').value  = (p && typeof p.price==='number') ? p.price : '';
   document.getElementById('pe-m2pal').value  = (p && typeof p.m2_pallet==='number') ? p.m2_pallet : '';
+  document.getElementById('pe-subseries').value = (p && p.subseries) || '';
   document.getElementById('prodedit-overlay').classList.add('open');
   setTimeout(()=>document.getElementById('pe-code')?.focus(), 80);
 }
@@ -1953,15 +2037,16 @@ window.closeProductEdit = closeProductEdit;
 
 function saveProductEdit(){
   const v = id => document.getElementById(id).value.trim();
-  const newCode   = v('pe-code');
-  const newBrand  = v('pe-brand').toUpperCase();
-  const newSeries = v('pe-series');
-  const newSize   = v('pe-size');
-  const newFinish = v('pe-finish');
-  const newColor  = v('pe-color');
-  const newType   = v('pe-type') || 'fondo';
-  const priceStr  = v('pe-price');
-  const m2palStr  = v('pe-m2pal');
+  const newCode      = v('pe-code');
+  const newBrand     = v('pe-brand').toUpperCase();
+  const newSeries    = v('pe-series');
+  const newSize      = v('pe-size');
+  const newFinish    = v('pe-finish');
+  const newColor     = v('pe-color');
+  const newType      = v('pe-type') || 'fondo';
+  const newSubseries = v('pe-subseries').toUpperCase();
+  const priceStr     = v('pe-price');
+  const m2palStr     = v('pe-m2pal');
   if(!newCode){ alert('Il codice è obbligatorio.'); return; }
   if(!newBrand || !newSeries){ alert('Marchio e serie sono obbligatori.'); return; }
   const newPrice = priceStr === '' ? 0 : parseFloat(priceStr.replace(',', '.'));
@@ -1979,6 +2064,7 @@ function saveProductEdit(){
     price:  newPrice
   };
   if(m2pal !== null && isFinite(m2pal) && m2pal > 0) rec.m2_pallet = m2pal;
+  if(newSubseries) rec.subseries = newSubseries;
 
   if(!_peEditingCode){
     // INSERIMENTO nuovo prodotto
@@ -2000,14 +2086,17 @@ function saveProductEdit(){
     }
     // Se i campi sono uguali al base, rimuovi override (pulizia)
     const base = (__PRODUCTS_BASE||[]).find(x=>x.code===_peEditingCode) || {};
-    const same = ['code','brand','series','size','finish','color','type','price','m2_pallet'].every(k=>{
+    const same = ['code','brand','series','size','finish','color','type','price','m2_pallet','subseries'].every(k=>{
       const a = rec[k], b = base[k];
-      if(a === undefined && (b === undefined || b === null)) return true;
+      if((a === undefined || a === '') && (b === undefined || b === null || b === '')) return true;
       return a === b;
     });
     if(same){
       delete productSettings.overrides[_peEditingCode];
     } else {
+      // Se l'utente ha SVUOTATO il subseries (per togliere il decoro), lo memorizziamo come stringa vuota
+      // così applyProductSettings sa di sovrascrivere il valore base
+      if(!newSubseries && base.subseries) rec.subseries = '';
       productSettings.overrides[_peEditingCode] = rec;
     }
   }
@@ -2317,7 +2406,8 @@ function addCart(code){
   const raw=inputEl?inputEl.value.replace(',','.'):''
   const mq=parseFloat(raw)||mqDraft[code]||1;
   mqDraft[code]=mq;
-  cart.push({product:p, mq});
+  // Ogni item ha il suo sconto: 'none' di default
+  cart.push({product:p, mq, discount:{type:'none', customPrice:null}});
   const card=document.getElementById('card-'+code);
   if(card){
     card.classList.add('in-cart');
@@ -2342,6 +2432,55 @@ function removeCart(code){
 
 function clearCart(){ cart=[]; render(); updateCartUI(); }
 
+// ── SCONTO PER SINGOLO PRODOTTO NEL CARRELLO ──────────────────────────────────
+// Calcola il prezzo unitario finale di un item del carrello applicando il suo sconto specifico
+function cartItemFinalUnit(item){
+  if(!item || !item.product) return 0;
+  const base = prezzoCorretto(item.product, item.mq);
+  const d = item.discount || {type:'none'};
+  if(d.type === 'pct5')   return base * 0.95;
+  if(d.type === 'pct10')  return base * 0.90;
+  if(d.type === 'custom' && typeof d.customPrice === 'number' && d.customPrice >= 0) return d.customPrice;
+  return base;
+}
+function cartItemFinalTot(item){
+  return cartItemFinalUnit(item) * (parseFloat(item.mq)||0);
+}
+
+function setCartItemDiscType(code, type){
+  const item = cart.find(c => c && c.product && c.product.code === code);
+  if(!item) return;
+  if(!item.discount) item.discount = {type:'none', customPrice:null};
+  item.discount.type = type;
+  if(type !== 'custom') item.discount.customPrice = null;
+  updateCartUI();
+}
+function setCartItemCustomPrice(code, val){
+  const item = cart.find(c => c && c.product && c.product.code === code);
+  if(!item) return;
+  if(!item.discount) item.discount = {type:'custom', customPrice:null};
+  item.discount.type = 'custom';
+  const v = parseFloat(String(val||'').replace(',', '.'));
+  item.discount.customPrice = (isFinite(v) && v >= 0) ? v : null;
+  // Aggiorna solo il totale di questa riga senza rifare il render (per non perdere il focus)
+  const totEl = document.getElementById('ci-tot-' + code);
+  if(totEl) totEl.textContent = item.discount.customPrice !== null ? fmt(cartItemFinalTot(item)) : '€ —';
+  // Aggiorna anche il footer (totale carrello)
+  _updateCartFooter();
+}
+window.setCartItemDiscType = setCartItemDiscType;
+window.setCartItemCustomPrice = setCartItemCustomPrice;
+
+function _updateCartFooter(){
+  const cartValido = cart.filter(x => x && x.product && x.product.code);
+  const totMq = cartValido.reduce((n,x) => n + (parseFloat(x.mq)||0), 0);
+  const totVal = cartValido.reduce((n,x) => n + cartItemFinalTot(x), 0);
+  const mqEl = document.getElementById('cp-tot-mq');
+  const valEl = document.getElementById('cp-tot-val');
+  if(mqEl) mqEl.textContent = totMq.toFixed(2) + ' mq';
+  if(valEl) valEl.textContent = fmt(totVal);
+}
+
 function updateCartUI(){
   const n=cart.length;
   $('cart-count').textContent=n;
@@ -2354,30 +2493,57 @@ function updateCartUI(){
   // Filtra eventuali righe con product undefined (sicurezza)
   const cartValido = cart.filter(x => x && x.product && x.product.code);
 
-  items.innerHTML=cartValido.map(({product:p,mq})=>{
+  items.innerHTML=cartValido.map(item=>{
+    const p = item.product, mq = item.mq;
     const desc=[p.color,p.finish,p.size?p.size+' cm':''].filter(Boolean).join(' · ');
     const bancali = p.m2_pallet ? (mq/p.m2_pallet) : null;
     const bancaliStr = bancali ? `${bancali.toFixed(2)} bancal${bancali<=1?'e':'i'}` : '';
     const isEsatto = bancali && Math.abs(bancali - Math.round(bancali)) < 0.01;
-    const prezzo = prezzoCorretto(p, mq);
+    const baseUnit = prezzoCorretto(p, mq);
     const scLabel = p.m2_pallet ? (mq >= p.m2_pallet ? '−60%−10%−10%' : '−60%−10%−5%') : '−60%−10%−10%';
+    const d = item.discount || {type:'none', customPrice:null};
+    const dType = d.type || 'none';
+    const finalTot = cartItemFinalTot(item);
+    const finalUnit = cartItemFinalUnit(item);
+    // Badge sconto extra
+    let discBadge = '';
+    if(dType === 'pct5')   discBadge = '<span style="background:#FFF0F2;color:#C8102E;border:1px solid #C8102E;border-radius:9px;font-size:9px;font-weight:700;padding:1px 6px;margin-left:5px">−5%</span>';
+    if(dType === 'pct10')  discBadge = '<span style="background:#FFF0F2;color:#C8102E;border:1px solid #C8102E;border-radius:9px;font-size:9px;font-weight:700;padding:1px 6px;margin-left:5px">−10%</span>';
+    if(dType === 'custom' && d.customPrice !== null) discBadge = '<span style="background:#FEF7DD;color:#8A6500;border:1px solid #E5C661;border-radius:9px;font-size:9px;font-weight:700;padding:1px 6px;margin-left:5px">'+fmt(d.customPrice)+'/mq</span>';
+    const customWrapStyle = (dType === 'custom') ? '' : 'display:none;';
+    const customVal = (d.customPrice !== null && d.customPrice !== undefined) ? d.customPrice : '';
     return `<div class="ci">
       <div class="ci-code">${p.code}</div>
-      <div class="ci-body"><div class="ci-series">${p.series}</div><div class="ci-desc">${desc||'—'}</div>
+      <div class="ci-body"><div class="ci-series">${p.series}${discBadge}</div><div class="ci-desc">${desc||'—'}</div>
         <div style="font-size:9px;color:var(--mid);margin-top:2px">${scLabel}</div>
         ${bancaliStr?`<div style="font-size:10px;margin-top:2px;color:${isEsatto?'var(--green)':'#856404'};font-weight:600">📦 ${bancaliStr}${isEsatto?' ✅':''}</div>`:''}
+        <div class="ci-disc-row">
+          <span class="ci-disc-label">Sconto extra:</span>
+          <button type="button" class="ci-disc-btn${dType==='none'?' active':''}" onclick="setCartItemDiscType('${p.code}','none')">No</button>
+          <button type="button" class="ci-disc-btn${dType==='pct5'?' active':''}" onclick="setCartItemDiscType('${p.code}','pct5')">−5%</button>
+          <button type="button" class="ci-disc-btn${dType==='pct10'?' active':''}" onclick="setCartItemDiscType('${p.code}','pct10')">−10%</button>
+          <button type="button" class="ci-disc-btn${dType==='custom'?' active':''}" onclick="setCartItemDiscType('${p.code}','custom')">€/mq</button>
+        </div>
+        <div class="ci-disc-custom-wrap" id="ci-disc-custom-${p.code}" style="${customWrapStyle}">
+          <input type="number" step="0.01" min="0" placeholder="€/mq es. 12.50" value="${customVal}" oninput="setCartItemCustomPrice('${p.code}', this.value)" class="ci-disc-custom-input"/>
+        </div>
       </div>
       <div class="ci-right">
         <div class="ci-mq">${mq} mq</div>
-        <div class="ci-tot">${fmt(prezzo*mq)}</div>
+        <div class="ci-tot" id="ci-tot-${p.code}">${dType==='custom' && d.customPrice===null ? '€ —' : fmt(finalTot)}</div>
+        ${dType!=='none' && !(dType==='custom' && d.customPrice===null) ? `<div class="ci-unit-info" title="Prezzo unitario con sconto">${fmt(finalUnit)}/mq</div>` : ''}
         <button class="ci-del" onclick="removeCart('${p.code}')">✕</button>
       </div>
     </div>`;
   }).join('');
 
-  $('cp-output').textContent=cartValido.map(({product:p,mq})=>{
+  $('cp-output').textContent=cartValido.map(item=>{
+    const p = item.product, mq = item.mq;
     return [p.series,p.color,p.finish,p.size,'-',p.code,'-',mq+'mq'].filter(Boolean).join(' ');
   }).join('\n');
+
+  // Aggiorna footer totali
+  _updateCartFooter();
 }
 
 function openCart(){
@@ -2487,8 +2653,44 @@ function openSaveOrder(){
   }
   clientArr.forEach(c=>{ const o=document.createElement('option'); o.value=c.id; o.textContent=c.name; sel.appendChild(o); });
   if(selectedClient) sel.value=selectedClient;
+  // Reset UI sconto
+  const radios = document.querySelectorAll('input[name="disc-type"]');
+  radios.forEach(r=>{ r.checked = (r.value === 'none'); });
+  const cw = $('disc-custom-wrap'); if(cw) cw.style.display = 'none';
+  const cp = $('disc-custom-price'); if(cp) cp.value = '';
   $('modal-save-order').classList.add('open');
+  _updateDiscPreview();
 }
+
+// Stato corrente dello sconto scelto nel modal
+function _getDiscState(){
+  const r = document.querySelector('input[name="disc-type"]:checked');
+  const type = r ? r.value : 'none';
+  let customPrice = null;
+  if(type === 'custom'){
+    const v = parseFloat(($('disc-custom-price')?.value || '').replace(',', '.'));
+    if(isFinite(v) && v > 0) customPrice = v;
+  }
+  return { type, customPrice };
+}
+
+// Mostra/nasconde il campo prezzo e aggiorna la preview
+function _updateDiscPreview(){
+  const { type, customPrice } = _getDiscState();
+  const cw = $('disc-custom-wrap');
+  if(cw) cw.style.display = (type === 'custom') ? 'block' : 'none';
+  const cartValido = cart.filter(x => x && x.product && x.product.code);
+  const totMq = cartValido.reduce((n,x)=>n+(parseFloat(x.mq)||0),0);
+  const totBase = cartValido.reduce((n,x)=>n + prezzoCorretto(x.product, x.mq) * (parseFloat(x.mq)||0), 0);
+  let totFinal = totBase;
+  if(type === 'pct5')  totFinal = totBase * 0.95;
+  if(type === 'pct10') totFinal = totBase * 0.90;
+  if(type === 'custom' && customPrice !== null) totFinal = customPrice * totMq;
+  const mqEl = $('disc-prev-mq');     if(mqEl) mqEl.textContent = totMq.toFixed(2) + ' mq';
+  const fromEl = $('disc-prev-from'); if(fromEl) fromEl.textContent = fmt(totBase);
+  const toEl = $('disc-prev-to');     if(toEl) toEl.textContent = (type === 'custom' && customPrice === null) ? '€ —' : fmt(totFinal);
+}
+window._updateDiscPreview = _updateDiscPreview;
 
 function saveOrder(){
   try {
@@ -2500,28 +2702,62 @@ function saveOrder(){
     const cliName = clients[clientId].name;
     const numItems = cartValido.length;
     const totMq = cartValido.reduce((n,x)=>n+(parseFloat(x.mq)||0),0);
+    // Valida i prezzi personalizzati nel carrello
+    for(const it of cartValido){
+      const d = it.discount || {type:'none'};
+      if(d.type === 'custom' && (d.customPrice === null || d.customPrice === undefined || d.customPrice <= 0)){
+        alert('L\'articolo "' + it.product.code + '" ha lo sconto "\u20ac/mq" attivo ma il prezzo \u00e8 vuoto o non valido. Inseriscilo o scegli un\'altra opzione.');
+        return;
+      }
+    }
+    // Conteggio per messaggio di conferma
+    const nDiscounts = cartValido.filter(x => x.discount && x.discount.type && x.discount.type !== 'none').length;
+    const discDesc = nDiscounts > 0
+      ? '\nArticoli con sconto extra: ' + nDiscounts + '/' + numItems
+      : '';
+
     listinoConfirm(
-      `Stai per salvare un ordine per "${cliName}" con ${numItems} articoli (${totMq.toFixed(2)} m\u00b2). Continuare?`,
+      'Stai per salvare un ordine per "' + cliName + '" con ' + numItems + ' articoli (' + totMq.toFixed(2) + ' m\u00b2).' + discDesc + '\n\nContinuare?',
       ()=>{
         try {
-          const items = cartValido.map(({product:p, mq}) => ({
-            code: p.code,
-            series: p.series,
-            color: p.color,
-            finish: p.finish,
-            size: p.size,
-            mq: mq,
-            price: p.price,
-            m2_pallet: p.m2_pallet || null,
-            prezzo_unit: prezzoCorretto(p, mq)
-          }));
-          clients[clientId].orders.push({ id:uid(), date:Date.now(), items });
-          // Sync immediato sul cloud (no debounce)
+          const items = cartValido.map(it => {
+            const p = it.product, mq = it.mq;
+            const baseUnit = prezzoCorretto(p, mq);
+            const d = it.discount || {type:'none'};
+            const finalUnit = cartItemFinalUnit(it);
+            const out = {
+              code: p.code,
+              series: p.series,
+              color: p.color,
+              finish: p.finish,
+              size: p.size,
+              mq: mq,
+              price: p.price,
+              m2_pallet: p.m2_pallet || null,
+              prezzo_unit_base: baseUnit,
+              prezzo_unit: finalUnit
+            };
+            // Salva metadata sconto sull'articolo (per visualizzazione futura)
+            if(d.type && d.type !== 'none'){
+              out.discount = { type: d.type };
+              if(d.type === 'custom') out.discount.customPrice = d.customPrice;
+              if(d.type === 'pct5')   out.discount.pct = 5;
+              if(d.type === 'pct10')  out.discount.pct = 10;
+            }
+            return out;
+          });
+          clients[clientId].orders.push({
+            id:uid(),
+            date:Date.now(),
+            items
+          });
           saveClients({immediate:true});
           closeModal('modal-save-order');
           closeCart();
           clearCart();
-          showSyncToast('\u2713 Ordine salvato per ' + cliName);
+          let toastMsg = '\u2713 Ordine salvato per ' + cliName;
+          if(nDiscounts > 0) toastMsg += ' \u00b7 ' + nDiscounts + ' sconto' + (nDiscounts===1?'':'i') + ' extra';
+          showSyncToast(toastMsg);
         } catch(err) {
           alert('Errore nel salvataggio: ' + err.message);
           console.error(err);
@@ -3425,6 +3661,67 @@ function renderClientStats() {
   const totVal = ordini.reduce((s,o) => s + o.items.reduce((ss,i) => ss + itemTot(i), 0), 0);
   const totMq  = ordini.reduce((s,o) => s + o.items.reduce((ss,i) => ss + i.mq, 0), 0);
 
+  // Ordini dal più recente al più vecchio per la lista dettagliata
+  const ordiniSorted = [...ordini].sort((a,b) => new Date(b.date) - new Date(a.date));
+  const ordersHtml = ordiniSorted.map(o => {
+    const dt = new Date(o.date);
+    const dateStr = dt.toLocaleDateString('it-IT', {day:'2-digit',month:'2-digit',year:'numeric'});
+    const timeStr = dt.toLocaleTimeString('it-IT', {hour:'2-digit',minute:'2-digit'});
+    const items = Array.isArray(o.items) ? o.items : [];
+    const orderMq = items.reduce((s,i) => s + (parseFloat(i.mq)||0), 0);
+    const orderTot = items.reduce((s,i) => s + itemTot(i), 0);
+    const itemsHtml = items.map(i => {
+      const sub = [];
+      if(i.color)  sub.push(i.color);
+      if(i.finish) sub.push(i.finish);
+      if(i.size)   sub.push(i.size+' cm');
+      const subTxt = sub.length ? ' · ' + sub.map(s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')).join(' · ') : '';
+      const seriesBold = i.series ? '<strong>'+toT(i.series)+'</strong>' : '<strong>—</strong>';
+      const mqVal = (parseFloat(i.mq)||0).toFixed(2);
+      const totVal = itemTot(i);
+      // Badge sconto per singolo articolo
+      let itemDiscBadge = '';
+      if(i.discount && i.discount.type){
+        if(i.discount.type === 'pct5')   itemDiscBadge = ' <span style="background:#FFF0F2;color:#C8102E;border:1px solid #C8102E;border-radius:8px;font-size:9px;font-weight:700;padding:1px 5px;margin-left:4px">−5%</span>';
+        if(i.discount.type === 'pct10')  itemDiscBadge = ' <span style="background:#FFF0F2;color:#C8102E;border:1px solid #C8102E;border-radius:8px;font-size:9px;font-weight:700;padding:1px 5px;margin-left:4px">−10%</span>';
+        if(i.discount.type === 'custom' && i.discount.customPrice) itemDiscBadge = ' <span style="background:#FEF7DD;color:#8A6500;border:1px solid #E5C661;border-radius:8px;font-size:9px;font-weight:700;padding:1px 5px;margin-left:4px">'+fmt(i.discount.customPrice)+'/mq</span>';
+      }
+      return `<div class="order-recap-item">
+        <span class="ori-code">${(i.code||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</span>
+        <span class="ori-desc">${seriesBold}${subTxt}${itemDiscBadge}</span>
+        <span class="ori-mq">${mqVal} mq</span>
+        <span class="ori-tot">${fmt(totVal)}</span>
+      </div>`;
+    }).join('');
+    // Conteggio articoli con sconto extra (badge sull'header dell'ordine)
+    const nDiscItems = items.filter(i => i.discount && i.discount.type && i.discount.type !== 'none').length;
+    let discBadge = '';
+    if(nDiscItems > 0){
+      discBadge = '<span style="background:#FFF0F2;color:#C8102E;border:1px solid #C8102E;border-radius:10px;font-size:10px;font-weight:700;padding:1px 7px;margin-left:6px" title="Articoli con sconto extra">'+nDiscItems+' sconti</span>';
+    } else if(o.discount && o.discount.type && o.discount.type !== 'none'){
+      // Compatibilità con ordini vecchi salvati con sconto unico
+      if(o.discount.type === 'pct5')   discBadge = '<span style="background:#FFF0F2;color:#C8102E;border:1px solid #C8102E;border-radius:10px;font-size:10px;font-weight:700;padding:1px 7px;margin-left:6px">−5%</span>';
+      if(o.discount.type === 'pct10')  discBadge = '<span style="background:#FFF0F2;color:#C8102E;border:1px solid #C8102E;border-radius:10px;font-size:10px;font-weight:700;padding:1px 7px;margin-left:6px">−10%</span>';
+      if(o.discount.type === 'custom' && o.discount.customPrice) discBadge = '<span style="background:#FEF7DD;color:#8A6500;border:1px solid #E5C661;border-radius:10px;font-size:10px;font-weight:700;padding:1px 7px;margin-left:6px">'+fmt(o.discount.customPrice)+'/mq</span>';
+    }
+    return `<div class="order-recap-card collapsed" id="orec-${o.id}">
+      <div class="order-recap-head" onclick="this.parentElement.classList.toggle('collapsed')">
+        <span class="order-recap-toggle">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+        <div>
+          <span class="order-recap-date">${dateStr}</span><span class="order-recap-time">${timeStr}</span>${discBadge}
+          <div class="order-recap-meta">${items.length} articol${items.length===1?'o':'i'}</div>
+        </div>
+        <span class="order-recap-mq">${orderMq.toFixed(2)} mq</span>
+        <span class="order-recap-tot">${fmt(orderTot)}</span>
+      </div>
+      <div class="order-recap-items">
+        ${itemsHtml || '<div class="order-recap-item" style="grid-template-columns:1fr;color:var(--mid)">Nessun articolo</div>'}
+      </div>
+    </div>`;
+  }).join('');
+
   body.innerHTML = `<div class="client-stats-grid">
 
     <!-- Serie più ordinate -->
@@ -3473,8 +3770,36 @@ function renderClientStats() {
       </div>
     </div>
 
+  </div>
+
+  <!-- Riepilogo ordini dettagliato per data -->
+  <div class="orders-recap">
+    <div class="orders-recap-title">
+      <span>Riepilogo ordini per data &middot; ${ordini.length} ordin${ordini.length===1?'e':'i'}${statsAnno ? ' &middot; '+statsAnno : ''}</span>
+      <span class="orders-recap-actions">
+        <button class="recap-mini-btn" onclick="_recapToggleAll('${clientId}', true)">Espandi tutti</button>
+        <button class="recap-mini-btn" onclick="_recapToggleAll('${clientId}', false)">Comprimi tutti</button>
+      </span>
+    </div>
+    <div class="orders-recap-list">
+      ${ordersHtml}
+    </div>
+    <div class="orders-recap-footer">
+      <span class="lbl">Totale</span>
+      <span><span class="val">${totMq.toFixed(2)} mq</span> &middot; <span class="val green">${fmt(totVal)}</span></span>
+    </div>
   </div>`;
 }
+
+// Espandi/comprimi tutti gli ordini nel riepilogo
+function _recapToggleAll(clientId, expand){
+  const cards = document.querySelectorAll('#client-stats-body .order-recap-card');
+  cards.forEach(card => {
+    if(expand) card.classList.remove('collapsed');
+    else card.classList.add('collapsed');
+  });
+}
+window._recapToggleAll = _recapToggleAll;
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 // Carica subito da localStorage per UI veloce
