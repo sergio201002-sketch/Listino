@@ -199,9 +199,32 @@ header {
 /* ── CART PANEL ──────────────────────────────────────── */
 .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 100; backdrop-filter: blur(2px); }
 .overlay.open { display: block; }
-.cart-panel { position: fixed; right: 0; top: 0; bottom: 0; width: min(480px, 100vw); background: var(--white); display: flex; flex-direction: column; z-index: 101; transform: translateX(100%); transition: transform 0.28s cubic-bezier(0.4,0,0.2,1); box-shadow: -8px 0 40px rgba(0,0,0,0.18); pointer-events: none; }
+.cart-panel {
+  position: fixed; right: 0; top: 0;
+  /* Dynamic viewport height: esclude la tastiera virtuale su mobile;
+     fallback 100vh per browser senza supporto */
+  height: 100vh;
+  height: 100dvh;
+  width: min(480px, 100vw);
+  background: var(--white);
+  display: flex; flex-direction: column;
+  z-index: 101;
+  transform: translateX(100%);
+  transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+  box-shadow: -8px 0 40px rgba(0,0,0,0.18);
+  pointer-events: none;
+}
 .cart-panel.open { pointer-events: auto; }
 .cart-panel.open { transform: translateX(0); }
+/* Quando la tastiera virtuale è aperta su mobile: chiudi pannelli ridondanti
+   e lascia spazio agli input, mantenendo footer compatto */
+.cart-panel.kbd-open .cp-collapse.open .cp-collapse-body { display: none; }
+.cart-panel.kbd-open .cp-collapse.open .cp-collapse-chev { transform: none; }
+.cart-panel.kbd-open .cp-output { max-height: 60px; }
+.cart-panel.kbd-open .cp-footer { padding-top: 4px; padding-bottom: 8px; gap: 4px; }
+.cart-panel.kbd-open .cp-totals { padding: 4px 11px; font-size: 11px; }
+.cart-panel.kbd-open .cp-actions,
+.cart-panel.kbd-open .cp-footer > div:last-child { display: none; }
 .cp-header { background: var(--dark); padding: 18px 22px; display: flex; align-items: center; justify-content: space-between; }
 .cp-header h2 { font-family: 'Playfair Display', serif; font-size: 19px; font-weight: 700; color: white; }
 .cp-sub { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 2px; }
@@ -821,6 +844,24 @@ header {
   touch-action: manipulation;
 }
 .modal-new-esp-btn:hover { opacity: 0.88; }
+
+/* Opzioni "forma" del tipo espositore (lineare / girevole) */
+.esp-type-shape-opt {
+  flex: 1;
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 11px;
+  border: 1.5px solid var(--border);
+  border-radius: 7px;
+  cursor: pointer;
+  background: white;
+  transition: all 0.15s;
+  -webkit-tap-highlight-color: rgba(107,63,160,0.15);
+}
+.esp-type-shape-opt input { margin: 0; accent-color: #6B3FA0; }
+.esp-type-shape-opt span { font-size: 12px; font-weight: 800; color: var(--dark); line-height: 1.2; }
+.esp-type-shape-sub { font-weight: 500; font-size: 10px; color: var(--mid); }
+.esp-type-shape-opt:hover { border-color: #6B3FA0; }
+.esp-type-shape-opt:has(input:checked) { border-color: #6B3FA0; background: #F5EEFC; }
 .modal-input:focus { outline: none; border-color: var(--red); }
 .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
 .btn-modal-cancel { background: none; border: 1.5px solid var(--border); color: var(--mid); border-radius: 7px; padding: 11px 18px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; min-height: 44px; -webkit-tap-highlight-color: rgba(0,0,0,0.1); touch-action: manipulation; }
@@ -896,17 +937,98 @@ header {
   padding: 9px 10px;
   border-top: 2px solid var(--border);
   letter-spacing: 0.04em;
+  /* Allinea come il resto della tabella: testo a sinistra di default */
+  text-align: left;
 }
+/* Le celle numeriche restano a destra in linea con il body */
+.stats-table tfoot td.num { text-align: right; }
 
 /* Nasconde grafici quando si è in vista tabella */
 .stats-page.view-table .bar-chart,
-.stats-page.view-table .rank-list:not(.stats-rank-keep) {
+.stats-page.view-table .rank-list:not(.stats-rank-keep),
+.stats-page.view-table .mini-bars {
   display: none;
 }
 .stats-page.view-chart .stats-table-wrap { display: none; }
 /* Default: nasconde le tabelle se non c'è classe view-table */
 .stats-page:not(.view-table) .stats-table-wrap { display: none; }
-.stats-table-wrap { padding: 4px 0; }
+.stats-table-wrap {
+  padding: 4px 0;
+  /* Permette scroll orizzontale se la tabella non entra */
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+}
+
+/* Chip filtri di ordinamento sopra le tabelle */
+.stats-sort-chips {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.stats-sort-chip {
+  background: white;
+  border: 1px solid var(--border);
+  color: var(--mid);
+  border-radius: 5px;
+  padding: 4px 9px;
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.15s;
+  min-height: 26px;
+  -webkit-tap-highlight-color: rgba(200,16,46,0.15);
+  touch-action: manipulation;
+}
+.stats-sort-chip:hover { border-color: var(--red); color: var(--red); }
+.stats-sort-chip.active {
+  background: var(--dark);
+  color: white;
+  border-color: var(--dark);
+}
+
+/* === RESPONSIVE STATS (mobile) === */
+@media (max-width: 720px) {
+  .stats-page { padding: 12px 10px !important; }
+  .stat-card { padding: 12px 10px !important; }
+  .stat-card-title { font-size: 11px !important; }
+  /* Tabelle più compatte */
+  .stats-table { font-size: 10.5px; }
+  .stats-table thead th { padding: 6px 6px; font-size: 8.5px; }
+  .stats-table tbody td { padding: 5px 6px; }
+  .stats-table tfoot td { padding: 6px; font-size: 10px; }
+  /* Grafico a barre più stretto */
+  .bar-chart { gap: 3px; height: 100px; }
+  .bar-lbl { font-size: 8px; }
+  .bar-sublbl { font-size: 7.5px; }
+  /* Mini-bars cliente più stretti */
+  .mini-bars { gap: 2px; }
+  .mini-lbl { font-size: 6.5px; }
+  .mini-sublbl { font-size: 6.5px; }
+  /* KPI cards più piccoli */
+  .kpi-card { padding: 12px 10px !important; }
+  .kpi-icon svg { width: 22px !important; height: 22px !important; }
+  .kpi-val { font-size: 22px !important; }
+  .kpi-label { font-size: 9.5px !important; }
+  /* Rank items */
+  .rank-list { max-height: 220px; }
+  .rank-name { font-size: 9.5px; max-width: 80px; }
+  .rank-val { font-size: 10px; }
+  .rank-pos { font-size: 9px; min-width: 16px; }
+  /* Cliente stats - tabelle */
+  .client-stats-section { padding: 12px !important; }
+}
+@media (max-width: 460px) {
+  .stats-table { font-size: 10px; }
+  .stats-table thead th { padding: 5px 5px; font-size: 8px; letter-spacing: 0.06em; }
+  .stats-table tbody td { padding: 4px 5px; }
+  .stats-table tfoot td { padding: 5px; font-size: 9.5px; }
+  .bar-chart { gap: 2px; height: 90px; }
+  .stats-h2 { font-size: 18px; }
+}
 
 .stats-topbar {
   display: flex; align-items: center; justify-content: space-between;
@@ -1176,6 +1298,31 @@ header {
 .esp-rot-slot-del:hover { background: var(--red); color: white; }
 .esp-rot-slot-replace:hover { background: #6B3FA0; color: white; }
 .esp-rot-slot-info:hover { background: #3D6FA8; color: white; }
+/* Riga azioni "sposta" in fondo allo slot pieno */
+.esp-rot-slot-actions {
+  display: flex; align-items: center; justify-content: center;
+  gap: 4px;
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px dashed rgba(107,63,160,0.2);
+}
+.esp-rot-slot-mv {
+  border: 1px solid var(--border);
+  background: white;
+  color: var(--mid);
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 800;
+  width: 22px; height: 22px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: all 0.12s;
+  -webkit-tap-highlight-color: rgba(107,63,160,0.2);
+  touch-action: manipulation;
+  padding: 0;
+}
+.esp-rot-slot-mv:hover { border-color: #6B3FA0; color: #6B3FA0; background: #F5EEFC; }
+.esp-rot-slot-mv:active { transform: scale(0.94); }
 
 /* Modal info slot */
 #modal-slot-info .modal { padding: 22px; }
@@ -1857,20 +2004,34 @@ window.FIREBASE_CONFIG = {
       <h3 style="margin:0">Tipi di espositore personalizzati</h3>
       <button class="cp-close" onclick="closeModal('modal-esp-types')" style="background:rgba(0,0,0,0.06);color:var(--dark);border:none">✕</button>
     </div>
-    <p style="font-size:12px;color:var(--mid);margin-bottom:14px">Crea i tuoi tipi di espositore (es. "30×60 a parete", "Totem 80×80"). Puoi indicare il totale di slot e — se è un girevole — quanti slot per lato.</p>
+    <p style="font-size:12px;color:var(--mid);margin-bottom:14px">Crea i tuoi tipi di espositore (es. "30×60 a parete", "Totem 80×80"). Scegli la forma: <strong>lineare</strong> (un solo lato), <strong>girevole</strong> (due lati con vista destra/sinistra/completo).</p>
 
     <!-- Form crea nuovo tipo -->
     <div class="esp-type-form">
       <label class="save-order-lbl" for="esp-type-name">Nome del tipo</label>
       <input type="text" class="modal-input" id="esp-type-name" placeholder="Es. 30×60 a parete" maxlength="60" style="margin-bottom:8px"/>
+
+      <!-- Forma: lineare o girevole -->
+      <label class="save-order-lbl">Forma</label>
+      <div class="esp-type-shape" style="display:flex;gap:6px;margin-bottom:10px">
+        <label class="esp-type-shape-opt">
+          <input type="radio" name="esp-type-shape" value="line" checked onchange="_updateEspTypeShape()"/>
+          <span>Lineare<br><span class="esp-type-shape-sub">(un solo lato)</span></span>
+        </label>
+        <label class="esp-type-shape-opt">
+          <input type="radio" name="esp-type-shape" value="rot" onchange="_updateEspTypeShape()"/>
+          <span>Girevole<br><span class="esp-type-shape-sub">(due lati)</span></span>
+        </label>
+      </div>
+
       <div style="display:flex;gap:8px;margin-bottom:8px">
         <div style="flex:1">
           <label class="save-order-lbl" for="esp-type-total">Slot totali</label>
           <input type="number" min="1" max="60" class="modal-input" id="esp-type-total" placeholder="Es. 12" style="margin-bottom:0"/>
         </div>
-        <div style="flex:1">
-          <label class="save-order-lbl" for="esp-type-perside">Slot per lato <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--light)">(0 = no girevole)</span></label>
-          <input type="number" min="0" max="30" class="modal-input" id="esp-type-perside" placeholder="0" style="margin-bottom:0"/>
+        <div style="flex:1" id="esp-type-perside-wrap" style="display:none">
+          <label class="save-order-lbl" for="esp-type-perside">Slot per lato</label>
+          <input type="number" min="1" max="30" class="modal-input" id="esp-type-perside" placeholder="Es. 6" style="margin-bottom:0"/>
         </div>
       </div>
       <button onclick="_addCustomEspType()" class="btn-modal-ok" style="margin-top:4px">+ Crea tipo</button>
@@ -3564,6 +3725,58 @@ function openCart(){
 }
 function closeCart(){ $('overlay').classList.remove('open'); $('cp').classList.remove('open'); }
 
+/* ── Gestione tastiera virtuale mobile per il carrello ─────────────────────
+   Quando la tastiera apre, riduciamo l'altezza del pannello carrello a quella
+   visibile (visualViewport.height) e scrolliamo l'input attivo in vista. */
+(function _setupCartKeyboardHandling(){
+  if(typeof window === 'undefined' || !window.visualViewport) return;
+  var vv = window.visualViewport;
+  var rafScheduled = false;
+  function applyVV(){
+    rafScheduled = false;
+    var cp = document.getElementById('cp');
+    if(!cp) return;
+    var winH = window.innerHeight || document.documentElement.clientHeight;
+    var vvH = vv.height;
+    var diff = winH - vvH;
+    // Se la differenza è apprezzabile, è probabile sia la tastiera
+    if(diff > 120){
+      cp.style.height = vvH + 'px';
+      cp.style.maxHeight = vvH + 'px';
+      cp.classList.add('kbd-open');
+      // Se c'è un input focalizzato dentro il carrello, scrolla per vederlo
+      var act = document.activeElement;
+      if(act && cp.contains(act) && (act.tagName === 'INPUT' || act.tagName === 'TEXTAREA' || act.tagName === 'SELECT')){
+        try { act.scrollIntoView({block:'center', behavior:'smooth'}); } catch(_){}
+      }
+    } else {
+      // Tastiera chiusa: ripristina altezza dinamica
+      cp.style.height = '';
+      cp.style.maxHeight = '';
+      cp.classList.remove('kbd-open');
+    }
+  }
+  function schedule(){
+    if(rafScheduled) return;
+    rafScheduled = true;
+    requestAnimationFrame(applyVV);
+  }
+  vv.addEventListener('resize', schedule);
+  vv.addEventListener('scroll', schedule);
+  // Anche quando un input riceve focus, scrolla in vista dopo che la tastiera si è aperta
+  document.addEventListener('focusin', function(ev){
+    var cp = document.getElementById('cp');
+    if(!cp || !cp.classList.contains('open')) return;
+    if(!cp.contains(ev.target)) return;
+    if(ev.target.tagName !== 'INPUT' && ev.target.tagName !== 'TEXTAREA' && ev.target.tagName !== 'SELECT') return;
+    // Aspetta che la tastiera sia effettivamente aperta
+    setTimeout(function(){
+      try { ev.target.scrollIntoView({block:'center', behavior:'smooth'}); } catch(_){}
+      applyVV();
+    }, 300);
+  });
+})();
+
 /* ── Toggle carrello a schermo intero ─────────────────────────────────────── */
 function toggleCartFullscreen(){
   const cp = $('cp');
@@ -4676,7 +4889,12 @@ function _editCustomEspType(id){
   var perEl  = document.getElementById('esp-type-perside');
   if(nameEl) nameEl.value = t.name || '';
   if(totEl)  totEl.value  = t.total || '';
-  if(perEl)  perEl.value  = t.perSide || 0;
+  if(perEl)  perEl.value  = t.perSide || '';
+  // Pre-seleziona la forma in base al perSide
+  var isRot = t.perSide && t.perSide > 0;
+  var shapeRadio = document.querySelector('input[name="esp-type-shape"][value="'+(isRot?'rot':'line')+'"]');
+  if(shapeRadio) shapeRadio.checked = true;
+  _updateEspTypeShape();
   // Cambia il testo del bottone
   var btn = document.querySelector('.esp-type-form .btn-modal-ok');
   if(btn) btn.textContent = '✓ Salva modifiche';
@@ -4709,6 +4927,10 @@ function _cancelEditEspType(){
   ['esp-type-name','esp-type-total','esp-type-perside'].forEach(function(id){
     var el = document.getElementById(id); if(el) el.value='';
   });
+  // Reset radio "forma" su "lineare"
+  var lineRadio = document.querySelector('input[name="esp-type-shape"][value="line"]');
+  if(lineRadio) lineRadio.checked = true;
+  if(typeof _updateEspTypeShape === 'function') _updateEspTypeShape();
   var btn = document.querySelector('.esp-type-form .btn-modal-ok');
   if(btn) btn.textContent = '+ Crea tipo';
   var cancelBtn = document.getElementById('esp-type-cancel-edit');
@@ -4717,13 +4939,27 @@ function _cancelEditEspType(){
   if(formWrap) formWrap.classList.remove('editing');
 }
 window._cancelEditEspType = _cancelEditEspType;
+function _updateEspTypeShape(){
+  var shape = document.querySelector('input[name="esp-type-shape"]:checked');
+  var shapeVal = shape ? shape.value : 'line';
+  var perWrap = document.getElementById('esp-type-perside-wrap');
+  if(perWrap){
+    // Mostra solo se "girevole"
+    perWrap.style.display = (shapeVal === 'rot') ? '' : 'none';
+  }
+}
+window._updateEspTypeShape = _updateEspTypeShape;
+
 function _addCustomEspType(){
   var nm = (document.getElementById('esp-type-name').value || '').trim();
   var tot = parseInt(document.getElementById('esp-type-total').value, 10);
-  var per = parseInt(document.getElementById('esp-type-perside').value, 10);
+  var shape = document.querySelector('input[name="esp-type-shape"]:checked');
+  var shapeVal = shape ? shape.value : 'line';
+  var per = (shapeVal === 'rot') ? parseInt(document.getElementById('esp-type-perside').value, 10) : 0;
   if(!nm){ alert('Inserisci un nome per il tipo.'); return; }
   if(!tot || tot < 1 || tot > 60){ alert('Inserisci un numero valido di slot totali (1-60).'); return; }
-  if(per && per > 0){
+  if(shapeVal === 'rot'){
+    if(!per || per < 1){ alert('Per un espositore girevole indica gli slot per lato (almeno 1).'); return; }
     if(per > tot/2 + 1){ alert('Slot per lato troppo alto rispetto al totale. Per un girevole, perSide ≤ total/2.'); return; }
   }
   var types = _loadCustomEspTypes();
@@ -4795,6 +5031,11 @@ function _renderRotGrid(cid, e){
         + '<button class="esp-rot-slot-info" onclick="event.stopPropagation();_showSlotInfo(\''+e.id+'\','+idx+')" title="Informazioni">i</button>'
         + '<button class="esp-rot-slot-del" onclick="event.stopPropagation();_remRotSlot(\''+e.id+'\','+idx+')" title="Rimuovi">✕</button>'
         + '<button class="esp-rot-slot-replace" onclick="event.stopPropagation();_pickRotSlot(\''+e.id+'\','+idx+')" title="Sostituisci">↻</button>'
+        + '<div class="esp-rot-slot-actions">'
+          + '<button class="esp-rot-slot-mv" onclick="event.stopPropagation();_moveRotSlot(\''+e.id+'\','+idx+',-1)" title="Sposta indietro">←</button>'
+          + '<button class="esp-rot-slot-mv" onclick="event.stopPropagation();_moveRotSlotTo(\''+e.id+'\','+idx+')" title="Sposta in slot...">⇄</button>'
+          + '<button class="esp-rot-slot-mv" onclick="event.stopPropagation();_moveRotSlot(\''+e.id+'\','+idx+',1)" title="Sposta avanti">→</button>'
+        + '</div>'
         + '</div>';
     }
     return '<div class="esp-rot-slot empty" data-slot="'+idx+'" onclick="_pickRotSlot(\''+e.id+'\','+idx+')">'
@@ -4916,6 +5157,72 @@ function _showSlotInfo(eid, slotIdx){
   mb.classList.add('open');
 }
 window._showSlotInfo = _showSlotInfo;
+
+/* Sposta un campione di una posizione (-1 indietro, +1 avanti).
+   Se la posizione di destinazione è occupata, scambia i due campioni.
+   Se è vuota, sposta il campione. Wrap-around ai bordi (0 ↔ total-1). */
+function _moveRotSlot(eid, slotIdx, direction){
+  var cid=null,cids=Object.keys(clients);
+  for(var k=0;k<cids.length;k++){
+    if(_getEsps(cids[k]).find(function(e){return e.id===eid;})){ cid = cids[k]; break; }
+  }
+  if(!cid) return;
+  var e = _getEsps(cid).find(function(x){return x.id===eid;});
+  if(!e) return;
+  var idx = parseInt(slotIdx,10);
+  var dir = parseInt(direction,10) || 0;
+  if(!dir) return;
+  var total = _rotTotal(e);
+  if(!total) return;
+  var newIdx = idx + dir;
+  // Wrap-around
+  if(newIdx < 0) newIdx = total - 1;
+  if(newIdx >= total) newIdx = 0;
+  var srcItem = e.items.find(function(x){return x.slot === idx;});
+  var dstItem = e.items.find(function(x){return x.slot === newIdx;});
+  if(!srcItem) return;
+  if(dstItem){
+    // Scambia gli slot dei due item
+    srcItem.slot = newIdx;
+    dstItem.slot = idx;
+  } else {
+    // Sposta semplicemente il campione
+    srcItem.slot = newIdx;
+  }
+  saveClients({immediate:true});
+  renderOrderDetail();
+}
+window._moveRotSlot = _moveRotSlot;
+
+/* Sposta in uno slot specifico chiesto via prompt. */
+function _moveRotSlotTo(eid, slotIdx){
+  var cid=null,cids=Object.keys(clients);
+  for(var k=0;k<cids.length;k++){
+    if(_getEsps(cids[k]).find(function(e){return e.id===eid;})){ cid = cids[k]; break; }
+  }
+  if(!cid) return;
+  var e = _getEsps(cid).find(function(x){return x.id===eid;});
+  if(!e) return;
+  var idx = parseInt(slotIdx,10);
+  var total = _rotTotal(e);
+  var target = prompt('Sposta in quale slot? (1-'+total+')', String(idx+1));
+  if(target === null) return;
+  var newIdx = parseInt(target,10) - 1;
+  if(isNaN(newIdx) || newIdx < 0 || newIdx >= total){ alert('Slot non valido.'); return; }
+  if(newIdx === idx) return;
+  var srcItem = e.items.find(function(x){return x.slot === idx;});
+  var dstItem = e.items.find(function(x){return x.slot === newIdx;});
+  if(!srcItem) return;
+  if(dstItem){
+    srcItem.slot = newIdx;
+    dstItem.slot = idx;
+  } else {
+    srcItem.slot = newIdx;
+  }
+  saveClients({immediate:true});
+  renderOrderDetail();
+}
+window._moveRotSlotTo = _moveRotSlotTo;
 
 function _remRotSlot(eid, slotIdx){
   var cid=null,cids=Object.keys(clients);
@@ -5454,6 +5761,46 @@ function renderRankAnni(ordini, targetId) {
   );
 }
 
+/* Stato ordinamento delle tabelle (per cliente e prodotti).
+   Valori: 'eur-desc' (default), 'eur-asc', 'ord-desc' */
+var _sortClienti  = (function(){ try { return localStorage.getItem('sort_clienti') || 'eur-desc'; } catch(e){ return 'eur-desc'; } })();
+var _sortProdotti = (function(){ try { return localStorage.getItem('sort_prodotti') || 'ord-desc'; } catch(e){ return 'ord-desc'; } })();
+
+function setSortClienti(mode){
+  _sortClienti = mode;
+  try { localStorage.setItem('sort_clienti', mode); } catch(e){}
+  try { renderStats(); } catch(e){}
+}
+window.setSortClienti = setSortClienti;
+function setSortProdotti(mode){
+  _sortProdotti = mode;
+  try { localStorage.setItem('sort_prodotti', mode); } catch(e){}
+  try { renderStats(); } catch(e){}
+}
+window.setSortProdotti = setSortProdotti;
+
+/* Restituisce HTML dei chip filtri per le tabelle */
+function _sortChipsHtml(targetSetter, current){
+  var modes = [
+    {id:'eur-desc', lbl:'€ ↓ (più alto)'},
+    {id:'eur-asc',  lbl:'€ ↑ (più basso)'},
+    {id:'ord-desc', lbl:'Ordini ↓'}
+  ];
+  return '<div class="stats-sort-chips">'
+    + modes.map(function(m){
+        return '<button class="stats-sort-chip'+(current===m.id?' active':'')+'" onclick="'+targetSetter+'(\''+m.id+'\')">'+m.lbl+'</button>';
+      }).join('')
+    + '</div>';
+}
+
+function _applySort(arr, mode){
+  var s = arr.slice();
+  if(mode === 'eur-asc')  s.sort(function(a,b){ return a.val - b.val; });
+  else if(mode === 'ord-desc') s.sort(function(a,b){ return b.n - a.n; });
+  else /* eur-desc */     s.sort(function(a,b){ return b.val - a.val; });
+  return s;
+}
+
 function renderRankClienti(ordini) {
   const map = {};
   ordini.forEach(({client:c, order:o}) => {
@@ -5462,11 +5809,12 @@ function renderRankClienti(ordini) {
     map[c.id].mq  += o.items.reduce((s,i) => s + (parseFloat(i.mq)||0), 0);
     map[c.id].n++;
   });
-  const all = Object.values(map).sort((a,b) => b.val - a.val);
-  const lista = all.slice(0, 10);
-  const max = lista[0]?.val || 1;
-  $('rank-clienti').innerHTML = lista.length
-    ? lista.map((x, i) => `<div class="rank-item">
+  const allSorted = _applySort(Object.values(map), _sortClienti);
+  // Top 10 sempre per fatturato decrescente (per il grafico)
+  const top10 = Object.values(map).sort((a,b) => b.val - a.val).slice(0, 10);
+  const max = top10[0]?.val || 1;
+  $('rank-clienti').innerHTML = top10.length
+    ? top10.map((x, i) => `<div class="rank-item">
         <span class="rank-pos">${i+1}</span>
         <div class="rank-bar-wrap">
           <div class="rank-bar rb-dark" style="width:${Math.round(x.val/max*100)}%">
@@ -5476,15 +5824,20 @@ function renderRankClienti(ordini) {
         <span class="rank-val">${fmt(x.val)}</span>
       </div>`).join('')
     : '<div class="stats-empty">Nessun dato</div>';
-  // Tabella: tutti i clienti
-  const totN = all.reduce((s,x)=>s+x.n,0);
-  const totMq = all.reduce((s,x)=>s+x.mq,0);
-  const totEur = all.reduce((s,x)=>s+x.val,0);
-  _renderStatsTable('table-clienti',
-    [{label:'#'},{label:'Cliente'},{label:'Ordini',num:true},{label:'Mq',num:true},{label:'Fatturato',num:true}],
-    all.map((x,i)=>[i+1, x.name, x.n, x.mq.toFixed(2), '<span class="col-green">'+fmt(x.val)+'</span>']),
-    ['', 'Totale', totN, totMq.toFixed(2), '<span class="col-green">'+fmt(totEur)+'</span>']
-  );
+  // Tabella: tutti i clienti, ordinati come selezionato
+  const totN = allSorted.reduce((s,x)=>s+x.n,0);
+  const totMq = allSorted.reduce((s,x)=>s+x.mq,0);
+  const totEur = allSorted.reduce((s,x)=>s+x.val,0);
+  const wrap = document.getElementById('table-clienti');
+  if(wrap){
+    var chips = _sortChipsHtml('setSortClienti', _sortClienti);
+    wrap.innerHTML = chips + '<div id="table-clienti-inner"></div>';
+    _renderStatsTable('table-clienti-inner',
+      [{label:'#'},{label:'Cliente'},{label:'Ordini',num:true},{label:'Mq',num:true},{label:'Fatturato',num:true}],
+      allSorted.map((x,i)=>[i+1, x.name, x.n, x.mq.toFixed(2), '<span class="col-green">'+fmt(x.val)+'</span>']),
+      ['', 'Totale', totN, totMq.toFixed(2), '<span class="col-green">'+fmt(totEur)+'</span>']
+    );
+  }
 }
 
 function renderRankSerie(ordini) {
@@ -5530,11 +5883,11 @@ function renderRankProdotti(ordini) {
       map[i.code].val += itemTot(i);
     });
   });
-  const all = Object.values(map).sort((a,b) => b.n-a.n);
-  const lista = all.slice(0, 20);
-  const max = lista[0]?.n || 1;
-  $('rank-prodotti').innerHTML = lista.length
-    ? lista.map((x, i) => `<div class="rank-item">
+  // Grafico: top 20 sempre per "Volte" (numero ordini)
+  const top20 = Object.values(map).sort((a,b) => b.n - a.n).slice(0, 20);
+  const max = top20[0]?.n || 1;
+  $('rank-prodotti').innerHTML = top20.length
+    ? top20.map((x, i) => `<div class="rank-item">
         <span class="rank-pos">${i+1}</span>
         <div class="rank-bar-wrap">
           <div class="rank-bar rb-green" style="width:${Math.round(x.n/max*100)}%">
@@ -5544,15 +5897,21 @@ function renderRankProdotti(ordini) {
         <span class="rank-val">${x.n}x</span>
       </div>`).join('')
     : '<div class="stats-empty">Nessun dato</div>';
-  // Tabella
-  const totN = all.reduce((s,x)=>s+x.n,0);
-  const totMq = all.reduce((s,x)=>s+x.mq,0);
-  const totEur = all.reduce((s,x)=>s+x.val,0);
-  _renderStatsTable('table-prodotti',
-    [{label:'#'},{label:'Codice'},{label:'Serie'},{label:'Colore'},{label:'Volte',num:true},{label:'Mq',num:true},{label:'Fatturato',num:true}],
-    all.map((x,i)=>[i+1, x.code, x.series?toT(x.series):'—', x.color||'—', x.n, x.mq.toFixed(2), '<span class="col-green">'+fmt(x.val)+'</span>']),
-    ['', '', '', 'Totale', totN, totMq.toFixed(2), '<span class="col-green">'+fmt(totEur)+'</span>']
-  );
+  // Tabella: ordinata come da filtro selezionato
+  const allSorted = _applySort(Object.values(map), _sortProdotti);
+  const totN = allSorted.reduce((s,x)=>s+x.n,0);
+  const totMq = allSorted.reduce((s,x)=>s+x.mq,0);
+  const totEur = allSorted.reduce((s,x)=>s+x.val,0);
+  const wrap = document.getElementById('table-prodotti');
+  if(wrap){
+    var chips = _sortChipsHtml('setSortProdotti', _sortProdotti);
+    wrap.innerHTML = chips + '<div id="table-prodotti-inner"></div>';
+    _renderStatsTable('table-prodotti-inner',
+      [{label:'#'},{label:'Codice'},{label:'Serie'},{label:'Colore'},{label:'Volte',num:true},{label:'Mq',num:true},{label:'Fatturato',num:true}],
+      allSorted.map((x,i)=>[i+1, x.code, x.series?toT(x.series):'—', x.color||'—', x.n, x.mq.toFixed(2), '<span class="col-green">'+fmt(x.val)+'</span>']),
+      ['', '', '', 'Totale', totN, totMq.toFixed(2), '<span class="col-green">'+fmt(totEur)+'</span>']
+    );
+  }
 }
 
 function renderClientStats() {
@@ -5674,6 +6033,10 @@ function renderClientStats() {
     </div>`;
   }).join('');
 
+  // Calcoli aggiuntivi per la tabella per-mese (serve anche conteggio ordini per mese)
+  const ordcMese = new Array(12).fill(0);
+  ordini.forEach(o => { ordcMese[new Date(o.date).getMonth()]++; });
+
   body.innerHTML = `<div class="client-stats-grid">
 
     <!-- Serie più ordinate -->
@@ -5690,6 +6053,15 @@ function renderClientStats() {
           <span class="rank-val">${mq.toFixed(1)} mq</span>
         </div>`).join('')}
       </div>
+      <div class="stats-table-wrap">
+        <table class="stats-table">
+          <thead><tr><th>#</th><th>Serie</th><th class="num">Mq</th></tr></thead>
+          <tbody>
+            ${serieList.map(([s,mq],i)=>`<tr><td>${i+1}</td><td>${toT(s)}</td><td class="num">${mq.toFixed(2)}</td></tr>`).join('')}
+          </tbody>
+          <tfoot><tr><td></td><td>Totale</td><td class="num">${(serieList.reduce((s,[,mq])=>s+mq,0)).toFixed(2)}</td></tr></tfoot>
+        </table>
+      </div>
     </div>
 
     <!-- Storico mq mese per mese -->
@@ -5700,6 +6072,15 @@ function renderClientStats() {
           <div class="mini-fill" style="height:${Math.round(mq/maxMese*54)}px" title="${mq.toFixed(1)} mq"></div>
           <div class="mini-lbl">${MESI[i]}</div>
         </div>`).join('')}
+      </div>
+      <div class="stats-table-wrap">
+        <table class="stats-table">
+          <thead><tr><th>Mese</th><th class="num">Ordini</th><th class="num">Mq</th></tr></thead>
+          <tbody>
+            ${MESI.map((m,i)=>`<tr><td>${m}</td><td class="num">${ordcMese[i]}</td><td class="num">${mqMese[i].toFixed(2)}</td></tr>`).join('')}
+          </tbody>
+          <tfoot><tr><td>Totale</td><td class="num">${ordcMese.reduce((s,n)=>s+n,0)}</td><td class="num">${mqMese.reduce((s,n)=>s+n,0).toFixed(2)}</td></tr></tfoot>
+        </table>
       </div>
     </div>
 
@@ -5712,6 +6093,15 @@ function renderClientStats() {
           <div class="mini-lbl">${MESI[i]}</div>
           <div class="mini-sublbl">${v ? fmtCompact(v) : ''}</div>
         </div>`).join('')}
+      </div>
+      <div class="stats-table-wrap">
+        <table class="stats-table">
+          <thead><tr><th>Mese</th><th class="num">Ordini</th><th class="num">Fatturato</th></tr></thead>
+          <tbody>
+            ${MESI.map((m,i)=>`<tr><td>${m}</td><td class="num">${ordcMese[i]}</td><td class="num"><span class="col-green">${fmt(fattMese[i])}</span></td></tr>`).join('')}
+          </tbody>
+          <tfoot><tr><td>Totale</td><td class="num">${ordcMese.reduce((s,n)=>s+n,0)}</td><td class="num"><span class="col-green">${fmt(fattMese.reduce((s,n)=>s+n,0))}</span></td></tr></tfoot>
+        </table>
       </div>
     </div>
 
@@ -5728,6 +6118,15 @@ function renderClientStats() {
           </div>
           <span class="rank-val">${fmt(v.val)}</span>
         </div>`).join('') : '<div class="stats-empty">Nessun dato</div>'}
+      </div>
+      <div class="stats-table-wrap">
+        <table class="stats-table">
+          <thead><tr><th>Anno</th><th class="num">Ordini</th><th class="num">Fatturato</th></tr></thead>
+          <tbody>
+            ${annoList.length ? annoList.map(([anno,v])=>`<tr><td>${anno}</td><td class="num">${v.n}</td><td class="num"><span class="col-green">${fmt(v.val)}</span></td></tr>`).join('') : '<tr><td colspan="3" style="text-align:center;color:var(--light)">Nessun dato</td></tr>'}
+          </tbody>
+          <tfoot><tr><td>Totale</td><td class="num">${annoList.reduce((s,[,v])=>s+v.n,0)}</td><td class="num"><span class="col-green">${fmt(annoList.reduce((s,[,v])=>s+v.val,0))}</span></td></tr></tfoot>
+        </table>
       </div>
     </div>
 
