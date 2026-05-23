@@ -696,6 +696,53 @@ header {
   justify-content: center;
   gap: 6px;
 }
+/* Barra collassabile sopra al footer: racchiude tutta la sezione "Finalizza ordine" */
+.cp-fold-bar {
+  border-top: 1px solid var(--border);
+  background: var(--white);
+}
+.cp-fold-toggle {
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 9px 14px;
+  display: flex; align-items: center; gap: 9px;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  -webkit-tap-highlight-color: rgba(0,0,0,0.05);
+  touch-action: manipulation;
+  min-height: 38px;
+}
+.cp-fold-chev {
+  width: 14px; height: 14px;
+  color: var(--mid);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+.cp-footer.folded ~ * .cp-fold-chev,
+.cart-panel.fold-closed .cp-fold-chev { transform: rotate(-90deg); }
+.cp-fold-title {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--dark);
+  flex-shrink: 0;
+}
+.cp-fold-sum {
+  flex: 1;
+  text-align: right;
+  font-family: 'JetBrains Mono','Inter',monospace;
+  font-size: 11.5px;
+  font-weight: 800;
+  color: var(--green);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* Quando il pannello carrello ha .fold-closed: nascondi il footer e mostra solo la fold-bar */
+.cart-panel.fold-closed .cp-footer { display: none !important; }
+
 .cp-footer { border-top: 1px solid var(--border); padding: 8px 14px 12px; display: flex; flex-direction: column; gap: 6px; }
 .output-lbl { font-size: 9px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--light); margin-bottom: 5px; }
 .cp-output { background: #111; border-radius: 5px; padding: 9px 11px; font-family: 'Inter', monospace; font-size: 10.5px; line-height: 1.7; color: #6EE7A0; white-space: pre-wrap; word-break: break-all; max-height: 130px; overflow-y: auto; }
@@ -1904,6 +1951,14 @@ window.FIREBASE_CONFIG = {
 
   <div class="cp-items" id="cp-items">
     <div class="cart-empty"><div class="ei">🛒</div><p>Il carrello è vuoto</p></div>
+  </div>
+  <!-- Toggle compatto sopra al footer: permette di collassare tutta la sezione "Finalizza ordine" -->
+  <div class="cp-fold-bar" id="cp-fold-bar" style="display:none">
+    <button type="button" class="cp-fold-toggle" id="cp-fold-toggle" onclick="toggleCartFold()" aria-expanded="true">
+      <svg class="cp-fold-chev" viewBox="0 0 24 24" fill="none"><polyline points="6 9 12 15 18 9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="cp-fold-title">Finalizza ordine</span>
+      <span class="cp-fold-sum" id="cp-fold-sum">— mq · € —</span>
+    </button>
   </div>
   <div class="cp-footer" id="cp-footer" style="display:none">
     <div class="cp-totals" id="cp-totals">
@@ -3598,7 +3653,39 @@ function _updateCartFooter(){
   const valEl = document.getElementById('cp-tot-val');
   if(mqEl) mqEl.textContent = totMq.toFixed(2) + ' mq';
   if(valEl) valEl.textContent = fmt(totVal);
+  // Aggiorna anche il riepilogo nella fold-bar (sempre visibile)
+  const sumEl = document.getElementById('cp-fold-sum');
+  if(sumEl) sumEl.textContent = totMq.toFixed(2) + ' mq · ' + fmt(totVal);
+  const foldBar = document.getElementById('cp-fold-bar');
+  if(foldBar) foldBar.style.display = cartValido.length ? 'block' : 'none';
 }
+
+/* Toggle apri/chiudi tendina "Finalizza ordine" del carrello */
+function toggleCartFold(){
+  const cp = document.getElementById('cp');
+  if(!cp) return;
+  const isClosed = cp.classList.toggle('fold-closed');
+  try { localStorage.setItem('cart_fold_closed', isClosed ? '1' : '0'); } catch(e){}
+  const tog = document.getElementById('cp-fold-toggle');
+  if(tog) tog.setAttribute('aria-expanded', isClosed ? 'false' : 'true');
+}
+window.toggleCartFold = toggleCartFold;
+/* Applica lo stato salvato all'apertura della pagina */
+(function _initCartFoldState(){
+  try {
+    var closed = localStorage.getItem('cart_fold_closed') === '1';
+    var apply = function(){
+      var cp = document.getElementById('cp');
+      if(cp){
+        if(closed) cp.classList.add('fold-closed');
+        var tog = document.getElementById('cp-fold-toggle');
+        if(tog) tog.setAttribute('aria-expanded', closed ? 'false' : 'true');
+      }
+    };
+    if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', apply);
+    else apply();
+  } catch(e){}
+})();
 
 function updateCartUI(){
   const n=cart.length;
