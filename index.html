@@ -96,7 +96,39 @@ header {
 
 /* ── FILTERS ─────────────────────────────────────────── */
 .filters { background: var(--white); border-bottom: 2px solid var(--red); padding: 14px 32px; }
-.filters-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+.filters-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+/* Barra di ricerca dentro la griglia filtri */
+.listino-search-wrap {
+  display: flex; align-items: center; gap: 6px;
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  padding: 0 9px;
+  background: white;
+  transition: border-color 0.15s;
+  min-height: 40px;
+}
+.listino-search-wrap:focus-within { border-color: var(--red); }
+.listino-search-ic { width: 14px; height: 14px; color: var(--mid); flex-shrink: 0; }
+.listino-search-input {
+  flex: 1; min-width: 0;
+  border: none; outline: none; background: transparent;
+  font-family: 'Inter', sans-serif; font-size: 13px;
+  color: var(--dark); padding: 8px 0;
+}
+.listino-search-input::placeholder { color: var(--light); }
+.listino-search-clear {
+  background: none; border: none;
+  color: var(--light); cursor: pointer;
+  font-size: 13px;
+  width: 24px; height: 24px; border-radius: 50%;
+  display: none;
+  align-items: center; justify-content: center;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+  touch-action: manipulation;
+}
+.listino-search-clear.visible { display: flex; }
+.listino-search-clear:hover { background: var(--bg); color: var(--dark); }
 .fg { display: flex; flex-direction: column; gap: 4px; }
 .fg label { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); }
 .fg select {
@@ -579,6 +611,47 @@ header {
 }
 .ci-disc-custom-input:focus { outline: none; border-color: var(--red); box-shadow: 0 0 0 3px rgba(200,16,46,0.08); }
 
+/* Blocco modifica sconti standard (3 step composti) */
+.ci-disc-std-wrap {
+  padding: 6px 10px 8px;
+  background: rgba(243,238,248,0.6);
+  border-top: 1px dashed #C9B8E0;
+}
+.ci-disc-std-lbl {
+  font-size: 8.5px; font-weight: 800; letter-spacing: 0.1em;
+  text-transform: uppercase; color: #6B3FA0;
+  margin-bottom: 4px;
+}
+.ci-disc-std-row {
+  display: flex; align-items: center; gap: 4px;
+  flex-wrap: wrap;
+}
+.ci-disc-std-step {
+  display: flex; align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: white;
+  padding: 0 6px;
+  min-height: 28px;
+  flex: 1 1 60px;
+  min-width: 0;
+}
+.ci-disc-std-step:focus-within { border-color: #6B3FA0; }
+.ci-disc-std-input {
+  flex: 1; min-width: 0;
+  border: none; outline: none; background: transparent;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px; font-weight: 800;
+  color: var(--dark);
+  padding: 4px 0;
+  text-align: right;
+  -webkit-appearance: none; -moz-appearance: textfield;
+}
+.ci-disc-std-input::-webkit-outer-spin-button,
+.ci-disc-std-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.ci-disc-std-unit { font-size: 10px; font-weight: 700; color: var(--mid); margin-left: 3px; }
+.ci-disc-std-sep { font-size: 11px; font-weight: 800; color: #6B3FA0; margin: 0 2px; }
+
 /* Badge sconto in header */
 .ci-disc-badge {
   display: inline-flex; align-items: center;
@@ -590,6 +663,7 @@ header {
   letter-spacing: 0.04em;
 }
 .ci-disc-badge.custom { background: #FEF7DD; color: #8A6500; border-color: #E5C661; }
+.ci-disc-badge.std { background: #F3EEF8; color: #6B3FA0; border-color: #B7A3D6; }
 
 /* Totale carrello nel footer */
 .cp-totals {
@@ -1371,6 +1445,82 @@ header {
 .esp-rot-slot-mv:hover { border-color: #6B3FA0; color: #6B3FA0; background: #F5EEFC; }
 .esp-rot-slot-mv:active { transform: scale(0.94); }
 
+/* Pallino luminoso di stato sul slot pieno (top-left) */
+.esp-rot-slot-status {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 18px; height: 18px;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 2;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.esp-rot-slot-status-dot {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--st-color, #ccc);
+  display: block;
+  box-shadow:
+    0 0 0 2px white,
+    0 0 6px 2px var(--st-color, rgba(0,0,0,0.2)),
+    inset 0 1px 2px rgba(255,255,255,0.4);
+  transition: transform 0.15s, box-shadow 0.2s;
+}
+.esp-rot-slot-status:hover .esp-rot-slot-status-dot {
+  transform: scale(1.18);
+  box-shadow:
+    0 0 0 2px white,
+    0 0 10px 3px var(--st-color, rgba(0,0,0,0.3)),
+    inset 0 1px 2px rgba(255,255,255,0.4);
+}
+/* Sposta il numero #N a destra del pallino per non sovrapporsi */
+.esp-rot-slot.filled .esp-rot-slot-num { padding-left: 22px; }
+
+/* Tinta leggera lo sfondo dello slot in base allo stato */
+.esp-rot-slot.filled.cs-presente   { border-color: rgba(40,167,69,0.4); }
+.esp-rot-slot.filled.cs-sostituire { border-color: rgba(255,193,7,0.5); background: #FFFCEC; }
+.esp-rot-slot.filled.cs-fuoriprod  { border-color: rgba(220,53,69,0.4); background: #FFF4F5; }
+.esp-rot-slot.filled.cs-ordinato   { border-color: rgba(23,162,184,0.4); background: #EEFAFC; }
+.esp-rot-slot.filled.cs-programma  { border-color: rgba(123,45,139,0.4); background: #F8F0FB; }
+
+/* Menu popup per cambiare stato (allegato al body, position fixed) */
+.slot-status-menu {
+  position: fixed;
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: 7px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+  padding: 4px;
+  z-index: 9999;
+  min-width: 160px;
+}
+.slot-status-menu-item {
+  display: flex; align-items: center; gap: 7px;
+  padding: 6px 9px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--dark);
+  transition: background 0.12s;
+  -webkit-tap-highlight-color: rgba(0,0,0,0.05);
+  touch-action: manipulation;
+}
+.slot-status-menu-item:hover { background: var(--bg); }
+.slot-status-menu-item.active { background: rgba(107,63,160,0.08); color: #6B3FA0; }
+.slot-status-menu-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  display: inline-block; flex-shrink: 0;
+  box-shadow: 0 0 4px var(--dot-color, #ccc);
+  background: var(--dot-color, #ccc);
+}
+
 /* Modal info slot */
 #modal-slot-info .modal { padding: 22px; }
 .slot-info-swatch-wrap {
@@ -1720,6 +1870,17 @@ window.FIREBASE_CONFIG = {
       <div class="fg"><label>Formato</label><select id="sel-size" onchange="markSpecialSize()" disabled></select></div>
       <div class="fg"><label>Finitura</label><select id="sel-finish" disabled></select></div>
       <div class="fg"><label>Colore</label><select id="sel-color" disabled></select></div>
+      <div class="fg fg-search">
+        <label for="listino-search">Cerca prodotto</label>
+        <div class="listino-search-wrap">
+          <svg class="listino-search-ic" viewBox="0 0 14 14" fill="none">
+            <circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.4"/>
+            <path d="M9.5 9.5l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+          <input type="text" id="listino-search" class="listino-search-input" placeholder="Codice, serie, colore…" autocomplete="off" oninput="setListinoSearch(this.value)"/>
+          <button type="button" id="listino-search-clear" class="listino-search-clear" onclick="setListinoSearch('');document.getElementById('listino-search').value=''" title="Pulisci">✕</button>
+        </div>
+      </div>
     </div>
   </div>
   <div class="main">
@@ -3240,13 +3401,35 @@ const toT = s => s ? s.split(' ').map(w=>w[0].toUpperCase()+w.slice(1).toLowerCa
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
 const fmtDate = ts => new Date(ts).toLocaleDateString('it-IT', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
 
-const hasFilter = () => !!(state.brand || state.series);
+// Ricerca testuale aggiuntiva (oltre ai filtri dropdown)
+let _listinoSearch = '';
+function setListinoSearch(v){
+  _listinoSearch = String(v||'').trim();
+  const clearBtn = document.getElementById('listino-search-clear');
+  if(clearBtn) clearBtn.classList.toggle('visible', _listinoSearch.length > 0);
+  // Re-render dei prodotti
+  try { render(); } catch(_){}
+}
+window.setListinoSearch = setListinoSearch;
+const hasFilter = () => !!(state.brand || state.series || _listinoSearch);
+function _matchesListinoSearch(p){
+  if(!_listinoSearch) return true;
+  const q = _listinoSearch.toLowerCase();
+  return (p.code||'').toLowerCase().includes(q)
+      || (p.series||'').toLowerCase().includes(q)
+      || (p.color||'').toLowerCase().includes(q)
+      || (p.finish||'').toLowerCase().includes(q)
+      || (p.size||'').toLowerCase().includes(q)
+      || (p.subseries||'').toLowerCase().includes(q)
+      || (p.brand||'').toLowerCase().includes(q);
+}
 const filtered = () => PRODUCTS.filter(p =>
   (!state.brand  || p.brand===state.brand)  &&
   (!state.series || p.series===state.series) &&
   (!state.size   || p.size===state.size)     &&
   (!state.finish || p.finish===state.finish) &&
-  (!state.color  || p.color===state.color)
+  (!state.color  || p.color===state.color)   &&
+  _matchesListinoSearch(p)
 );
 const inCart = c => cart.some(x=>x.product.code===c);
 const getEntry = c => cart.find(x=>x.product.code===c);
@@ -3532,8 +3715,18 @@ function clearCart(){ cart=[]; render(); updateCartUI(); }
 // Calcola il prezzo unitario finale di un item del carrello applicando il suo sconto specifico
 function cartItemFinalUnit(item){
   if(!item || !item.product) return 0;
-  const base = prezzoCorretto(item.product, item.mq);
+  const p = item.product;
   const d = item.discount || {type:'none'};
+  // Tipo "std": sconto composto a 3 step direttamente sul prezzo di listino (sostituisce DA/DB)
+  if(d.type === 'std' && Array.isArray(d.std) && d.std.length){
+    let pf = p.price || 0;
+    d.std.forEach(s => {
+      const v = parseFloat(s);
+      if(isFinite(v) && v > 0 && v < 100) pf *= (1 - v/100);
+    });
+    return pf;
+  }
+  const base = prezzoCorretto(p, item.mq);
   if(d.type === 'pct5')   return base * 0.95;
   if(d.type === 'pct10')  return base * 0.90;
   if(d.type === 'custom' && typeof d.customPrice === 'number' && d.customPrice >= 0) return d.customPrice;
@@ -3549,8 +3742,29 @@ function setCartItemDiscType(code, type){
   if(!item.discount) item.discount = {type:'none', customPrice:null};
   item.discount.type = type;
   if(type !== 'custom') item.discount.customPrice = null;
+  // Inizializza i 3 step "std" con i valori predefiniti del prodotto
+  // (sotto/sopra bancale) se l'utente sceglie il tipo 'std' per la prima volta
+  if(type === 'std' && (!Array.isArray(item.discount.std) || !item.discount.std.length)){
+    const p = item.product;
+    const sopraBancale = p.m2_pallet && (parseFloat(item.mq)||0) >= p.m2_pallet;
+    // Default: -60% -10% -5% (sotto bancale) oppure -60% -10% -10% (sopra bancale)
+    item.discount.std = sopraBancale ? [60, 10, 10] : [60, 10, 5];
+  }
   updateCartUI();
 }
+function setCartItemStd(code, idx, val){
+  const item = cart.find(c => c && c.product && c.product.code === code);
+  if(!item) return;
+  if(!item.discount) item.discount = {type:'std'};
+  if(!Array.isArray(item.discount.std)) item.discount.std = [60, 10, 5];
+  const i = parseInt(idx,10);
+  const v = parseFloat(String(val||'').replace(',', '.'));
+  item.discount.std[i] = (isFinite(v) && v >= 0 && v < 100) ? v : 0;
+  item.discount.type = 'std';
+  _updateCartItemRow(code);
+  _updateCartFooter();
+}
+window.setCartItemStd = setCartItemStd;
 function setCartItemCustomPrice(code, val){
   const item = cart.find(c => c && c.product && c.product.code === code);
   if(!item) return;
@@ -3607,7 +3821,7 @@ function _updateCartItemRow(code){
   const finalTot = cartItemFinalTot(item);
   const d = item.discount || {type:'none', customPrice:null};
   const dType = d.type || 'none';
-  const hasDisc = (dType === 'pct5' || dType === 'pct10' || (dType === 'custom' && d.customPrice !== null));
+  const hasDisc = (dType === 'pct5' || dType === 'pct10' || (dType === 'custom' && d.customPrice !== null) || (dType === 'std' && Array.isArray(d.std) && d.std.length));
   const noPriceYet = (dType === 'custom' && d.customPrice === null);
 
   // Totale
@@ -3721,6 +3935,9 @@ function updateCartUI(){
     if(dType === 'pct5')  discBadge = '<span class="ci-disc-badge">−5%</span>';
     if(dType === 'pct10') discBadge = '<span class="ci-disc-badge">−10%</span>';
     if(dType === 'custom' && d.customPrice !== null) discBadge = '<span class="ci-disc-badge custom">'+fmt(d.customPrice)+'/mq</span>';
+    if(dType === 'std' && Array.isArray(d.std) && d.std.length){
+      discBadge = '<span class="ci-disc-badge std">−'+d.std[0]+'% −'+d.std[1]+'% −'+d.std[2]+'%</span>';
+    }
 
     // Info bancali da mettere sotto il valore mq
     let bancaliHtml = '';
@@ -3778,10 +3995,34 @@ function updateCartUI(){
         <button type="button" class="ci-disc-btn${dType==='pct5'?' active':''}" onclick="setCartItemDiscType('${p.code}','pct5')">−5%</button>
         <button type="button" class="ci-disc-btn${dType==='pct10'?' active':''}" onclick="setCartItemDiscType('${p.code}','pct10')">−10%</button>
         <button type="button" class="ci-disc-btn${dType==='custom'?' active':''}" onclick="setCartItemDiscType('${p.code}','custom')">€/mq</button>
+        <button type="button" class="ci-disc-btn${dType==='std'?' active':''}" onclick="setCartItemDiscType('${p.code}','std')" title="Modifica gli sconti standard (paletta)">Std</button>
       </div>
       <div class="ci-disc-custom-wrap" id="ci-disc-custom-${p.code}" style="${customWrapStyle}">
         <input type="number" step="0.01" min="0" placeholder="Prezzo personalizzato €/mq (es. 12.50)" value="${customVal}" oninput="setCartItemCustomPrice('${p.code}', this.value)" class="ci-disc-custom-input"/>
       </div>
+      ${(() => {
+        const isStd = dType === 'std';
+        const std = (d.std && d.std.length) ? d.std : (p.m2_pallet && mq >= p.m2_pallet ? [60,10,10] : [60,10,5]);
+        return `<div class="ci-disc-std-wrap" id="ci-disc-std-${p.code}" style="${isStd?'':'display:none;'}">
+          <div class="ci-disc-std-lbl">Sconti standard (${p.m2_pallet && mq >= p.m2_pallet ? 'sopra paletta' : 'sotto paletta'}):</div>
+          <div class="ci-disc-std-row">
+            <div class="ci-disc-std-step">
+              <input type="number" min="0" max="99" step="1" value="${std[0]||0}" oninput="setCartItemStd('${p.code}',0,this.value)" class="ci-disc-std-input"/>
+              <span class="ci-disc-std-unit">%</span>
+            </div>
+            <span class="ci-disc-std-sep">+</span>
+            <div class="ci-disc-std-step">
+              <input type="number" min="0" max="99" step="1" value="${std[1]||0}" oninput="setCartItemStd('${p.code}',1,this.value)" class="ci-disc-std-input"/>
+              <span class="ci-disc-std-unit">%</span>
+            </div>
+            <span class="ci-disc-std-sep">+</span>
+            <div class="ci-disc-std-step">
+              <input type="number" min="0" max="99" step="1" value="${std[2]||0}" oninput="setCartItemStd('${p.code}',2,this.value)" class="ci-disc-std-input"/>
+              <span class="ci-disc-std-unit">%</span>
+            </div>
+          </div>
+        </div>`;
+      })()}
     </div>`;
   }).join('');
 
@@ -3917,12 +4158,29 @@ function cartSearch(q){
   if(!q){ resultsEl.classList.remove('visible'); resultsEl.innerHTML=''; return; }
 
   const ql = q.toLowerCase();
-  // Cerca per codice (priorità) o serie o colore
-  const matches = PRODUCTS.filter(p =>
-    p.code.toLowerCase().includes(ql) ||
-    p.series.toLowerCase().includes(ql) ||
-    (p.color && p.color.toLowerCase().includes(ql))
-  ).slice(0, 10);
+  // Cerca su tutti i campi rilevanti con scoring (match più precisi prima)
+  const scored = [];
+  PRODUCTS.forEach(p => {
+    const code = (p.code||'').toLowerCase();
+    const series = (p.series||'').toLowerCase();
+    const color = (p.color||'').toLowerCase();
+    const finish = (p.finish||'').toLowerCase();
+    const size = (p.size||'').toLowerCase();
+    const subseries = (p.subseries||'').toLowerCase();
+    let score = -1;
+    if(code === ql) score = 100;
+    else if(code.startsWith(ql)) score = 90;
+    else if(series.startsWith(ql)) score = 80;
+    else if(code.includes(ql)) score = 70;
+    else if(series.includes(ql)) score = 60;
+    else if(color.includes(ql)) score = 50;
+    else if(subseries.includes(ql)) score = 40;
+    else if(finish.includes(ql)) score = 30;
+    else if(size.includes(ql)) score = 20;
+    if(score >= 0) scored.push({p, score});
+  });
+  scored.sort((a,b) => b.score - a.score);
+  const matches = scored.slice(0, 30).map(x => x.p);
 
   if(!matches.length){
     resultsEl.innerHTML = '<div class="cp-sr-none">Nessun prodotto trovato</div>';
@@ -5110,7 +5368,11 @@ function _renderRotGrid(cid, e){
       var swatch = colorMeta ? '<span class="esp-rot-swatch" style="background:'+colorMeta.swatch+'"></span>' : '';
       var seriesShort = item.series ? toT(item.series) : '';
       var colorShort  = item.color || '';
-      return '<div class="esp-rot-slot filled" data-slot="'+idx+'">'
+      // Stato del campione (presente/sostituire/fuoriprod/ordinato/programma)
+      var statInfo = _statInfo(item.status||'presente');
+      var statusDot = '<button class="esp-rot-slot-status" onclick="event.stopPropagation();_toggleSlotStatusMenu(this,\''+e.id+'\','+idx+')" title="Stato: '+(statInfo.label||'Nessuno')+'" style="--st-color:'+(statInfo.dot||'#ccc')+'"><span class="esp-rot-slot-status-dot"></span></button>';
+      return '<div class="esp-rot-slot filled '+(statInfo.cls||'')+'" data-slot="'+idx+'">'
+        + statusDot
         + '<div class="esp-rot-slot-num">#'+slotNum+'</div>'
         + '<div class="esp-rot-slot-code">'+_esc(item.code||'')+'</div>'
         + '<div class="esp-rot-slot-series">'+_esc(seriesShort)+'</div>'
@@ -5311,6 +5573,99 @@ function _moveRotSlotTo(eid, slotIdx){
 }
 window._moveRotSlotTo = _moveRotSlotTo;
 
+/* Apre/chiude il menu di scelta stato per uno slot del Merch.
+   Il menu viene allegato al body (position:fixed) per non essere tagliato dall'overflow:hidden dello slot. */
+function _toggleSlotStatusMenu(btn, eid, slotIdx){
+  // Se è già aperto un menu per lo stesso slot, chiudilo (toggle)
+  var existing = document.getElementById('slot-status-menu-open');
+  if(existing){
+    existing.remove();
+    // Se cliccavi lo stesso pulsante, fermati qui (toggle off)
+    if(existing.dataset.btn === btn.getAttribute('data-key')) return;
+  }
+  var cid=null,cids=Object.keys(clients);
+  for(var k=0;k<cids.length;k++){
+    if(_getEsps(cids[k]).find(function(e){return e.id===eid;})){ cid = cids[k]; break; }
+  }
+  if(!cid) return;
+  var e = _getEsps(cid).find(function(x){return x.id===eid;});
+  if(!e) return;
+  var idx = parseInt(slotIdx,10);
+  var item = e.items.find(function(x){return x.slot === idx;});
+  if(!item) return;
+  var currentStatus = item.status || 'presente';
+  // Crea il menu
+  var menu = document.createElement('div');
+  menu.id = 'slot-status-menu-open';
+  menu.className = 'slot-status-menu';
+  var html = '';
+  _STATI.forEach(function(s){
+    if(!s.id) return; // salta "Nessuno" (vuoto)
+    var active = (s.id === currentStatus) ? ' active' : '';
+    html += '<div class="slot-status-menu-item'+active+'" onclick="_setSlotStatus(\''+e.id+'\','+idx+',\''+s.id+'\')">'
+      + '<span class="slot-status-menu-dot" style="--dot-color:'+s.dot+'"></span>'
+      + '<span>'+s.label+'</span>'
+      + '</div>';
+  });
+  menu.innerHTML = html;
+  document.body.appendChild(menu);
+  // Posiziona il menu accanto al pulsante (sotto, allineato a sinistra). Aggiusta se va fuori dallo schermo.
+  var rect = btn.getBoundingClientRect();
+  var top = rect.bottom + 4;
+  var left = rect.left;
+  // Misura il menu per evitare di uscire dallo schermo
+  var menuW = menu.offsetWidth || 160;
+  var menuH = menu.offsetHeight || 200;
+  var vw = window.innerWidth, vh = window.innerHeight;
+  if(left + menuW > vw - 8) left = vw - menuW - 8;
+  if(left < 8) left = 8;
+  if(top + menuH > vh - 8) top = rect.top - menuH - 4; // mostra sopra se non c'è spazio sotto
+  if(top < 8) top = 8;
+  menu.style.top  = top + 'px';
+  menu.style.left = left + 'px';
+  // Chiudi al click esterno (al prossimo tick per non chiudere subito)
+  setTimeout(function(){
+    document.addEventListener('mousedown', _closeSlotStatusMenuOnce);
+    document.addEventListener('touchstart', _closeSlotStatusMenuOnce, {passive:true});
+  }, 0);
+}
+window._toggleSlotStatusMenu = _toggleSlotStatusMenu;
+
+function _closeSlotStatusMenuOnce(ev){
+  var menu = document.getElementById('slot-status-menu-open');
+  if(!menu) {
+    document.removeEventListener('mousedown', _closeSlotStatusMenuOnce);
+    document.removeEventListener('touchstart', _closeSlotStatusMenuOnce);
+    return;
+  }
+  if(menu.contains(ev.target) || (ev.target.closest && ev.target.closest('.esp-rot-slot-status'))) return;
+  menu.remove();
+  document.removeEventListener('mousedown', _closeSlotStatusMenuOnce);
+  document.removeEventListener('touchstart', _closeSlotStatusMenuOnce);
+}
+
+/* Imposta lo stato di un campione in uno slot del Merch */
+function _setSlotStatus(eid, slotIdx, statusId){
+  var cid=null,cids=Object.keys(clients);
+  for(var k=0;k<cids.length;k++){
+    if(_getEsps(cids[k]).find(function(e){return e.id===eid;})){ cid = cids[k]; break; }
+  }
+  if(!cid) return;
+  var e = _getEsps(cid).find(function(x){return x.id===eid;});
+  if(!e) return;
+  var idx = parseInt(slotIdx,10);
+  var item = e.items.find(function(x){return x.slot === idx;});
+  if(!item) return;
+  item.status = statusId;
+  saveClients({immediate:true});
+  var menu = document.getElementById('slot-status-menu-open');
+  if(menu) menu.remove();
+  document.removeEventListener('mousedown', _closeSlotStatusMenuOnce);
+  document.removeEventListener('touchstart', _closeSlotStatusMenuOnce);
+  renderOrderDetail();
+}
+window._setSlotStatus = _setSlotStatus;
+
 function _remRotSlot(eid, slotIdx){
   var cid=null,cids=Object.keys(clients);
   for(var k=0;k<cids.length;k++){
@@ -5376,9 +5731,30 @@ function _srch(eid,q){
   if(!q.trim()){res.style.display='none';return;}
   _ST[eid]=setTimeout(function(){
     var ql=q.toLowerCase();
-    var found=PRODUCTS.filter(function(p){
-      return p.type==='fondo'&&(p.code.toLowerCase().startsWith(ql)||p.series.toLowerCase().includes(ql)||(p.color||'').toLowerCase().includes(ql));
-    }).slice(0,10);
+    // Cerca con includes (non startsWith) su tutti i campi rilevanti, su tutti i tipi.
+    // Scoring: match esatto > inizio codice > inizio serie > includes generico.
+    var scored = [];
+    PRODUCTS.forEach(function(p){
+      var code = (p.code||'').toLowerCase();
+      var series = (p.series||'').toLowerCase();
+      var color = (p.color||'').toLowerCase();
+      var finish = (p.finish||'').toLowerCase();
+      var size = (p.size||'').toLowerCase();
+      var subseries = (p.subseries||'').toLowerCase();
+      var score = -1;
+      if(code === ql) score = 100;
+      else if(code.startsWith(ql)) score = 90;
+      else if(series.startsWith(ql)) score = 80;
+      else if(code.includes(ql)) score = 70;
+      else if(series.includes(ql)) score = 60;
+      else if(color.includes(ql)) score = 50;
+      else if(subseries.includes(ql)) score = 40;
+      else if(finish.includes(ql)) score = 30;
+      else if(size.includes(ql)) score = 20;
+      if(score >= 0) scored.push({p:p, score:score});
+    });
+    scored.sort(function(a,b){ return b.score - a.score; });
+    var found = scored.slice(0, 30).map(function(x){return x.p;});
     if(!found.length){res.style.display='none';return;}
     var h='';
     found.forEach(function(p){
@@ -5505,6 +5881,23 @@ function _exportXls(cid){
   var esps=_getEsps(cid);
   if(!esps.length){alert('Nessun espositore da esportare.');return;}
 
+  // Verifica che la libreria XLSX sia stata caricata (da CDN)
+  if(typeof XLSX === 'undefined' || !XLSX.utils){
+    var msg = 'Libreria Excel non caricata.\n\n'
+      + 'Probabilmente il browser ha bloccato il download della libreria da Internet.\n\n'
+      + 'Possibili cause:\n'
+      + '• Stai aprendo il file in modalità anteprima (es. anteprima di OneDrive) che blocca le risorse esterne\n'
+      + '• Non sei connesso a Internet\n'
+      + '• Un antivirus/firewall blocca cdnjs.cloudflare.com\n\n'
+      + 'Soluzione: apri il file direttamente con il browser (doppio click sul file index.html) e assicurati di essere online.\n\n'
+      + 'Vuoi esportare comunque in CSV (formato testo) come alternativa?';
+    if(confirm(msg)){
+      _exportCsv(cid);
+    }
+    return;
+  }
+
+  try {
   var wb=XLSX.utils.book_new();
   var wsData=[];
 
@@ -5583,7 +5976,66 @@ function _exportXls(cid){
 
   XLSX.utils.book_append_sheet(wb, ws, c.name.substring(0,31));
   XLSX.writeFile(wb, 'Inventario_'+c.name.replace(/[^a-zA-Z0-9]/g,'_')+'.xlsx');
+  } catch(err){
+    console.error('Errore export XLS:', err);
+    if(confirm('Errore nell\'export Excel: '+err.message+'\n\nVuoi esportare in CSV (testo) come alternativa?')){
+      _exportCsv(cid);
+    }
+  }
 }
+
+/* Esporta inventario come CSV (fallback senza libreria esterna) */
+function _exportCsv(cid){
+  var c=clients[cid];
+  if(!c){alert('Cliente non trovato.');return;}
+  var esps=_getEsps(cid);
+  if(!esps.length){alert('Nessun espositore da esportare.');return;}
+  function _csvEsc(s){
+    s = String(s == null ? '' : s);
+    if(/[",;\n\r]/.test(s)) return '"'+s.replace(/"/g,'""')+'"';
+    return s;
+  }
+  var statusLabels={
+    'presente':'Presente','sostituire':'Da sostituire',
+    'fuoriprod':'Fuori produzione','ordinato':'Ordinato','programma':'In programma'
+  };
+  var lines = [];
+  lines.push(['Espositore','Serie','Colore','Finitura','Formato','Codice','Stato','Note','Slot'].map(_csvEsc).join(';'));
+  esps.forEach(function(e){
+    if(!e.items.length){
+      lines.push([_csvEsc(e.name), '(nessun campione)','','','','','','',''].join(';'));
+    } else {
+      e.items.forEach(function(item){
+        lines.push([
+          _csvEsc(e.name),
+          _csvEsc(item.series||''),
+          _csvEsc(item.color||''),
+          _csvEsc(item.finish||''),
+          _csvEsc(item.size?(item.size+' cm'):''),
+          _csvEsc(item.code||''),
+          _csvEsc(statusLabels[item.status||'presente']||''),
+          _csvEsc(item.note||''),
+          (typeof item.slot === 'number' ? (item.slot+1) : '')
+        ].join(';'));
+      });
+    }
+    lines.push(''); // riga vuota separatrice
+  });
+  // BOM UTF-8 per Excel
+  var csv = '﻿' + lines.join('\r\n');
+  var blob = new Blob([csv], {type: 'text/csv;charset=utf-8'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'Inventario_'+c.name.replace(/[^a-zA-Z0-9]/g,'_')+'.csv';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function(){
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, 100);
+}
+window._exportCsv = _exportCsv;
 
 // ── MODALS ────────────────────────────────────────────────────────────────────
 function closeModal(id){ $(id).classList.remove('open'); }
