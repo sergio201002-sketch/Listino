@@ -2214,6 +2214,101 @@ window.FIREBASE_CONFIG = {
 </div>
 
 <!-- MODAL: gestione tipi espositore personalizzati -->
+<!-- MODAL: condizioni speciali del cliente (prezzi netti, sconti su brand/serie/formato/finitura) -->
+<div class="modal-bg" id="modal-client-rules" style="z-index:520">
+  <div class="modal" style="max-width:640px;width:96vw">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <h3 style="margin:0">Condizioni speciali — <span id="mcr-client-name"></span></h3>
+      <button class="cp-close" onclick="closeModal('modal-client-rules')" style="background:rgba(0,0,0,0.06);color:var(--dark);border:none">✕</button>
+    </div>
+    <p style="font-size:12px;color:var(--mid);margin-bottom:14px">Definisci prezzi netti o sconti speciali che si applicheranno automaticamente quando aggiungi questo cliente al carrello. Le regole vengono valutate dall'alto verso il basso: la prima che combacia con il prodotto viene applicata.</p>
+
+    <!-- Form crea/modifica regola -->
+    <div class="cr-form" id="cr-form">
+      <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+        <div style="flex:1 1 100%">
+          <label class="save-order-lbl" for="cr-name">Nome regola</label>
+          <input type="text" class="modal-input" id="cr-name" placeholder="Es. Prezzi netti Be-Square" maxlength="80" style="margin-bottom:0"/>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+        <div style="flex:1 1 45%">
+          <label class="save-order-lbl">Brand</label>
+          <select class="modal-input" id="cr-brand" style="margin-bottom:0" onchange="_crBrandChange()"></select>
+        </div>
+        <div style="flex:1 1 45%">
+          <label class="save-order-lbl">Serie</label>
+          <select class="modal-input" id="cr-series" style="margin-bottom:0"></select>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+        <div style="flex:1 1 45%">
+          <label class="save-order-lbl">Formati (opz.)</label>
+          <input type="text" class="modal-input" id="cr-sizes" placeholder="Es. 60x60, 30x60" style="margin-bottom:0"/>
+        </div>
+        <div style="flex:1 1 45%">
+          <label class="save-order-lbl">Finiture (opz.)</label>
+          <input type="text" class="modal-input" id="cr-finishes" placeholder="Es. Naturale R10 Rett." style="margin-bottom:0"/>
+        </div>
+      </div>
+
+      <label class="save-order-lbl">Tipo di condizione</label>
+      <div class="cr-effect" style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap">
+        <label class="esp-type-shape-opt" style="flex:1 1 28%">
+          <input type="radio" name="cr-effect" value="net" checked onchange="_crEffectChange()"/>
+          <span>Prezzo netto<br><span class="esp-type-shape-sub">€/mq fisso</span></span>
+        </label>
+        <label class="esp-type-shape-opt" style="flex:1 1 28%">
+          <input type="radio" name="cr-effect" value="std" onchange="_crEffectChange()"/>
+          <span>Sconto comp.<br><span class="esp-type-shape-sub">3 step %</span></span>
+        </label>
+        <label class="esp-type-shape-opt" style="flex:1 1 28%">
+          <input type="radio" name="cr-effect" value="pct" onchange="_crEffectChange()"/>
+          <span>Sconto %<br><span class="esp-type-shape-sub">singolo sul listino</span></span>
+        </label>
+      </div>
+
+      <!-- Input "net" -->
+      <div class="cr-effect-input" id="cr-eff-net">
+        <label class="save-order-lbl" for="cr-net-price">Prezzo netto €/mq</label>
+        <input type="number" min="0" step="0.01" class="modal-input" id="cr-net-price" placeholder="Es. 25.00" style="margin-bottom:0"/>
+      </div>
+      <!-- Input "std" -->
+      <div class="cr-effect-input" id="cr-eff-std" style="display:none">
+        <label class="save-order-lbl">Sconti composti (3 step)</label>
+        <div style="display:flex;align-items:center;gap:4px">
+          <input type="number" min="0" max="99" class="modal-input" id="cr-std-1" placeholder="60" style="margin-bottom:0;width:70px;text-align:right"/>
+          <span>%</span>
+          <span style="color:#6B3FA0;font-weight:800">+</span>
+          <input type="number" min="0" max="99" class="modal-input" id="cr-std-2" placeholder="10" style="margin-bottom:0;width:70px;text-align:right"/>
+          <span>%</span>
+          <span style="color:#6B3FA0;font-weight:800">+</span>
+          <input type="number" min="0" max="99" class="modal-input" id="cr-std-3" placeholder="5" style="margin-bottom:0;width:70px;text-align:right"/>
+          <span>%</span>
+        </div>
+      </div>
+      <!-- Input "pct" -->
+      <div class="cr-effect-input" id="cr-eff-pct" style="display:none">
+        <label class="save-order-lbl" for="cr-pct-val">Sconto % sul prezzo finale</label>
+        <input type="number" min="0" max="99" step="0.5" class="modal-input" id="cr-pct-val" placeholder="Es. 15" style="margin-bottom:0"/>
+      </div>
+
+      <button onclick="_saveClientRule()" class="btn-modal-ok" style="margin-top:14px">+ Aggiungi condizione</button>
+      <button onclick="_cancelClientRuleEdit()" class="btn-modal-cancel" id="cr-cancel-edit" style="margin-left:6px;display:none">Annulla modifica</button>
+    </div>
+
+    <!-- Lista regole esistenti -->
+    <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--border)">
+      <div style="font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--mid);margin-bottom:8px">Condizioni attive</div>
+      <div id="cr-list" style="display:flex;flex-direction:column;gap:6px"></div>
+    </div>
+
+    <div class="modal-actions" style="margin-top:18px">
+      <button class="btn-modal-cancel" onclick="closeModal('modal-client-rules')">Chiudi</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-bg" id="modal-esp-types" style="z-index:520">
   <div class="modal" style="max-width:520px;width:96vw">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
@@ -2418,7 +2513,12 @@ function setOrderRecipient(val){
   try { localStorage.setItem('order_recipient', _orderRecipient); } catch(e){}
   _renderCartOutput();
 }
-function setCartClientId(val){ _cartClientId = val || ''; _renderCartOutput(); }
+function setCartClientId(val){
+  _cartClientId = val || '';
+  _renderCartOutput();
+  // Ri-render del carrello per applicare/rimuovere automaticamente le condizioni speciali del cliente
+  try { updateCartUI(); } catch(_){}
+}
 function setCartRef(val){ _cartRef = String(val||'').slice(0,120); _renderCartOutput(); }
 window.setOrderRecipient = setOrderRecipient;
 window.setCartClientId = setCartClientId;
@@ -3730,6 +3830,25 @@ function cartItemFinalUnit(item){
   if(d.type === 'pct5')   return base * 0.95;
   if(d.type === 'pct10')  return base * 0.90;
   if(d.type === 'custom' && typeof d.customPrice === 'number' && d.customPrice >= 0) return d.customPrice;
+  // Se non c'è uno sconto esplicito e c'è un cliente selezionato, prova ad applicare le regole speciali
+  if(d.type === 'none' || !d.type){
+    const cid = (typeof _cartClientId !== 'undefined') ? _cartClientId : '';
+    if(cid){
+      const rule = _findClientRule(cid, p);
+      if(rule){
+        if(rule.effect === 'net' && typeof rule.netPrice === 'number') return rule.netPrice;
+        if(rule.effect === 'std' && Array.isArray(rule.std)){
+          let pf = p.price || 0;
+          rule.std.forEach(s => {
+            const v = parseFloat(s);
+            if(isFinite(v) && v > 0 && v < 100) pf *= (1 - v/100);
+          });
+          return pf;
+        }
+        if(rule.effect === 'pct' && typeof rule.pct === 'number') return base * (1 - rule.pct/100);
+      }
+    }
+  }
   return base;
 }
 function cartItemFinalTot(item){
@@ -4699,7 +4818,10 @@ function renderOrderDetail(){
   }
   var h='<div class="od-header">';
   h+='<div class="od-title">'+c.name+'</div>';
-  h+='<div class="od-actions"><button class="btn-del-client" data-cid="'+c.id+'" onclick="deleteClient(this.dataset.cid)">\uD83D\uDDD1 Elimina</button></div>';
+  h+='<div class="od-actions">';
+  h+='<button class="btn-del-client" data-cid="'+c.id+'" onclick="openClientRules(this.dataset.cid)" style="border-color:#6B3FA0;color:#6B3FA0" title="Condizioni speciali (prezzi netti, sconti)">\u2699 Condizioni</button>';
+  h+='<button class="btn-del-client" data-cid="'+c.id+'" onclick="deleteClient(this.dataset.cid)">\uD83D\uDDD1 Elimina</button>';
+  h+='</div>';
   h+='</div>';
   h+='<div class="client-tabs">';
   h+='<button class="client-tab'+(tab==='ordini'?' active':'')+'" data-cid="'+c.id+'" data-tab="ordini" onclick="_setTab(this.dataset.cid,this.dataset.tab)">\uD83D\uDCE6 Ordini</button>';
@@ -4776,6 +4898,207 @@ function deleteOrder(clientId, orderId){
     renderClientList();
   });
 }
+
+/* ── CONDIZIONI SPECIALI PER CLIENTE ──────────────────────────────────────
+   Permette di definire prezzi netti o sconti speciali su combinazioni di
+   brand/serie/formato/finitura. Le regole sono salvate in clients[id].pricingRules.
+   Quando un cliente è selezionato nel carrello, le regole vengono applicate
+   automaticamente ai prodotti corrispondenti. */
+
+var _crEditingClientId = null;
+var _crEditingRuleId = null;
+
+function _getClientRules(cid){
+  if(!clients[cid]) return [];
+  if(!Array.isArray(clients[cid].pricingRules)) clients[cid].pricingRules = [];
+  return clients[cid].pricingRules;
+}
+
+function openClientRules(cid){
+  if(!clients[cid]){ alert('Cliente non trovato.'); return; }
+  _crEditingClientId = cid;
+  _crEditingRuleId = null;
+  document.getElementById('mcr-client-name').textContent = clients[cid].name;
+  // Popola select brand
+  var brandSel = document.getElementById('cr-brand');
+  brandSel.innerHTML = '<option value="">Tutti</option>';
+  var brands = [...new Set(PRODUCTS.map(function(p){return p.brand;}).filter(Boolean))].sort();
+  brands.forEach(function(b){
+    var o = document.createElement('option'); o.value = b; o.textContent = toT(b); brandSel.appendChild(o);
+  });
+  _crBrandChange();
+  _crEffectChange();
+  _resetClientRuleForm();
+  _renderClientRulesList();
+  document.getElementById('modal-client-rules').classList.add('open');
+}
+window.openClientRules = openClientRules;
+
+function _crBrandChange(){
+  var brandSel = document.getElementById('cr-brand');
+  var seriesSel = document.getElementById('cr-series');
+  seriesSel.innerHTML = '<option value="">Tutte</option>';
+  var b = brandSel.value;
+  var pool = b ? PRODUCTS.filter(function(p){return p.brand === b;}) : PRODUCTS;
+  var series = [...new Set(pool.map(function(p){return p.series;}).filter(Boolean))].sort();
+  series.forEach(function(s){
+    var o = document.createElement('option'); o.value = s; o.textContent = toT(s); seriesSel.appendChild(o);
+  });
+}
+window._crBrandChange = _crBrandChange;
+
+function _crEffectChange(){
+  var sel = document.querySelector('input[name="cr-effect"]:checked');
+  var v = sel ? sel.value : 'net';
+  document.getElementById('cr-eff-net').style.display = (v === 'net') ? '' : 'none';
+  document.getElementById('cr-eff-std').style.display = (v === 'std') ? '' : 'none';
+  document.getElementById('cr-eff-pct').style.display = (v === 'pct') ? '' : 'none';
+}
+window._crEffectChange = _crEffectChange;
+
+function _resetClientRuleForm(){
+  _crEditingRuleId = null;
+  ['cr-name','cr-net-price','cr-std-1','cr-std-2','cr-std-3','cr-pct-val','cr-sizes','cr-finishes'].forEach(function(id){
+    var el = document.getElementById(id); if(el) el.value = '';
+  });
+  var brandSel = document.getElementById('cr-brand'); if(brandSel) brandSel.value = '';
+  _crBrandChange();
+  var radio = document.querySelector('input[name="cr-effect"][value="net"]'); if(radio) radio.checked = true;
+  _crEffectChange();
+  var btn = document.querySelector('#cr-form .btn-modal-ok'); if(btn) btn.textContent = '+ Aggiungi condizione';
+  var cancelBtn = document.getElementById('cr-cancel-edit'); if(cancelBtn) cancelBtn.style.display = 'none';
+}
+
+function _cancelClientRuleEdit(){ _resetClientRuleForm(); }
+window._cancelClientRuleEdit = _cancelClientRuleEdit;
+
+function _saveClientRule(){
+  if(!_crEditingClientId) return;
+  var nm = (document.getElementById('cr-name').value || '').trim();
+  var brand = document.getElementById('cr-brand').value || '';
+  var series = document.getElementById('cr-series').value || '';
+  var sizesRaw = (document.getElementById('cr-sizes').value || '').trim();
+  var finishesRaw = (document.getElementById('cr-finishes').value || '').trim();
+  var effect = (document.querySelector('input[name="cr-effect"]:checked')||{}).value || 'net';
+  // Crea la regola
+  var rule = {
+    id: _crEditingRuleId || uid(),
+    name: nm || ('Condizione ' + ((_getClientRules(_crEditingClientId).length||0)+1)),
+    brand: brand,
+    series: series,
+    sizes: sizesRaw ? sizesRaw.split(',').map(function(s){return s.trim();}).filter(Boolean) : [],
+    finishes: finishesRaw ? finishesRaw.split(',').map(function(s){return s.trim().toLowerCase();}).filter(Boolean) : [],
+    effect: effect
+  };
+  if(effect === 'net'){
+    var np = parseFloat(document.getElementById('cr-net-price').value);
+    if(!isFinite(np) || np < 0){ alert('Inserisci un prezzo netto valido.'); return; }
+    rule.netPrice = np;
+  } else if(effect === 'std'){
+    var s1 = parseFloat(document.getElementById('cr-std-1').value) || 0;
+    var s2 = parseFloat(document.getElementById('cr-std-2').value) || 0;
+    var s3 = parseFloat(document.getElementById('cr-std-3').value) || 0;
+    if(s1 === 0 && s2 === 0 && s3 === 0){ alert('Inserisci almeno uno sconto non nullo.'); return; }
+    rule.std = [s1, s2, s3];
+  } else if(effect === 'pct'){
+    var pv = parseFloat(document.getElementById('cr-pct-val').value);
+    if(!isFinite(pv) || pv <= 0 || pv >= 100){ alert('Inserisci uno sconto % valido (0-99).'); return; }
+    rule.pct = pv;
+  }
+  var rules = _getClientRules(_crEditingClientId);
+  if(_crEditingRuleId){
+    var idx = rules.findIndex(function(r){return r.id === _crEditingRuleId;});
+    if(idx >= 0) rules[idx] = rule;
+  } else {
+    rules.push(rule);
+  }
+  saveClients({immediate:true});
+  _resetClientRuleForm();
+  _renderClientRulesList();
+}
+window._saveClientRule = _saveClientRule;
+
+function _editClientRule(rid){
+  if(!_crEditingClientId) return;
+  var rule = _getClientRules(_crEditingClientId).find(function(r){return r.id === rid;});
+  if(!rule) return;
+  _crEditingRuleId = rid;
+  document.getElementById('cr-name').value = rule.name || '';
+  document.getElementById('cr-brand').value = rule.brand || '';
+  _crBrandChange();
+  document.getElementById('cr-series').value = rule.series || '';
+  document.getElementById('cr-sizes').value = (rule.sizes||[]).join(', ');
+  document.getElementById('cr-finishes').value = (rule.finishes||[]).join(', ');
+  var radio = document.querySelector('input[name="cr-effect"][value="'+(rule.effect||'net')+'"]');
+  if(radio) radio.checked = true;
+  _crEffectChange();
+  if(rule.effect === 'net') document.getElementById('cr-net-price').value = rule.netPrice || '';
+  if(rule.effect === 'std'){
+    document.getElementById('cr-std-1').value = (rule.std||[])[0] || '';
+    document.getElementById('cr-std-2').value = (rule.std||[])[1] || '';
+    document.getElementById('cr-std-3').value = (rule.std||[])[2] || '';
+  }
+  if(rule.effect === 'pct') document.getElementById('cr-pct-val').value = rule.pct || '';
+  var btn = document.querySelector('#cr-form .btn-modal-ok'); if(btn) btn.textContent = '✓ Salva modifiche';
+  var cancelBtn = document.getElementById('cr-cancel-edit'); if(cancelBtn) cancelBtn.style.display = '';
+}
+window._editClientRule = _editClientRule;
+
+function _delClientRule(rid){
+  if(!_crEditingClientId) return;
+  listinoConfirm('Eliminare questa condizione speciale?', function(){
+    clients[_crEditingClientId].pricingRules = _getClientRules(_crEditingClientId).filter(function(r){return r.id !== rid;});
+    saveClients({immediate:true});
+    _renderClientRulesList();
+  });
+}
+window._delClientRule = _delClientRule;
+
+function _renderClientRulesList(){
+  var el = document.getElementById('cr-list');
+  if(!el || !_crEditingClientId) return;
+  var rules = _getClientRules(_crEditingClientId);
+  if(!rules.length){
+    el.innerHTML = '<div style="font-size:12px;color:var(--light);text-align:center;padding:14px;background:var(--bg);border-radius:6px;border:1px dashed var(--border)">Nessuna condizione speciale.</div>';
+    return;
+  }
+  el.innerHTML = rules.map(function(r){
+    var crit = [];
+    if(r.brand) crit.push('<b>'+toT(r.brand)+'</b>');
+    if(r.series) crit.push(toT(r.series));
+    if(r.sizes && r.sizes.length) crit.push(r.sizes.join('/'));
+    if(r.finishes && r.finishes.length) crit.push(r.finishes.join('/'));
+    var critStr = crit.length ? crit.join(' · ') : '<i>Tutti i prodotti</i>';
+    var effStr = '';
+    if(r.effect === 'net') effStr = '<span style="color:#1A7A3C;font-weight:800">Netto '+fmt(r.netPrice||0)+'/mq</span>';
+    else if(r.effect === 'std') effStr = '<span style="color:#6B3FA0;font-weight:800">−'+(r.std||[0,0,0]).join('% −')+'%</span>';
+    else if(r.effect === 'pct') effStr = '<span style="color:#C8102E;font-weight:800">−'+r.pct+'%</span>';
+    return '<div style="display:flex;align-items:center;gap:8px;padding:9px 11px;background:white;border:1px solid var(--border);border-radius:6px">'
+      + '<div style="flex:1;min-width:0">'
+      + '<div style="font-size:12.5px;font-weight:800;color:var(--dark)">'+_esc(r.name||'(senza nome)')+'</div>'
+      + '<div style="font-size:10.5px;color:var(--mid);margin-top:2px">'+critStr+' → '+effStr+'</div>'
+      + '</div>'
+      + '<button onclick="_editClientRule(\''+r.id+'\')" style="background:none;border:1.5px solid var(--border);color:var(--mid);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:13px" title="Modifica">✎</button>'
+      + '<button onclick="_delClientRule(\''+r.id+'\')" style="background:none;border:1.5px solid var(--border);color:var(--mid);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:14px" title="Elimina">🗑</button>'
+      + '</div>';
+  }).join('');
+}
+
+/* Restituisce la regola applicabile (la prima) a un prodotto per il cliente specificato */
+function _findClientRule(cid, product){
+  if(!cid || !product || !clients[cid]) return null;
+  var rules = _getClientRules(cid);
+  for(var i=0;i<rules.length;i++){
+    var r = rules[i];
+    if(r.brand && product.brand !== r.brand) continue;
+    if(r.series && product.series !== r.series) continue;
+    if(r.sizes && r.sizes.length && !r.sizes.some(function(s){return (product.size||'').toLowerCase() === s.toLowerCase();})) continue;
+    if(r.finishes && r.finishes.length && !r.finishes.some(function(f){return (product.finish||'').toLowerCase().indexOf(f) !== -1;})) continue;
+    return r;
+  }
+  return null;
+}
+window._findClientRule = _findClientRule;
 
 function deleteClient(id){
   if(!clients[id]) return;
