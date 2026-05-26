@@ -864,6 +864,201 @@ header {
 .client-search:focus { outline: none; background: white; }
 .client-sample-hits { font-size: 10px; color: var(--red); font-weight: 700; margin-top: 2px; }
 .client-sample-hit-list { font-size: 10.5px; color: var(--mid); margin-top: 3px; line-height: 1.35; }
+
+/* Barra di ricerca dentro la vista cliente (cerca nei campioni di quel singolo cliente) */
+.cs-search-wrap {
+  display: flex; align-items: center; gap: 8px;
+  margin: 12px 20px 0;
+  padding: 9px 12px;
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  transition: border-color 0.15s;
+}
+.cs-search-wrap:focus-within { border-color: #6B3FA0; box-shadow: 0 0 0 3px rgba(107,63,160,0.08); }
+.cs-search-ic { width: 14px; height: 14px; color: var(--mid); flex-shrink: 0; }
+.cs-search-input {
+  flex: 1; min-width: 0;
+  border: none; outline: none; background: transparent;
+  font-family: 'Inter', sans-serif; font-size: 12.5px;
+  color: var(--dark); padding: 4px 0;
+}
+.cs-search-input::placeholder { color: var(--light); }
+.cs-search-clear {
+  background: none; border: none;
+  color: var(--light); cursor: pointer;
+  font-size: 13px;
+  width: 24px; height: 24px; border-radius: 50%;
+  display: none;
+  align-items: center; justify-content: center;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+  touch-action: manipulation;
+}
+.cs-search-clear:hover { background: var(--bg); color: var(--dark); }
+@media (max-width: 600px){
+  .cs-search-wrap { margin: 12px 12px 0; padding: 8px 10px; }
+  .cs-search-input { font-size: 12px; }
+}
+
+/* Riepilogo aggregato campioni per serie (cross-espositori) nella vista cliente */
+.cs-aggregate {
+  background: linear-gradient(135deg, #F3EEF8 0%, #FAF7FE 100%);
+  border: 1.5px solid #B7A3D6;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin: 12px 20px 0;
+}
+.cs-aggregate-empty { color: var(--mid); font-style: italic; text-align: center; background: var(--bg); border: 1px dashed var(--border); }
+.cs-aggregate-title { font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #6B3FA0; }
+.cs-aggregate-title strong { letter-spacing: 0; text-transform: none; color: var(--dark); }
+.cs-aggregate-summary { font-size: 11px; color: var(--mid); font-weight: 600; margin-top: 3px; margin-bottom: 10px; }
+.cs-aggregate-list { display: flex; flex-direction: column; gap: 10px; }
+.cs-aggregate-group { background: white; border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; }
+.cs-aggregate-group-head { font-size: 12px; font-weight: 800; color: var(--dark); letter-spacing: 0.02em; margin-bottom: 6px; overflow-wrap: anywhere; }
+.cs-aggregate-group-items { display: flex; flex-direction: column; gap: 4px; }
+.cs-aggregate-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-top: 1px dashed var(--border); font-size: 11.5px; overflow-wrap: anywhere; }
+.cs-aggregate-item:first-child { border-top: none; }
+.cs-aggregate-dot { width: 9px; height: 9px; border-radius: 50%; box-shadow: 0 0 5px currentColor; flex-shrink: 0; }
+.cs-aggregate-swatch { width: 14px; height: 14px; border-radius: 3px; border: 1px solid rgba(0,0,0,0.1); flex-shrink: 0; }
+.cs-aggregate-code { font-family: 'Inter', sans-serif; font-weight: 800; color: var(--dark); letter-spacing: 0.02em; min-width: 60px; }
+.cs-aggregate-color { flex: 1; color: var(--dark); font-weight: 700; min-width: 0; overflow-wrap: anywhere; }
+.cs-aggregate-esp { font-size: 10.5px; color: var(--mid); font-style: italic; }
+@media (max-width:600px){
+  .cs-aggregate { margin: 12px 12px 0; padding: 11px 12px; }
+  .cs-aggregate-esp { font-size: 9.5px; }
+}
+
+/* === Tab Campioni: albero gerarchico Azienda > Serie > Formato > Colori === */
+.cs-tree { padding: 16px 20px; display: flex; flex-direction: column; gap: 14px; }
+.cs-tree-toolbar {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; flex-wrap: wrap;
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.cs-tree-sum { font-size: 11.5px; font-weight: 700; color: var(--mid); }
+.cs-suggest-btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: white;
+  border: 1.5px solid var(--border);
+  color: var(--mid);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: 11.5px; font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.15s;
+  min-height: 32px;
+  -webkit-tap-highlight-color: rgba(255,193,7,0.2);
+  touch-action: manipulation;
+}
+.cs-suggest-btn:hover { border-color: #8A6500; color: #8A6500; }
+.cs-suggest-btn.active { background: #FEF7DD; border-color: #E5C661; color: #8A6500; box-shadow: 0 0 0 3px rgba(229,198,97,0.18); }
+
+.cs-tree-brand {
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.cs-tree-brand-head {
+  background: var(--dark);
+  color: white;
+  padding: 9px 14px;
+  font-size: 12px; font-weight: 800; letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.cs-tree-cnt { font-weight: 500; opacity: 0.7; letter-spacing: 0; text-transform: none; font-size: 10.5px; }
+.cs-tree-series {
+  padding: 10px 14px;
+  border-top: 1px solid var(--border);
+}
+.cs-tree-series:first-of-type { border-top: none; }
+.cs-tree-series-head {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px; font-weight: 800;
+  color: var(--red);
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+.cs-tree-fmt { margin-bottom: 8px; }
+.cs-tree-fmt:last-child { margin-bottom: 0; }
+.cs-tree-fmt-head {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--mid);
+  margin-bottom: 4px;
+}
+.cs-tree-colors {
+  display: flex; flex-wrap: wrap; gap: 5px;
+}
+.cs-color-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 11px; font-weight: 700;
+  border: 1px solid var(--border);
+  background: white;
+  max-width: 100%;
+}
+.cs-color-chip.owned { color: var(--dark); }
+.cs-color-chip.suggested {
+  background: #FEF7DD;
+  border-color: #E5C661;
+  color: #8A6500;
+  border-style: dashed;
+}
+.cs-color-swatch {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.12);
+  flex-shrink: 0;
+}
+.cs-color-name { font-size: 11px; }
+.cs-color-cnt {
+  background: var(--dark);
+  color: white;
+  font-size: 9.5px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 8px;
+  margin-left: 1px;
+}
+.cs-color-sug {
+  color: #8A6500;
+  font-weight: 900;
+  font-size: 13px;
+  line-height: 0.9;
+}
+.cs-tree-suggest {
+  margin-top: 8px;
+  padding: 10px 12px;
+  background: #FFFCEC;
+  border: 1px dashed #E5C661;
+  border-radius: 7px;
+}
+.cs-tree-suggest-head {
+  font-size: 11px;
+  font-weight: 700;
+  color: #8A6500;
+  margin-bottom: 6px;
+}
+.cs-tree-suggest-head strong { color: var(--dark); }
+.cs-tree-suggest-full {
+  text-align: center;
+  color: var(--green);
+  font-weight: 700;
+  font-size: 12px;
+  background: #E6F5EC;
+  border-color: #B5DDC5;
+}
+@media (max-width: 600px){
+  .cs-tree { padding: 14px 12px; }
+  .cs-tree-series { padding: 10px 12px; }
+}
 .client-items { overflow-y: auto; max-height: 600px; }
 .client-item { padding: 12px 16px; cursor: pointer; border-bottom: 1px solid var(--border); transition: background 0.1s; display: flex; align-items: center; justify-content: space-between; }
 .client-item:hover { background: var(--bg); }
@@ -4718,18 +4913,58 @@ function setClientSearchMode(mode, btn){
   document.querySelectorAll('.csm-btn').forEach(b=>b.classList.toggle('active', b===btn));
   const inp = $('client-search');
   if(inp){
-    inp.placeholder = (mode === 'sample')
-      ? 'Cerca campione (codice, serie, colore)...'
-      : 'Cerca cliente...';
+    if(mode === 'sample') inp.placeholder = 'Cerca campione (codice, serie, colore)...';
+    else if(mode === 'series') inp.placeholder = 'Cerca serie (mostra tutti i colori/formati)...';
+    else inp.placeholder = 'Cerca cliente...';
   }
   renderClientList();
+  // Se siamo in modalità series e c'è un cliente selezionato + un filtro, ri-render del dettaglio cliente
+  if(mode === 'series' && selectedClient){ try { renderOrderDetail(); } catch(_){} }
 }
 window.setClientSearchMode = setClientSearchMode;
 
-function filterClients(q){ clientFilter=(q||'').toLowerCase().trim(); renderClientList(); }
+function filterClients(q){
+  clientFilter=(q||'').toLowerCase().trim();
+  renderClientList();
+}
 
-// Restituisce la lista di campioni di un cliente che matchano la query (max 5)
-function _matchClientSamples(c, q){
+/* Filtro per ricerca campioni DENTRO il singolo cliente selezionato */
+var _clientInnerFilter = '';
+function setClientInnerSearch(q){
+  _clientInnerFilter = (q||'').trim();
+  if(!selectedClient) return;
+  // Aggiorniamo solo gli elementi che cambiano (per non perdere il focus dell'input)
+  // 1) Toggle visibility del bottone "pulisci"
+  var clr = document.getElementById('cs-client-search-clear');
+  if(clr) clr.style.display = _clientInnerFilter ? 'flex' : 'none';
+  // 2) Aggiorna il riepilogo aggregato (lo inseriamo/rimuoviamo prima dei tab)
+  var existing = document.querySelector('.od-header')?.parentElement?.querySelector('.cs-aggregate');
+  if(existing) existing.remove();
+  if(_clientInnerFilter){
+    var aggregateHtml = _renderClientSeriesAggregate(clients[selectedClient], _clientInnerFilter);
+    var tabsEl = document.querySelector('.client-tabs');
+    if(tabsEl){
+      var wrap = document.createElement('div');
+      wrap.innerHTML = aggregateHtml;
+      tabsEl.parentNode.insertBefore(wrap.firstChild, tabsEl);
+    }
+  }
+}
+window.setClientInnerSearch = setClientInnerSearch;
+
+// Reset del filtro per-cliente quando si cambia cliente
+var _origSelectClient = (typeof selectClient === 'function') ? selectClient : null;
+if(_origSelectClient){
+  selectClient = function(id){
+    _clientInnerFilter = '';
+    _origSelectClient(id);
+  };
+  window.selectClient = selectClient;
+}
+
+// Restituisce la lista di campioni di un cliente che matchano la query.
+// Se onlySeries=true cerca solo nel campo "series"
+function _matchClientSamples(c, q, onlySeries){
   if(!q) return [];
   const esps = (c && c.espositori) || [];
   const out = [];
@@ -4737,10 +4972,16 @@ function _matchClientSamples(c, q){
     if(!e || !Array.isArray(e.items)) continue;
     for(const it of e.items){
       if(!it) continue;
-      const hay = [
-        it.code||'', it.series||'', it.color||'', it.finish||'', it.size||'', it.brand||'', e.name||''
-      ].join(' ').toLowerCase();
-      if(hay.includes(q)) out.push({ esp: e.name||'', item: it });
+      let match;
+      if(onlySeries){
+        match = (it.series||'').toLowerCase().includes(q);
+      } else {
+        const hay = [
+          it.code||'', it.series||'', it.color||'', it.finish||'', it.size||'', it.brand||'', e.name||''
+        ].join(' ').toLowerCase();
+        match = hay.includes(q);
+      }
+      if(match) out.push({ esp: e.name||'', item: it });
     }
   }
   return out;
@@ -4750,14 +4991,15 @@ function renderClientList(){
   const el=$('client-items');
   const allClients = Object.values(clients).filter(c => c && c.id && c.name);
   let arr;
-  if(clientSearchMode === 'sample' && clientFilter){
+  if((clientSearchMode === 'sample' || clientSearchMode === 'series') && clientFilter){
+    const onlySeries = (clientSearchMode === 'series');
     // Filtra i clienti che hanno almeno un campione corrispondente
     arr = allClients
-      .map(c => ({ c, hits: _matchClientSamples(c, clientFilter) }))
+      .map(c => ({ c, hits: _matchClientSamples(c, clientFilter, onlySeries) }))
       .filter(x => x.hits.length > 0)
       .sort((a,b) => b.hits.length - a.hits.length || a.c.name.localeCompare(b.c.name));
     if(!arr.length){
-      el.innerHTML = '<div class="no-clients">Nessun campione trovato.</div>';
+      el.innerHTML = '<div class="no-clients">Nessun '+(onlySeries?'cliente con questa serie':'campione')+' trovato.</div>';
       return;
     }
     el.innerHTML = arr.map(({c, hits})=>{
@@ -4823,13 +5065,227 @@ function renderOrderDetail(){
   h+='<button class="btn-del-client" data-cid="'+c.id+'" onclick="deleteClient(this.dataset.cid)">\uD83D\uDDD1 Elimina</button>';
   h+='</div>';
   h+='</div>';
+  // Barra di ricerca DENTRO il cliente: cerca campioni (serie/colore/formato/finitura/codice) tra TUTTI gli espositori del cliente
+  h+='<div class="cs-search-wrap">';
+  h+='<svg class="cs-search-ic" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.4"/><path d="M9.5 9.5l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>';
+  h+='<input type="text" id="cs-client-search" class="cs-search-input" placeholder="Cerca nei campioni di '+_esc(c.name)+' (serie, colore, formato, codice)..." value="'+_esc(_clientInnerFilter)+'" oninput="setClientInnerSearch(this.value)" autocomplete="off"/>';
+  h+='<button type="button" class="cs-search-clear" id="cs-client-search-clear" onclick="setClientInnerSearch(\'\');document.getElementById(\'cs-client-search\').value=\'\'" style="display:'+(_clientInnerFilter?'flex':'none')+'" title="Pulisci">\u2715</button>';
+  h+='</div>';
+  // Riepilogo aggregato campioni se c'\u00E8 un filtro attivo per questo cliente
+  if(_clientInnerFilter){
+    h += _renderClientSeriesAggregate(c, _clientInnerFilter);
+  }
   h+='<div class="client-tabs">';
   h+='<button class="client-tab'+(tab==='ordini'?' active':'')+'" data-cid="'+c.id+'" data-tab="ordini" onclick="_setTab(this.dataset.cid,this.dataset.tab)">\uD83D\uDCE6 Ordini</button>';
   h+='<button class="client-tab'+(tab==='inventario'?' active':'')+'" data-cid="'+c.id+'" data-tab="inventario" onclick="_setTab(this.dataset.cid,this.dataset.tab)">\uD83C\uDFF7\uFE0F Inventario</button>';
+  h+='<button class="client-tab'+(tab==='campioni'?' active':'')+'" data-cid="'+c.id+'" data-tab="campioni" onclick="_setTab(this.dataset.cid,this.dataset.tab)">\uD83D\uDCCB Campioni</button>';
   h+='</div>';
+  // Calcola il body in base alla tab (ora con anche "campioni")
+  if(tab === 'campioni'){
+    bodyHtml = _renderClientCampioniTree(c);
+  }
   h+=bodyHtml;
   od.innerHTML=h;
 }
+
+/* \u2500\u2500 TAB "Campioni": vista albero gerarchica Azienda > Serie > Formato > Colore \u2500\u2500 */
+var _suggestMode = {}; // {cid: true/false} - se mostrare suggerimenti (colori mancanti)
+function _toggleSuggest(cid){
+  _suggestMode[cid] = !_suggestMode[cid];
+  renderOrderDetail();
+}
+window._toggleSuggest = _toggleSuggest;
+
+function _renderClientCampioniTree(c){
+  // Raccoglie TUTTI i campioni del cliente da tutti gli espositori
+  var owned = []; // array di item del cliente
+  (c.espositori||[]).forEach(function(e){
+    (e.items||[]).forEach(function(it){
+      if(it && it.code) owned.push({item: it, esp: e.name||''});
+    });
+  });
+  if(!owned.length){
+    return '<div class="od-empty"><div class="oi">\uD83D\uDCCB</div><p>Nessun campione</p><span>Aggiungi campioni agli espositori del cliente per vederli qui.</span></div>';
+  }
+  // Raggruppa per Brand > Serie > (Formato + Finitura)
+  var tree = {};
+  owned.forEach(function(o){
+    var it = o.item;
+    var b = (it.brand||'(Senza marchio)').toUpperCase();
+    var s = (it.series||'(Senza serie)').toUpperCase();
+    var fmt = it.size ? (it.size+' cm') : '(Senza formato)';
+    var fin = it.finish || '';
+    var k = fmt + (fin ? ' \u00B7 '+fin : '');
+    tree[b] = tree[b] || {};
+    tree[b][s] = tree[b][s] || {};
+    tree[b][s][k] = tree[b][s][k] || [];
+    tree[b][s][k].push(o);
+  });
+
+  var suggest = !!_suggestMode[c.id];
+  // Conta totali
+  var totItems = owned.length;
+  var brandCount = Object.keys(tree).length;
+  var seriesCount = 0;
+  Object.values(tree).forEach(function(t){ seriesCount += Object.keys(t).length; });
+
+  var h = '<div class="cs-tree">';
+  h += '<div class="cs-tree-toolbar">';
+  h += '<div class="cs-tree-sum">'+totItems+' campion'+(totItems===1?'e':'i')+' &middot; '+brandCount+' marchi &middot; '+seriesCount+' seri'+(seriesCount===1?'e':'i')+'</div>';
+  h += '<button class="cs-suggest-btn'+(suggest?' active':'')+'" onclick="_toggleSuggest(\''+c.id+'\')" title="Mostra anche i colori che il cliente NON ha (suggerimenti)">';
+  h += '<svg viewBox="0 0 24 24" fill="none" style="width:14px;height:14px;vertical-align:middle;margin-right:4px"><path d="M9 21h6M12 3a6 6 0 0 0-3.5 10.9c.4.3.6.7.5 1.1L9 17h6l0-2c-.1-.4.1-.8.5-1.1A6 6 0 0 0 12 3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+  h += '<span>Suggerimenti</span>';
+  h += '</button>';
+  h += '</div>';
+
+  // Sort brand in ordine specifico (EMILCERAMICA, ERGON, PROVENZA, VIVA, ...)
+  var BRAND_ORDER = {'EMILCERAMICA':1,'ERGON':2,'PROVENZA':3,'VIVA':4};
+  var sortedBrands = Object.keys(tree).sort(function(a,b){
+    var oa = BRAND_ORDER[a] || 99, ob = BRAND_ORDER[b] || 99;
+    if(oa !== ob) return oa - ob;
+    return a.localeCompare(b);
+  });
+
+  sortedBrands.forEach(function(b){
+    var brandData = tree[b];
+    var brandSeriesCount = Object.keys(brandData).length;
+    h += '<div class="cs-tree-brand">';
+    h += '<div class="cs-tree-brand-head">'+toT(b)+' <span class="cs-tree-cnt">('+brandSeriesCount+' seri'+(brandSeriesCount===1?'e':'i')+')</span></div>';
+    var sortedSeries = Object.keys(brandData).sort();
+    sortedSeries.forEach(function(s){
+      var seriesData = brandData[s];
+      // Raccoglie tutti i colori posseduti dal cliente per questa serie (cross-formato/finitura)
+      var ownedColorsInSeries = {};
+      Object.values(seriesData).forEach(function(arr){
+        arr.forEach(function(o){
+          if(!o.item.color) return;
+          var k = o.item.color.toUpperCase();
+          if(!ownedColorsInSeries[k]) ownedColorsInSeries[k] = o.item.color;
+        });
+      });
+      h += '<div class="cs-tree-series">';
+      h += '<div class="cs-tree-series-head">'+toT(s)+' <span class="cs-tree-cnt">'+Object.keys(ownedColorsInSeries).length+' color'+(Object.keys(ownedColorsInSeries).length===1?'e':'i')+'</span></div>';
+      var sortedFmts = Object.keys(seriesData).sort();
+      sortedFmts.forEach(function(fmtKey){
+        var arr = seriesData[fmtKey];
+        var presentColors = {};
+        arr.forEach(function(o){
+          var col = o.item.color || '(senza colore)';
+          if(!presentColors[col.toUpperCase()]) presentColors[col.toUpperCase()] = { name: col, items: [] };
+          presentColors[col.toUpperCase()].items.push(o);
+        });
+        var presentArr = Object.values(presentColors).sort(function(a,b){return a.name.localeCompare(b.name);});
+        h += '<div class="cs-tree-fmt">';
+        h += '<div class="cs-tree-fmt-head">'+_esc(fmtKey)+'</div>';
+        h += '<div class="cs-tree-colors">';
+        presentArr.forEach(function(p){
+          var firstIt = p.items[0].item;
+          var colorMeta = _colorMeta(firstIt.color||'');
+          var swatchBg = colorMeta ? colorMeta.swatch : '#ccc';
+          var espNames = [...new Set(p.items.map(function(x){return x.esp;}))].join(', ');
+          h += '<div class="cs-color-chip owned" title="'+_esc(espNames)+'">'
+             + '<span class="cs-color-swatch" style="background:'+swatchBg+'"></span>'
+             + '<span class="cs-color-name">'+_esc(p.name)+'</span>'
+             + '<span class="cs-color-cnt">'+p.items.length+'</span>'
+             + '</div>';
+        });
+        h += '</div></div>';
+      });
+
+      // \u2500\u2500 SUGGERIMENTI: colori mancanti A LIVELLO DI SERIE (cross-formato/finitura) \u2500\u2500
+      // Prendiamo tutti i colori della serie dal listino PRODUCTS e mostriamo quelli che il cliente NON ha ancora
+      if(suggest){
+        var poolSeries = PRODUCTS.filter(function(p){
+          return (p.brand||'').toUpperCase() === b && (p.series||'').toUpperCase() === s;
+        });
+        // Estrai un solo prodotto per colore (preferendo Naturale come finitura pi\u00F9 comune)
+        var allColors = {};
+        poolSeries.forEach(function(p){
+          if(!p.color) return;
+          var k = p.color.toUpperCase();
+          if(!allColors[k]) allColors[k] = p;
+        });
+        var missingColors = [];
+        Object.keys(allColors).forEach(function(k){
+          if(!ownedColorsInSeries[k]) missingColors.push(allColors[k]);
+        });
+        missingColors.sort(function(a,b){return (a.color||'').localeCompare(b.color||'');});
+        if(missingColors.length){
+          h += '<div class="cs-tree-suggest">';
+          h += '<div class="cs-tree-suggest-head">\uD83D\uDCA1 Colori suggeriti per <strong>'+toT(s)+'</strong> <span class="cs-tree-cnt">('+missingColors.length+' non '+(missingColors.length===1?'presente':'presenti')+')</span></div>';
+          h += '<div class="cs-tree-colors">';
+          missingColors.forEach(function(p){
+            var colorMeta = _colorMeta(p.color||'');
+            var swatchBg = colorMeta ? colorMeta.swatch : '#ccc';
+            h += '<div class="cs-color-chip suggested" title="Suggerito: codice '+_esc(p.code)+' &middot; '+_esc(p.size||'')+(p.finish?' '+_esc(p.finish):'')+'">'
+               + '<span class="cs-color-swatch" style="background:'+swatchBg+'"></span>'
+               + '<span class="cs-color-name">'+_esc(p.color)+'</span>'
+               + '<span class="cs-color-sug">+</span>'
+               + '</div>';
+          });
+          h += '</div></div>';
+        } else {
+          h += '<div class="cs-tree-suggest cs-tree-suggest-full">\u2713 Il cliente ha gi\u00E0 tutti i colori disponibili di questa serie</div>';
+        }
+      }
+      h += '</div>';
+    });
+    h += '</div>';
+  });
+  h += '</div>';
+  return h;
+}
+window._renderClientCampioniTree = _renderClientCampioniTree;
+
+/* Renderizza il riepilogo aggregato dei campioni della serie cercata per il cliente,
+   indipendentemente da quale espositore li contiene. */
+function _renderClientSeriesAggregate(c, q){
+  var hits = _matchClientSamples(c, q.toLowerCase(), true);
+  if(!hits.length){
+    return '<div class="cs-aggregate cs-aggregate-empty">Nessun campione trovato per la serie "'+_esc(q)+'"</div>';
+  }
+  // Raggruppa per (series + finish + size)
+  var groups = {};
+  hits.forEach(function(h){
+    var it = h.item;
+    var key = (it.series||'')+'|'+(it.finish||'')+'|'+(it.size||'');
+    if(!groups[key]) groups[key] = { series:it.series||'', finish:it.finish||'', size:it.size||'', items:[] };
+    groups[key].items.push({ item: it, esp: h.esp });
+  });
+  var groupArr = Object.values(groups).sort(function(a,b){
+    return (a.series||'').localeCompare(b.series||'') ||
+           (a.finish||'').localeCompare(b.finish||'') ||
+           (a.size||'').localeCompare(b.size||'');
+  });
+  var seriesNames = [...new Set(hits.map(function(h){return h.item.series||'';}))];
+  var html = '<div class="cs-aggregate">';
+  html += '<div class="cs-aggregate-title">Riepilogo serie ricerca: <strong>"'+_esc(q)+'"</strong></div>';
+  html += '<div class="cs-aggregate-summary">'+hits.length+' campion'+(hits.length===1?'e':'i')+' &middot; '+seriesNames.length+' seri'+(seriesNames.length===1?'e':'i')+' &middot; '+Object.keys(groups).length+' format'+(Object.keys(groups).length===1?'o':'i')+'/finitur'+(Object.keys(groups).length===1?'a':'e')+'</div>';
+  html += '<div class="cs-aggregate-list">';
+  groupArr.forEach(function(g){
+    var head = toT(g.series||'') + (g.size?' &middot; '+g.size+' cm':'') + (g.finish?' &middot; '+g.finish:'');
+    html += '<div class="cs-aggregate-group">';
+    html += '<div class="cs-aggregate-group-head">'+head+' <span style="color:var(--mid);font-weight:600">('+g.items.length+' campion'+(g.items.length===1?'e':'i')+')</span></div>';
+    html += '<div class="cs-aggregate-group-items">';
+    g.items.forEach(function(p){
+      var it = p.item;
+      var colorMeta = _colorMeta(it.color);
+      var swatch = colorMeta ? '<span class="cs-aggregate-swatch" style="background:'+colorMeta.swatch+'"></span>' : '';
+      var statInfo = _statInfo(it.status||'presente');
+      html += '<div class="cs-aggregate-item">';
+      html += '<span class="cs-aggregate-dot" style="background:'+(statInfo.dot||'#ccc')+'" title="'+(statInfo.label||'')+'"></span>';
+      html += swatch;
+      html += '<span class="cs-aggregate-code">'+_esc(it.code||'')+'</span>';
+      html += '<span class="cs-aggregate-color">'+_esc(it.color||'')+'</span>';
+      html += '<span class="cs-aggregate-esp">in '+_esc(p.esp||'')+'</span>';
+      html += '</div>';
+    });
+    html += '</div></div>';
+  });
+  html += '</div></div>';
+  return html;
+}
+window._renderClientSeriesAggregate = _renderClientSeriesAggregate;
 
 function renderOrderCard(clientId, o){
   const total=o.items.reduce((s,i)=>s+itemTot(i),0);
