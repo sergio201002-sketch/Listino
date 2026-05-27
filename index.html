@@ -5717,29 +5717,73 @@ function _findClientRule(cid, product){
 }
 window._findClientRule = _findClientRule;
 
-/* Rinomina cliente con prompt */
+/* Rinomina cliente: trasforma il titolo in input editabile inline */
 function renameClient(id){
   if(!clients[id]){ alert('Cliente non trovato.'); return; }
-  var current = clients[id].name || '';
-  var nm = prompt('Nuovo nome per il cliente:', current);
-  if(nm === null) return;
-  nm = nm.trim();
-  if(!nm){ alert('Il nome non può essere vuoto.'); return; }
-  if(nm === current) return;
-  // Verifica che non esista già un altro cliente con questo nome
-  var dup = Object.values(clients).some(function(c){ return c && c.id !== id && c.name && c.name.toLowerCase() === nm.toLowerCase(); });
-  if(dup){
-    if(!confirm('Esiste già un altro cliente con questo nome. Procedere comunque?')) return;
+  var titleEl = document.querySelector('.od-title');
+  if(!titleEl) return;
+  // Se è già in modalità edit, non rifare nulla
+  if(titleEl.querySelector('input')) {
+    var inp = titleEl.querySelector('input');
+    inp.focus(); inp.select();
+    return;
   }
-  clients[id].name = nm;
-  saveClients({immediate:true});
-  renderClientList();
-  renderOrderDetail();
-  // Aggiorna anche il pannello carrello (select cliente)
-  try { _refreshCartClientSelect(); _renderCartOutput(); } catch(_){}
-  if(typeof showSyncToast === 'function') showSyncToast('✓ Cliente rinominato in "'+nm+'"');
+  var current = clients[id].name || '';
+  var input = document.createElement('input');
+  input.type = 'text';
+  input.value = current;
+  input.maxLength = 80;
+  input.className = 'od-title-input';
+  input.dataset.cid = id;
+  input.dataset.orig = current;
+  // Stile per matchare il titolo
+  input.style.cssText = 'font-family:var(--font-display);letter-spacing:-0.015em;font-size:18px;font-weight:800;color:var(--dark);border:1.5px solid #3D6FA8;border-radius:6px;padding:4px 10px;background:white;outline:none;width:100%;max-width:420px;';
+  // Salva al blur
+  input.addEventListener('blur', function(){ _finishRenameClient(input); });
+  // Salva su Enter, annulla su Escape
+  input.addEventListener('keydown', function(ev){
+    if(ev.key === 'Enter'){ ev.preventDefault(); input.blur(); }
+    else if(ev.key === 'Escape'){ input.value = input.dataset.orig; input.blur(); }
+  });
+  titleEl.innerHTML = '';
+  titleEl.appendChild(input);
+  setTimeout(function(){ input.focus(); input.select(); }, 30);
 }
 window.renameClient = renameClient;
+
+function _finishRenameClient(input){
+  if(!input || !input.parentNode) return;
+  var id = input.dataset.cid;
+  var orig = input.dataset.orig || '';
+  var nm = (input.value || '').trim();
+  if(!clients[id]){
+    // Cliente non più disponibile: torna a render normale
+    try { renderOrderDetail(); } catch(_){}
+    return;
+  }
+  if(!nm){
+    // Nome vuoto: ripristina senza modificare
+    nm = orig;
+  }
+  if(nm !== orig){
+    // Verifica duplicati
+    var dup = Object.values(clients).some(function(c){ return c && c.id !== id && c.name && c.name.toLowerCase() === nm.toLowerCase(); });
+    if(dup){
+      var ok = confirm('Esiste già un altro cliente con questo nome. Salvare comunque?');
+      if(!ok){ nm = orig; }
+    }
+  }
+  if(nm !== orig){
+    clients[id].name = nm;
+    saveClients({immediate:true});
+    if(typeof showSyncToast === 'function') showSyncToast('Cliente rinominato in "'+nm+'"');
+  }
+  // Re-render tutto
+  try { renderClientList(); } catch(_){}
+  try { renderOrderDetail(); } catch(_){}
+  try { _refreshCartClientSelect && _refreshCartClientSelect(); _renderCartOutput && _renderCartOutput(); } catch(_){}
+}
+window._finishRenameClient = _finishRenameClient;
 
 function deleteClient(id){
   if(!clients[id]) return;
