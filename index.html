@@ -8,7 +8,53 @@
 <meta http-equiv="Expires" content="0">
 <title>Listino Emilgroup 2026</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700;800&family=Barlow:wght@600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Inter+Tight:wght@500;600;700;800;900&display=swap');
+
+/* ============================================================
+   FONT SYSTEM (Inter Display via Inter Tight + Inter)
+   ============================================================ */
+:root {
+  /* Inter Tight ha proporzioni più "display" rispetto a Inter classico,
+     perfetto per titoli e KPI. Inter resta per il body text. */
+  --font-display: 'Inter Tight', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Inter', ui-monospace, SFMono-Regular, monospace;
+}
+html, body {
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "cv11", "ss01", "ss03"; /* tabular numerals + ligature pulite */
+}
+/* Override globale: tutti i Playfair Display ereditano lo stile display */
+[style*="Playfair Display"] { font-family: var(--font-display) !important; letter-spacing: -0.01em; }
+
+/* === RITOCCHI TIPOGRAFICI SISTEMICI === */
+/* I titoli display hanno tracking leggermente negativo per look premium */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  letter-spacing: -0.015em;
+  font-weight: 800;
+}
+/* I bottoni hanno tracking positivo per leggibilità su UPPERCASE */
+button { font-family: var(--font-body); letter-spacing: 0.01em; }
+/* I numeri usano tabular figures per allineamento perfetto in tabelle */
+.stats-table tbody td, .stats-table tfoot td,
+.cp-totals-val, .cp-totals-mq, .ci-tot, .ci-mq-input,
+.pc-val, .pt-val, .order-total, .rank-val,
+.kpi-val, .bar-sublbl, .mini-sublbl {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+}
+/* Input/select default font */
+input, select, textarea { font-family: var(--font-body); }
+/* I codici prodotto sempre nello stesso font display per coerenza */
+.code-text, .order-code, .camp-code, .ci-code, .cp-sr-code, .esp-rot-slot-code, .cs-aggregate-code {
+  font-family: var(--font-display);
+  letter-spacing: 0.01em;
+  font-weight: 800;
+}
 
 :root {
   --red:    #C8102E;
@@ -27,7 +73,7 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--bg); color: var(--dark); font-family: 'Inter', sans-serif; min-height: 100vh; }
+body { background: var(--bg); color: var(--dark); font-family: var(--font-body); min-height: 100vh; }
 
 /* ── HEADER ─────────────────────────────────────────── */
 header {
@@ -70,7 +116,7 @@ header {
   color: rgba(255,255,255,0.55);
   border: none; border-radius: 5px;
   padding: 7px 14px;
-  font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500;
+  font-family: var(--font-body); font-size: 12px; font-weight: 500;
   cursor: pointer; transition: all 0.15s; letter-spacing: 0.03em;
 }
 .nav-tab svg { flex-shrink: 0; transition: all 0.15s; }
@@ -82,7 +128,7 @@ header {
   display: flex; align-items: center; gap: 7px;
   background: var(--red); color: white; border: none; border-radius: 6px;
   padding: 8px 15px;
-  font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;
+  font-family: var(--font-body); font-size: 12px; font-weight: 600;
   cursor: pointer; transition: background 0.2s; letter-spacing: 0.04em;
 }
 .cart-btn svg { flex-shrink: 0; }
@@ -96,12 +142,44 @@ header {
 
 /* ── FILTERS ─────────────────────────────────────────── */
 .filters { background: var(--white); border-bottom: 2px solid var(--red); padding: 14px 32px; }
-.filters-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+.filters-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+/* Barra di ricerca dentro la griglia filtri */
+.listino-search-wrap {
+  display: flex; align-items: center; gap: 6px;
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  padding: 0 9px;
+  background: white;
+  transition: border-color 0.15s;
+  min-height: 40px;
+}
+.listino-search-wrap:focus-within { border-color: var(--red); }
+.listino-search-ic { width: 14px; height: 14px; color: var(--mid); flex-shrink: 0; }
+.listino-search-input {
+  flex: 1; min-width: 0;
+  border: none; outline: none; background: transparent;
+  font-family: var(--font-body); font-size: 13px;
+  color: var(--dark); padding: 8px 0;
+}
+.listino-search-input::placeholder { color: var(--light); }
+.listino-search-clear {
+  background: none; border: none;
+  color: var(--light); cursor: pointer;
+  font-size: 13px;
+  width: 24px; height: 24px; border-radius: 50%;
+  display: none;
+  align-items: center; justify-content: center;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+  touch-action: manipulation;
+}
+.listino-search-clear.visible { display: flex; }
+.listino-search-clear:hover { background: var(--bg); color: var(--dark); }
 .fg { display: flex; flex-direction: column; gap: 4px; }
 .fg label { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); }
 .fg select {
   border: 1.5px solid var(--border); border-radius: 5px; padding: 8px 28px 8px 10px;
-  font-family: 'Inter', sans-serif; font-size: 12px; color: var(--dark); background: var(--white);
+  font-family: var(--font-body); font-size: 12px; color: var(--dark); background: var(--white);
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236B6B6B' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat; background-position: right 10px center;
@@ -122,7 +200,7 @@ header {
 .leg-cell:nth-child(3) .leg-val { color: var(--green); }
 
 .rbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-.rbar-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--dark); }
+.rbar-title { font-family: var(--font-display); letter-spacing: -0.01em; font-size: 20px; font-weight: 700; color: var(--dark); }
 .rbar-count { font-size: 11px; color: var(--light); background: var(--white); border: 1px solid var(--border); padding: 3px 10px; border-radius: 20px; }
 
 .grid { display: grid; gap: 8px; }
@@ -140,7 +218,7 @@ header {
 .card-code { background: var(--dark); display: flex; align-items: center; justify-content: center; padding: 14px 6px; transition: background 0.2s; min-width: 0; }
 .card.in-cart .card-code { background: var(--green); }
 .card:hover:not(.in-cart) .card-code { background: var(--red); }
-.code-text { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 800; color: white; letter-spacing: 0.03em; text-align: center; word-break: break-all; overflow-wrap: anywhere; line-height: 1.15; max-width: 100%; hyphens: none; }
+.code-text { font-family: var(--font-body); font-size: 12px; font-weight: 800; color: white; letter-spacing: 0.03em; text-align: center; word-break: break-all; overflow-wrap: anywhere; line-height: 1.15; max-width: 100%; hyphens: none; }
 
 .card-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .card-brand { font-size: 9px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--red); overflow-wrap: anywhere; word-break: break-word; }
@@ -155,7 +233,7 @@ header {
 .price-cell { display: flex; flex-direction: column; align-items: flex-start; padding: 5px 12px; min-width: 0; flex: 1 1 auto; }
 .price-cell + .price-cell { border-left: 1px solid var(--border); }
 .pc-label { font-size: 8.5px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--light); white-space: nowrap; margin-bottom: 1px; }
-.pc-val { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 800; white-space: nowrap; letter-spacing: 0.01em; }
+.pc-val { font-family: var(--font-body); font-size: 14px; font-weight: 800; white-space: nowrap; letter-spacing: 0.01em; }
 .pc-lordo .pc-val { color: var(--mid); font-size: 12px; font-weight: 700; }
 .pc-a .pc-val { color: var(--red); }
 .pc-b .pc-val { color: var(--green); }
@@ -168,11 +246,11 @@ header {
 .card-ctrl { display: flex; flex-direction: column; align-items: stretch; justify-content: center; gap: 6px; padding: 12px 14px; border-left: 1px solid var(--border); min-width: 120px; }
 .mq-wrap { display: flex; align-items: center; border: 1.5px solid var(--border); border-radius: 5px; overflow: hidden; background: var(--white); }
 .mq-lbl { background: var(--bg); padding: 0 5px; font-size: 9px; font-weight: 700; color: var(--light); letter-spacing: 0.1em; text-transform: uppercase; border-right: 1px solid var(--border); align-self: stretch; display: flex; align-items: center; flex-shrink: 0; }
-.mq-input { flex: 1; border: none; background: transparent; padding: 8px 6px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; color: var(--dark); text-align: center; min-width: 0; width: 60px; }
+.mq-input { flex: 1; border: none; background: transparent; padding: 8px 6px; font-family: var(--font-body); font-size: 14px; font-weight: 700; color: var(--dark); text-align: center; min-width: 0; width: 60px; }
 .mq-input:focus { outline: none; }
 .mq-wrap:focus-within { border-color: var(--dark); }
 
-.btn-add, .btn-rem { width: 100%; padding: 7px; border-radius: 5px; border: 1.5px solid; font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; cursor: pointer; transition: all 0.15s; text-align: center; }
+.btn-add, .btn-rem { width: 100%; padding: 7px; border-radius: 5px; border: 1.5px solid; font-family: var(--font-body); font-size: 10px; font-weight: 700; letter-spacing: 0.06em; cursor: pointer; transition: all 0.15s; text-align: center; }
 .btn-add { border-color: var(--dark); background: var(--white); color: var(--dark); }
 .btn-add:hover { background: var(--dark); color: var(--white); }
 .btn-rem { border-color: var(--red); background: var(--white); color: var(--red); }
@@ -180,7 +258,7 @@ header {
 
 .empty { background: var(--white); border: 2px dashed var(--border); border-radius: 12px; text-align: center; padding: 72px 20px; }
 .empty-icon { font-size: 44px; margin-bottom: 14px; opacity: 0.2; }
-.empty h3 { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--mid); margin-bottom: 6px; }
+.empty h3 { font-family: var(--font-display); letter-spacing: -0.01em; font-size: 22px; color: var(--mid); margin-bottom: 6px; }
 .empty p { font-size: 13px; color: var(--light); }
 
 /* Section dividers */
@@ -193,17 +271,40 @@ header {
 .section-header:first-child { margin-top: 0; }
 .section-header.section-spec { background: #5c3a1a; }
 .section-icon { font-size: 14px; opacity: 0.7; }
-.section-title { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; flex: 1; }
+.section-title { font-family: var(--font-display); letter-spacing: -0.01em; font-size: 15px; font-weight: 700; flex: 1; }
 .section-count { font-size: 10px; opacity: 0.5; letter-spacing: 0.1em; }
 
 /* ── CART PANEL ──────────────────────────────────────── */
 .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 100; backdrop-filter: blur(2px); }
 .overlay.open { display: block; }
-.cart-panel { position: fixed; right: 0; top: 0; bottom: 0; width: min(480px, 100vw); background: var(--white); display: flex; flex-direction: column; z-index: 101; transform: translateX(100%); transition: transform 0.28s cubic-bezier(0.4,0,0.2,1); box-shadow: -8px 0 40px rgba(0,0,0,0.18); pointer-events: none; }
+.cart-panel {
+  position: fixed; right: 0; top: 0;
+  /* Dynamic viewport height: esclude la tastiera virtuale su mobile;
+     fallback 100vh per browser senza supporto */
+  height: 100vh;
+  height: 100dvh;
+  width: min(480px, 100vw);
+  background: var(--white);
+  display: flex; flex-direction: column;
+  z-index: 101;
+  transform: translateX(100%);
+  transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+  box-shadow: -8px 0 40px rgba(0,0,0,0.18);
+  pointer-events: none;
+}
 .cart-panel.open { pointer-events: auto; }
 .cart-panel.open { transform: translateX(0); }
+/* Quando la tastiera virtuale è aperta su mobile: chiudi pannelli ridondanti
+   e lascia spazio agli input, mantenendo footer compatto */
+.cart-panel.kbd-open .cp-collapse.open .cp-collapse-body { display: none; }
+.cart-panel.kbd-open .cp-collapse.open .cp-collapse-chev { transform: none; }
+.cart-panel.kbd-open .cp-output { max-height: 60px; }
+.cart-panel.kbd-open .cp-footer { padding-top: 4px; padding-bottom: 8px; gap: 4px; }
+.cart-panel.kbd-open .cp-totals { padding: 4px 11px; font-size: 11px; }
+.cart-panel.kbd-open .cp-actions,
+.cart-panel.kbd-open .cp-footer > div:last-child { display: none; }
 .cp-header { background: var(--dark); padding: 18px 22px; display: flex; align-items: center; justify-content: space-between; }
-.cp-header h2 { font-family: 'Playfair Display', serif; font-size: 19px; font-weight: 700; color: white; }
+.cp-header h2 { font-family: var(--font-display); letter-spacing: -0.01em; font-size: 19px; font-weight: 700; color: white; }
 .cp-sub { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 2px; }
 .cp-close { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: white; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
 .cp-close:hover { background: rgba(255,255,255,0.18); }
@@ -260,7 +361,7 @@ header {
 .cp-search-box svg { color: var(--mid); flex-shrink: 0; }
 .cp-search-input {
   flex: 1; border: none; outline: none;
-  font-family: 'Inter', sans-serif; font-size: 13px; color: var(--dark);
+  font-family: var(--font-body); font-size: 13px; color: var(--dark);
   background: transparent;
 }
 .cp-search-input::placeholder { color: var(--light); }
@@ -291,7 +392,7 @@ header {
   font-size: 10px; font-weight: 700; letter-spacing: 0.07em;
   background: var(--dark); color: white;
   padding: 2px 6px; border-radius: 4px; flex-shrink: 0;
-  font-family: 'Inter', monospace;
+  font-family: var(--font-mono);
 }
 .cp-sr-item.already-in .cp-sr-code { background: var(--green); }
 .cp-sr-info { flex: 1; min-width: 0; }
@@ -306,7 +407,7 @@ header {
 .cp-sr-mq-wrap:focus-within { border-color: var(--red); }
 .cp-sr-mq {
   width: 44px; border: none; outline: none; background: transparent;
-  font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700;
+  font-family: var(--font-body); font-size: 12px; font-weight: 700;
   color: var(--dark); text-align: center; padding: 5px 4px;
 }
 .cp-sr-mq-unit {
@@ -370,7 +471,7 @@ header {
 .ci-code {
   background: var(--dark); color: white; border-radius: 5px;
   padding: 3px 8px;
-  font-family: 'Inter', sans-serif; font-size: 11.5px; font-weight: 800;
+  font-family: var(--font-body); font-size: 11.5px; font-weight: 800;
   white-space: nowrap; flex-shrink: 0;
   letter-spacing: 0.02em;
 }
@@ -435,7 +536,7 @@ header {
   min-width: 0;
   background: transparent;
   border: none; outline: none;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body);
   font-size: 12px; font-weight: 800; color: var(--dark);
   padding: 0;
   text-align: left;
@@ -491,7 +592,7 @@ header {
 
 .ci-tot-block { background: linear-gradient(135deg, #FFF 0%, #F5F5F1 100%); }
 .ci-tot {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body);
   font-size: 12px; font-weight: 800; color: var(--green);
   line-height: 1.1;
   overflow-wrap: anywhere;
@@ -501,7 +602,7 @@ header {
 .ci-prices {
   margin-top: 1px;
   display: flex; flex-direction: column; gap: 0;
-  font-family: 'JetBrains Mono','Inter',monospace;
+  font-family: var(--font-mono);
 }
 .ci-price-line {
   display: flex; justify-content: space-between; align-items: baseline;
@@ -534,7 +635,7 @@ header {
   color: var(--mid);
   border-radius: 5px;
   padding: 3px 8px;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body);
   font-size: 10px; font-weight: 700;
   cursor: pointer; transition: all 0.12s;
   min-height: 24px;
@@ -550,11 +651,52 @@ header {
 .ci-disc-custom-input {
   width: 100%; border: 1px solid var(--border);
   border-radius: 5px; padding: 5px 9px;
-  font-family: 'JetBrains Mono','Inter',monospace;
+  font-family: var(--font-mono);
   font-size: 11px; min-height: 28px;
   background: white;
 }
 .ci-disc-custom-input:focus { outline: none; border-color: var(--red); box-shadow: 0 0 0 3px rgba(200,16,46,0.08); }
+
+/* Blocco modifica sconti standard (3 step composti) */
+.ci-disc-std-wrap {
+  padding: 6px 10px 8px;
+  background: rgba(243,238,248,0.6);
+  border-top: 1px dashed #C9B8E0;
+}
+.ci-disc-std-lbl {
+  font-size: 8.5px; font-weight: 800; letter-spacing: 0.1em;
+  text-transform: uppercase; color: #6B3FA0;
+  margin-bottom: 4px;
+}
+.ci-disc-std-row {
+  display: flex; align-items: center; gap: 4px;
+  flex-wrap: wrap;
+}
+.ci-disc-std-step {
+  display: flex; align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: white;
+  padding: 0 6px;
+  min-height: 28px;
+  flex: 1 1 60px;
+  min-width: 0;
+}
+.ci-disc-std-step:focus-within { border-color: #6B3FA0; }
+.ci-disc-std-input {
+  flex: 1; min-width: 0;
+  border: none; outline: none; background: transparent;
+  font-family: var(--font-body);
+  font-size: 12px; font-weight: 800;
+  color: var(--dark);
+  padding: 4px 0;
+  text-align: right;
+  -webkit-appearance: none; -moz-appearance: textfield;
+}
+.ci-disc-std-input::-webkit-outer-spin-button,
+.ci-disc-std-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.ci-disc-std-unit { font-size: 10px; font-weight: 700; color: var(--mid); margin-left: 3px; }
+.ci-disc-std-sep { font-size: 11px; font-weight: 800; color: #6B3FA0; margin: 0 2px; }
 
 /* Badge sconto in header */
 .ci-disc-badge {
@@ -567,6 +709,7 @@ header {
   letter-spacing: 0.04em;
 }
 .ci-disc-badge.custom { background: #FEF7DD; color: #8A6500; border-color: #E5C661; }
+.ci-disc-badge.std { background: #F3EEF8; color: #6B3FA0; border-color: #B7A3D6; }
 
 /* Totale carrello nel footer */
 .cp-totals {
@@ -577,8 +720,8 @@ header {
   font-size: 11.5px; color: var(--dark);
   border: 1px solid var(--border);
 }
-.cp-totals-mq { font-weight: 700; color: var(--mid); font-family: 'JetBrains Mono','Inter',monospace; font-size: 11.5px; }
-.cp-totals-val { font-weight: 800; color: var(--green); font-size: 14px; font-family: 'Inter', sans-serif; }
+.cp-totals-mq { font-weight: 700; color: var(--mid); font-family: var(--font-mono); font-size: 11.5px; }
+.cp-totals-val { font-weight: 800; color: var(--green); font-size: 14px; font-family: var(--font-body); }
 
 /* Campi per il testo ordine nel carrello */
 .cp-order-fields {
@@ -598,7 +741,7 @@ header {
   border: 1px solid var(--border);
   border-radius: 5px;
   padding: 5px 8px;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body);
   font-size: 11.5px;
   color: var(--dark);
   font-weight: 700;
@@ -627,7 +770,7 @@ header {
   align-items: center;
   gap: 7px;
   cursor: pointer;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body);
   font-size: 9.5px;
   font-weight: 800;
   letter-spacing: 0.1em;
@@ -673,20 +816,67 @@ header {
   justify-content: center;
   gap: 6px;
 }
+/* Barra collassabile sopra al footer: racchiude tutta la sezione "Finalizza ordine" */
+.cp-fold-bar {
+  border-top: 1px solid var(--border);
+  background: var(--white);
+}
+.cp-fold-toggle {
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 9px 14px;
+  display: flex; align-items: center; gap: 9px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  -webkit-tap-highlight-color: rgba(0,0,0,0.05);
+  touch-action: manipulation;
+  min-height: 38px;
+}
+.cp-fold-chev {
+  width: 14px; height: 14px;
+  color: var(--mid);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+.cp-footer.folded ~ * .cp-fold-chev,
+.cart-panel.fold-closed .cp-fold-chev { transform: rotate(-90deg); }
+.cp-fold-title {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--dark);
+  flex-shrink: 0;
+}
+.cp-fold-sum {
+  flex: 1;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 800;
+  color: var(--green);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* Quando il pannello carrello ha .fold-closed: nascondi il footer e mostra solo la fold-bar */
+.cart-panel.fold-closed .cp-footer { display: none !important; }
+
 .cp-footer { border-top: 1px solid var(--border); padding: 8px 14px 12px; display: flex; flex-direction: column; gap: 6px; }
 .output-lbl { font-size: 9px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--light); margin-bottom: 5px; }
-.cp-output { background: #111; border-radius: 5px; padding: 9px 11px; font-family: 'Inter', monospace; font-size: 10.5px; line-height: 1.7; color: #6EE7A0; white-space: pre-wrap; word-break: break-all; max-height: 130px; overflow-y: auto; }
+.cp-output { background: #111; border-radius: 5px; padding: 9px 11px; font-family: var(--font-mono); font-size: 10.5px; line-height: 1.7; color: #6EE7A0; white-space: pre-wrap; word-break: break-all; max-height: 130px; overflow-y: auto; }
 .cp-actions { display: flex; gap: 6px; flex-wrap: wrap; }
-.btn-copy { flex: 1; min-width: 90px; padding: 7px 10px; background: var(--dark); color: white; border: none; border-radius: 5px; font-family: 'Inter', sans-serif; font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: background 0.2s; min-height: 32px; }
+.btn-copy { flex: 1; min-width: 90px; padding: 7px 10px; background: var(--dark); color: white; border: none; border-radius: 5px; font-family: var(--font-body); font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: background 0.2s; min-height: 32px; }
 .btn-copy:hover { background: var(--dark2); }
 .btn-copy.ok { background: var(--green); }
-.btn-clr { padding: 7px 12px; background: white; color: var(--red); border: 1.5px solid var(--red); border-radius: 5px; font-family: 'Inter', sans-serif; font-size: 10.5px; font-weight: 700; cursor: pointer; transition: all 0.15s; min-height: 32px; }
+.btn-clr { padding: 7px 12px; background: white; color: var(--red); border: 1.5px solid var(--red); border-radius: 5px; font-family: var(--font-body); font-size: 10.5px; font-weight: 700; cursor: pointer; transition: all 0.15s; min-height: 32px; }
 .btn-clr:hover { background: var(--red); color: white; }
 
 /* Save to client button */
 .btn-save-order {
   width: 100%; padding: 7px 10px; background: var(--red); color: white;
-  border: none; border-radius: 5px; font-family: 'Inter', sans-serif;
+  border: none; border-radius: 5px; font-family: var(--font-body);
   font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em;
   text-transform: uppercase; cursor: pointer; transition: background 0.2s;
   min-height: 32px;
@@ -695,14 +885,14 @@ header {
 
 .cart-empty { text-align: center; padding: 50px 20px; }
 .cart-empty .ei { font-size: 36px; margin-bottom: 10px; opacity: 0.2; }
-.cart-empty p { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--mid); }
+.cart-empty p { font-family: var(--font-display); letter-spacing: -0.01em; font-size: 16px; color: var(--mid); }
 
 /* ── STORICO PAGE ─────────────────────────────────────── */
 .storico-page { max-width: 1200px; margin: 0 auto; padding: 28px 32px; }
 
 .storico-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
 .storico-header h2 { font-family: 'Barlow', 'Inter', sans-serif; font-size: 26px; font-weight: 800; letter-spacing: 0.03em; }
-.btn-new-client { display: flex; align-items: center; gap: 6px; background: var(--red); color: white; border: none; border-radius: 6px; padding: 9px 18px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+.btn-new-client { display: flex; align-items: center; gap: 6px; background: var(--red); color: white; border: none; border-radius: 6px; padding: 9px 18px; font-family: var(--font-body); font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
 .btn-new-client:hover { background: var(--red-d); }
 
 .storico-layout { display: grid; grid-template-columns: 280px 1fr; gap: 20px; min-height: 500px; }
@@ -711,21 +901,271 @@ header {
 .client-list { background: var(--white); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
 .client-list-header { padding: 14px 16px; border-bottom: 1px solid var(--border); font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mid); }
 .client-search-mode { display: flex; gap: 0; padding: 8px 10px 0 10px; border-bottom: 1px solid var(--border); background: var(--bg); }
-.csm-btn { flex: 1; background: transparent; border: 1.5px solid var(--border); color: var(--mid); padding: 7px 10px; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: all 0.15s; }
+.csm-btn { flex: 1; background: transparent; border: 1.5px solid var(--border); color: var(--mid); padding: 7px 10px; font-family: var(--font-body); font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: all 0.15s; }
 .csm-btn:first-child { border-radius: 5px 0 0 5px; border-right: none; }
 .csm-btn:last-child  { border-radius: 0 5px 5px 0; }
 .csm-btn.active { background: var(--red); color: white; border-color: var(--red); }
 .csm-btn:hover:not(.active) { background: white; color: var(--dark); }
-.client-search { width: 100%; border: none; border-bottom: 1px solid var(--border); padding: 10px 16px; font-family: 'Inter', sans-serif; font-size: 12px; color: var(--dark); background: var(--bg); }
+.client-search { width: 100%; border: none; border-bottom: 1px solid var(--border); padding: 10px 16px; font-family: var(--font-body); font-size: 12px; color: var(--dark); background: var(--bg); }
 .client-search:focus { outline: none; background: white; }
 .client-sample-hits { font-size: 10px; color: var(--red); font-weight: 700; margin-top: 2px; }
 .client-sample-hit-list { font-size: 10.5px; color: var(--mid); margin-top: 3px; line-height: 1.35; }
+
+/* Barra di ricerca dentro la vista cliente (cerca nei campioni di quel singolo cliente) */
+.cs-search-wrap {
+  display: flex; align-items: center; gap: 8px;
+  margin: 12px 20px 0;
+  padding: 9px 12px;
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  transition: border-color 0.15s;
+}
+.cs-search-wrap:focus-within { border-color: #6B3FA0; box-shadow: 0 0 0 3px rgba(107,63,160,0.08); }
+.cs-search-ic { width: 14px; height: 14px; color: var(--mid); flex-shrink: 0; }
+.cs-search-input {
+  flex: 1; min-width: 0;
+  border: none; outline: none; background: transparent;
+  font-family: var(--font-body); font-size: 12.5px;
+  color: var(--dark); padding: 4px 0;
+}
+.cs-search-input::placeholder { color: var(--light); }
+.cs-search-clear {
+  background: none; border: none;
+  color: var(--light); cursor: pointer;
+  font-size: 13px;
+  width: 24px; height: 24px; border-radius: 50%;
+  display: none;
+  align-items: center; justify-content: center;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+  touch-action: manipulation;
+}
+.cs-search-clear:hover { background: var(--bg); color: var(--dark); }
+@media (max-width: 600px){
+  .cs-search-wrap { margin: 12px 12px 0; padding: 8px 10px; }
+  .cs-search-input { font-size: 12px; }
+}
+
+/* Riepilogo aggregato campioni per serie (cross-espositori) nella vista cliente */
+.cs-aggregate {
+  background: linear-gradient(135deg, #F3EEF8 0%, #FAF7FE 100%);
+  border: 1.5px solid #B7A3D6;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin: 12px 20px 0;
+}
+.cs-aggregate-empty { color: var(--mid); font-style: italic; text-align: center; background: var(--bg); border: 1px dashed var(--border); }
+.cs-aggregate-title { font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #6B3FA0; }
+.cs-aggregate-title strong { letter-spacing: 0; text-transform: none; color: var(--dark); }
+.cs-aggregate-summary { font-size: 11px; color: var(--mid); font-weight: 600; margin-top: 3px; margin-bottom: 10px; }
+.cs-aggregate-list { display: flex; flex-direction: column; gap: 10px; }
+.cs-aggregate-group { background: white; border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; }
+.cs-aggregate-group-head { font-size: 12px; font-weight: 800; color: var(--dark); letter-spacing: 0.02em; margin-bottom: 6px; overflow-wrap: anywhere; }
+.cs-aggregate-group-items { display: flex; flex-direction: column; gap: 4px; }
+.cs-aggregate-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-top: 1px dashed var(--border); font-size: 11.5px; overflow-wrap: anywhere; }
+.cs-aggregate-item:first-child { border-top: none; }
+.cs-aggregate-dot { width: 9px; height: 9px; border-radius: 50%; box-shadow: 0 0 5px currentColor; flex-shrink: 0; }
+.cs-aggregate-swatch { width: 14px; height: 14px; border-radius: 3px; border: 1px solid rgba(0,0,0,0.1); flex-shrink: 0; }
+.cs-aggregate-code { font-family: var(--font-body); font-weight: 800; color: var(--dark); letter-spacing: 0.02em; min-width: 60px; }
+.cs-aggregate-color { flex: 1; color: var(--dark); font-weight: 700; min-width: 0; overflow-wrap: anywhere; }
+.cs-aggregate-esp { font-size: 10.5px; color: var(--mid); font-style: italic; }
+@media (max-width:600px){
+  .cs-aggregate { margin: 12px 12px 0; padding: 11px 12px; }
+  .cs-aggregate-esp { font-size: 9.5px; }
+}
+
+/* === Tab Campioni: albero gerarchico Azienda > Serie > Formato > Colori === */
+.cs-tree { padding: 16px 20px; display: flex; flex-direction: column; gap: 14px; }
+.cs-tree-toolbar {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; flex-wrap: wrap;
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.cs-tree-sum { font-size: 11.5px; font-weight: 700; color: var(--mid); }
+.cs-suggest-btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: white;
+  border: 1.5px solid var(--border);
+  color: var(--mid);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-family: var(--font-body);
+  font-size: 11.5px; font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.15s;
+  min-height: 32px;
+  -webkit-tap-highlight-color: rgba(255,193,7,0.2);
+  touch-action: manipulation;
+}
+.cs-suggest-btn:hover { border-color: #8A6500; color: #8A6500; }
+.cs-suggest-btn.active { background: #FEF7DD; border-color: #E5C661; color: #8A6500; box-shadow: 0 0 0 3px rgba(229,198,97,0.18); }
+
+.cs-tree-brand {
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.cs-tree-brand-head {
+  background: var(--dark);
+  color: white;
+  padding: 9px 14px;
+  font-size: 12px; font-weight: 800; letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.cs-tree-cnt { font-weight: 500; opacity: 0.7; letter-spacing: 0; text-transform: none; font-size: 10.5px; }
+.cs-tree-series {
+  padding: 10px 14px;
+  border-top: 1px solid var(--border);
+}
+.cs-tree-series:first-of-type { border-top: none; }
+.cs-tree-series-head {
+  font-family: var(--font-display);
+  font-size: 13px; font-weight: 800;
+  color: var(--red);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+/* Vista semplificata: pillole colori (posseduti vs mancanti) */
+.cs-tree-simple {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  margin-bottom: 4px;
+}
+.cs-color-simple {
+  display: inline-flex; align-items: center;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-size: 11.5px; font-weight: 700;
+  letter-spacing: 0.01em;
+  background: white;
+  transition: all 0.15s;
+}
+.cs-color-simple.owned {
+  border: 1.5px solid var(--green);
+  color: var(--green);
+  background: #F0FAF3;
+}
+.cs-color-simple.missing {
+  border: 1.5px dashed #C0C0C0;
+  color: var(--light);
+  background: transparent;
+}
+
+/* Tendina dettagli per formato/finitura */
+.cs-tree-details {
+  margin-top: 8px;
+  border-top: 1px dashed var(--border);
+  padding-top: 8px;
+}
+.cs-tree-details-summary {
+  list-style: none;
+  cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mid);
+  padding: 4px 0;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.cs-tree-details-summary::-webkit-details-marker { display: none; }
+.cs-tree-details-summary:hover { color: var(--dark); }
+.cs-tree-details-chev { transition: transform 0.2s; flex-shrink: 0; }
+.cs-tree-details[open] .cs-tree-details-chev { transform: rotate(180deg); }
+.cs-tree-details-body {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+.cs-tree-fmt { margin-bottom: 8px; }
+.cs-tree-fmt:last-child { margin-bottom: 0; }
+.cs-tree-fmt-head {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--mid);
+  margin-bottom: 4px;
+}
+.cs-tree-colors {
+  display: flex; flex-wrap: wrap; gap: 5px;
+}
+.cs-color-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 11px; font-weight: 700;
+  border: 1px solid var(--border);
+  background: white;
+  max-width: 100%;
+}
+.cs-color-chip.owned { color: var(--dark); }
+.cs-color-chip.suggested {
+  background: #FEF7DD;
+  border-color: #E5C661;
+  color: #8A6500;
+  border-style: dashed;
+}
+.cs-color-swatch {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.12);
+  flex-shrink: 0;
+}
+.cs-color-name { font-size: 11px; }
+.cs-color-cnt {
+  background: var(--dark);
+  color: white;
+  font-size: 9.5px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 8px;
+  margin-left: 1px;
+}
+.cs-color-sug {
+  color: #8A6500;
+  font-weight: 900;
+  font-size: 13px;
+  line-height: 0.9;
+}
+.cs-tree-suggest {
+  margin-top: 8px;
+  padding: 10px 12px;
+  background: #FFFCEC;
+  border: 1px dashed #E5C661;
+  border-radius: 7px;
+}
+.cs-tree-suggest-head {
+  font-size: 11px;
+  font-weight: 700;
+  color: #8A6500;
+  margin-bottom: 6px;
+}
+.cs-tree-suggest-head strong { color: var(--dark); }
+.cs-tree-suggest-full {
+  text-align: center;
+  color: var(--green);
+  font-weight: 700;
+  font-size: 12px;
+  background: #E6F5EC;
+  border-color: #B5DDC5;
+}
+@media (max-width: 600px){
+  .cs-tree { padding: 14px 12px; }
+  .cs-tree-series { padding: 10px 12px; }
+}
 .client-items { overflow-y: auto; max-height: 600px; }
 .client-item { padding: 12px 16px; cursor: pointer; border-bottom: 1px solid var(--border); transition: background 0.1s; display: flex; align-items: center; justify-content: space-between; }
 .client-item:hover { background: var(--bg); }
 .client-item.selected { background: var(--red-l); border-left: 3px solid var(--red); }
-.client-name { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 800; color: var(--dark); letter-spacing: 0.01em; }
-.client-meta { font-family: 'Inter', sans-serif; font-size: 10px; color: var(--light); margin-top: 2px; font-weight: 600; }
+.client-name { font-family: var(--font-body); font-size: 13px; font-weight: 800; color: var(--dark); letter-spacing: 0.01em; }
+.client-meta { font-family: var(--font-body); font-size: 10px; color: var(--light); margin-top: 2px; font-weight: 600; }
 .client-badge { background: var(--border); border-radius: 10px; padding: 2px 7px; font-size: 10px; font-weight: 600; color: var(--mid); }
 .client-item.selected .client-badge { background: var(--red); color: white; }
 .no-clients { padding: 32px 16px; text-align: center; color: var(--light); font-size: 12px; }
@@ -733,9 +1173,9 @@ header {
 /* Order detail */
 .order-detail { background: var(--white); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
 .od-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-.od-title { font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 800; letter-spacing: 0.01em; }
+.od-title { font-family: var(--font-body); font-size: 18px; font-weight: 800; letter-spacing: 0.01em; }
 .od-actions { display: flex; gap: 8px; }
-.btn-del-client { background: none; border: 1.5px solid var(--border); color: var(--mid); border-radius: 5px; padding: 8px 14px; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s; min-height: 38px; min-width: 80px; -webkit-tap-highlight-color: rgba(200,16,46,0.2); touch-action: manipulation; }
+.btn-del-client { background: none; border: 1.5px solid var(--border); color: var(--mid); border-radius: 5px; padding: 8px 14px; font-family: var(--font-body); font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s; min-height: 38px; min-width: 80px; -webkit-tap-highlight-color: rgba(200,16,46,0.2); touch-action: manipulation; }
 .btn-del-client:hover, .btn-del-client:active { border-color: var(--red); color: var(--red); background: var(--red-l); }
 
 .orders-list { padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
@@ -743,11 +1183,11 @@ header {
 .order-card { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
 .order-card-header { background: var(--bg); padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; }
 .order-card-header:hover { background: var(--border); }
-.order-date { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 800; color: var(--dark); letter-spacing: 0.01em; }
-.order-summary { font-family: 'Inter', sans-serif; font-size: 11px; color: var(--mid); font-weight: 500; }
+.order-date { font-family: var(--font-body); font-size: 12px; font-weight: 800; color: var(--dark); letter-spacing: 0.01em; }
+.order-summary { font-family: var(--font-body); font-size: 11px; color: var(--mid); font-weight: 500; }
 .order-ref { display: flex; align-items: baseline; gap: 5px; margin-top: 2px; flex-wrap: wrap; }
 .order-ref-lbl { font-size: 8.5px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--light); }
-.order-ref-val { font-family: 'Inter', sans-serif; font-size: 12.5px; font-weight: 800; color: var(--dark); letter-spacing: 0; overflow-wrap: anywhere; word-break: break-word; }
+.order-ref-val { font-family: var(--font-body); font-size: 12.5px; font-weight: 800; color: var(--dark); letter-spacing: 0; overflow-wrap: anywhere; word-break: break-word; }
 .order-toggle { font-size: 14px; color: var(--mid); transition: transform 0.2s; }
 .order-card.expanded .order-toggle { transform: rotate(180deg); }
 .order-body { display: none; padding: 12px 16px; border-top: 1px solid var(--border); }
@@ -755,7 +1195,7 @@ header {
 
 .order-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 12px; gap: 8px; }
 .order-row:last-child { border-bottom: none; }
-.order-code { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 800; color: var(--dark); flex-shrink: 0; }
+.order-code { font-family: var(--font-body); font-size: 14px; font-weight: 800; color: var(--dark); flex-shrink: 0; }
 .order-desc { flex: 1; color: var(--mid); font-size: 11px; }
 .order-mq { font-weight: 700; color: var(--dark); flex-shrink: 0; }
 .order-price { font-weight: 700; color: var(--green); flex-shrink: 0; min-width: 70px; text-align: right; }
@@ -764,17 +1204,17 @@ header {
 .order-text { font-size: 10px; color: var(--mid); cursor: pointer; text-decoration: underline; }
 .order-text:hover { color: var(--dark); }
 .order-total-label { font-size: 11px; font-weight: 600; color: var(--mid); }
-.order-total { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 800; color: var(--green); letter-spacing: 0.01em; }
+.order-total { font-family: var(--font-body); font-size: 16px; font-weight: 800; color: var(--green); letter-spacing: 0.01em; }
 
 .order-del { background: none; border: none; color: var(--light); font-size: 12px; cursor: pointer; padding: 3px 6px; border-radius: 3px; transition: all 0.15s; }
 .order-del:hover { color: var(--red); background: var(--red-l); }
 
 .od-empty { padding: 60px 20px; text-align: center; color: var(--light); }
 .od-empty .oi { font-size: 40px; margin-bottom: 12px; opacity: 0.2; }
-.od-empty p { font-family: 'Inter', sans-serif; font-size: 15px; color: var(--mid); font-weight: 700; letter-spacing: 0.01em; }
+.od-empty p { font-family: var(--font-body); font-size: 15px; color: var(--mid); font-weight: 700; letter-spacing: 0.01em; }
 .od-empty span { font-size: 12px; }
 
-.no-selection { display: flex; align-items: center; justify-content: center; height: 300px; color: var(--mid); font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; text-align: center; }
+.no-selection { display: flex; align-items: center; justify-content: center; height: 300px; color: var(--mid); font-family: var(--font-body); font-size: 14px; font-weight: 600; text-align: center; }
 
 /* Modal */
 .modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; }
@@ -805,15 +1245,15 @@ header {
 }
 .modal-bg.open { display: flex; }
 .modal { background: white; border-radius: 12px; padding: 28px; width: min(400px, 90vw); box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
-.modal h3 { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; margin-bottom: 16px; }
-.modal-input { width: 100%; border: 1.5px solid var(--border); border-radius: 6px; padding: 10px 14px; font-family: 'Inter', sans-serif; font-size: 14px; color: var(--dark); margin-bottom: 16px; box-sizing: border-box; }
+.modal h3 { font-family: var(--font-display); letter-spacing: -0.01em; font-size: 20px; font-weight: 700; margin-bottom: 16px; }
+.modal-input { width: 100%; border: 1.5px solid var(--border); border-radius: 6px; padding: 10px 14px; font-family: var(--font-body); font-size: 14px; color: var(--dark); margin-bottom: 16px; box-sizing: border-box; }
 .modal-input:focus { outline: none; border-color: var(--red); }
 .save-order-lbl { display: block; font-size: 10px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--mid); margin-bottom: 5px; }
 .modal-new-esp-btn {
   background: var(--red); color: white;
   border: none; border-radius: 5px;
   padding: 6px 10px;
-  font-family: 'Inter', sans-serif; font-size: 10.5px; font-weight: 700;
+  font-family: var(--font-body); font-size: 10.5px; font-weight: 700;
   letter-spacing: 0.04em; cursor: pointer;
   min-height: 30px;
   transition: opacity 0.15s;
@@ -821,11 +1261,29 @@ header {
   touch-action: manipulation;
 }
 .modal-new-esp-btn:hover { opacity: 0.88; }
+
+/* Opzioni "forma" del tipo espositore (lineare / girevole) */
+.esp-type-shape-opt {
+  flex: 1;
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 11px;
+  border: 1.5px solid var(--border);
+  border-radius: 7px;
+  cursor: pointer;
+  background: white;
+  transition: all 0.15s;
+  -webkit-tap-highlight-color: rgba(107,63,160,0.15);
+}
+.esp-type-shape-opt input { margin: 0; accent-color: #6B3FA0; }
+.esp-type-shape-opt span { font-size: 12px; font-weight: 800; color: var(--dark); line-height: 1.2; }
+.esp-type-shape-sub { font-weight: 500; font-size: 10px; color: var(--mid); }
+.esp-type-shape-opt:hover { border-color: #6B3FA0; }
+.esp-type-shape-opt:has(input:checked) { border-color: #6B3FA0; background: #F5EEFC; }
 .modal-input:focus { outline: none; border-color: var(--red); }
 .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
-.btn-modal-cancel { background: none; border: 1.5px solid var(--border); color: var(--mid); border-radius: 7px; padding: 11px 18px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; min-height: 44px; -webkit-tap-highlight-color: rgba(0,0,0,0.1); touch-action: manipulation; }
+.btn-modal-cancel { background: none; border: 1.5px solid var(--border); color: var(--mid); border-radius: 7px; padding: 11px 18px; font-family: var(--font-body); font-size: 13px; font-weight: 600; cursor: pointer; min-height: 44px; -webkit-tap-highlight-color: rgba(0,0,0,0.1); touch-action: manipulation; }
 .btn-modal-cancel:hover { border-color: var(--mid); color: var(--dark); }
-.btn-modal-ok { background: var(--red); color: white; border: none; border-radius: 7px; padding: 11px 22px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: background 0.2s; min-height: 44px; -webkit-tap-highlight-color: rgba(255,255,255,0.3); touch-action: manipulation; }
+.btn-modal-ok { background: var(--red); color: white; border: none; border-radius: 7px; padding: 11px 22px; font-family: var(--font-body); font-size: 13px; font-weight: 700; cursor: pointer; transition: background 0.2s; min-height: 44px; -webkit-tap-highlight-color: rgba(255,255,255,0.3); touch-action: manipulation; }
 .btn-modal-ok:hover, .btn-modal-ok:active { background: var(--red-d); }
 
 /* ── STATISTICHE ─────────────────────────────────────── */
@@ -845,7 +1303,7 @@ header {
   background: transparent;
   border: none;
   padding: 6px 11px;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body);
   font-size: 11px; font-weight: 700;
   letter-spacing: 0.04em;
   color: var(--mid);
@@ -862,7 +1320,7 @@ header {
 .stats-table {
   width: 100%;
   border-collapse: collapse;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body);
   font-size: 12px;
 }
 .stats-table thead th {
@@ -896,17 +1354,98 @@ header {
   padding: 9px 10px;
   border-top: 2px solid var(--border);
   letter-spacing: 0.04em;
+  /* Allinea come il resto della tabella: testo a sinistra di default */
+  text-align: left;
 }
+/* Le celle numeriche restano a destra in linea con il body */
+.stats-table tfoot td.num { text-align: right; }
 
 /* Nasconde grafici quando si è in vista tabella */
 .stats-page.view-table .bar-chart,
-.stats-page.view-table .rank-list:not(.stats-rank-keep) {
+.stats-page.view-table .rank-list:not(.stats-rank-keep),
+.stats-page.view-table .mini-bars {
   display: none;
 }
 .stats-page.view-chart .stats-table-wrap { display: none; }
 /* Default: nasconde le tabelle se non c'è classe view-table */
 .stats-page:not(.view-table) .stats-table-wrap { display: none; }
-.stats-table-wrap { padding: 4px 0; }
+.stats-table-wrap {
+  padding: 4px 0;
+  /* Permette scroll orizzontale se la tabella non entra */
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+}
+
+/* Chip filtri di ordinamento sopra le tabelle */
+.stats-sort-chips {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.stats-sort-chip {
+  background: white;
+  border: 1px solid var(--border);
+  color: var(--mid);
+  border-radius: 5px;
+  padding: 4px 9px;
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.15s;
+  min-height: 26px;
+  -webkit-tap-highlight-color: rgba(200,16,46,0.15);
+  touch-action: manipulation;
+}
+.stats-sort-chip:hover { border-color: var(--red); color: var(--red); }
+.stats-sort-chip.active {
+  background: var(--dark);
+  color: white;
+  border-color: var(--dark);
+}
+
+/* === RESPONSIVE STATS (mobile) === */
+@media (max-width: 720px) {
+  .stats-page { padding: 12px 10px !important; }
+  .stat-card { padding: 12px 10px !important; }
+  .stat-card-title { font-size: 11px !important; }
+  /* Tabelle più compatte */
+  .stats-table { font-size: 10.5px; }
+  .stats-table thead th { padding: 6px 6px; font-size: 8.5px; }
+  .stats-table tbody td { padding: 5px 6px; }
+  .stats-table tfoot td { padding: 6px; font-size: 10px; }
+  /* Grafico a barre più stretto */
+  .bar-chart { gap: 3px; height: 100px; }
+  .bar-lbl { font-size: 8px; }
+  .bar-sublbl { font-size: 7.5px; }
+  /* Mini-bars cliente più stretti */
+  .mini-bars { gap: 2px; }
+  .mini-lbl { font-size: 6.5px; }
+  .mini-sublbl { font-size: 6.5px; }
+  /* KPI cards più piccoli */
+  .kpi-card { padding: 12px 10px !important; }
+  .kpi-icon svg { width: 22px !important; height: 22px !important; }
+  .kpi-val { font-size: 22px !important; }
+  .kpi-label { font-size: 9.5px !important; }
+  /* Rank items */
+  .rank-list { max-height: 220px; }
+  .rank-name { font-size: 9.5px; max-width: 80px; }
+  .rank-val { font-size: 10px; }
+  .rank-pos { font-size: 9px; min-width: 16px; }
+  /* Cliente stats - tabelle */
+  .client-stats-section { padding: 12px !important; }
+}
+@media (max-width: 460px) {
+  .stats-table { font-size: 10px; }
+  .stats-table thead th { padding: 5px 5px; font-size: 8px; letter-spacing: 0.06em; }
+  .stats-table tbody td { padding: 4px 5px; }
+  .stats-table tfoot td { padding: 5px; font-size: 9.5px; }
+  .bar-chart { gap: 2px; height: 90px; }
+  .stats-h2 { font-size: 18px; }
+}
 
 .stats-topbar {
   display: flex; align-items: center; justify-content: space-between;
@@ -955,7 +1494,7 @@ header {
 .bar-fill .bar-tip { display: none; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: var(--dark); color: white; font-size: 10px; padding: 2px 6px; border-radius: 3px; white-space: nowrap; margin-bottom: 4px; z-index: 2; }
 .bar-fill:hover .bar-tip { display: block; }
 .bar-lbl { font-size: 9px; color: var(--light); font-weight: 500; }
-.bar-sublbl { font-size: 8.5px; color: var(--mid); font-weight: 700; font-family: 'JetBrains Mono','Inter',monospace; line-height: 1; }
+.bar-sublbl { font-size: 8.5px; color: var(--mid); font-weight: 700; font-family: var(--font-mono); line-height: 1; }
 .bar-sublbl-green { color: var(--green); }
 .bar-val { font-size: 9px; color: var(--mid); font-weight: 700; }
 
@@ -977,7 +1516,7 @@ header {
 .client-stats-section { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 20px; box-shadow: var(--shadow); }
 .stats-client-sel {
   margin-left: 12px; border: 1.5px solid var(--border); border-radius: 5px;
-  padding: 5px 28px 5px 10px; font-family: 'Inter', sans-serif; font-size: 12px;
+  padding: 5px 28px 5px 10px; font-family: var(--font-body); font-size: 12px;
   color: var(--dark); background: var(--bg); appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236B6B6B' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat; background-position: right 8px center; cursor: pointer;
@@ -995,27 +1534,27 @@ header {
 .order-recap-card.collapsed .order-recap-head { border-radius: 8px; }
 .order-recap-toggle { width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; color: var(--mid); transition: transform 0.18s; flex-shrink: 0; }
 .order-recap-card.collapsed .order-recap-toggle { transform: rotate(-90deg); }
-.order-recap-date { font-family: 'JetBrains Mono', 'Inter', monospace; font-size: 12px; font-weight: 700; color: var(--dark); }
-.order-recap-time { font-size: 10px; color: var(--mid); margin-left: 6px; font-family: 'JetBrains Mono', 'Inter', monospace; }
+.order-recap-date { font-family: var(--font-mono); font-size: 12px; font-weight: 700; color: var(--dark); }
+.order-recap-time { font-size: 10px; color: var(--mid); margin-left: 6px; font-family: var(--font-mono); }
 .order-recap-meta { font-size: 11px; color: var(--mid); }
 .order-recap-ref { display: inline-block; background: #FFF8E1; color: #8A6500; border: 1px solid #E5C661; border-radius: 4px; padding: 1px 6px; font-size: 10.5px; font-weight: 700; margin-left: 2px; }
-.order-recap-mq { font-family: 'JetBrains Mono', 'Inter', monospace; font-size: 12px; font-weight: 700; color: var(--dark); white-space: nowrap; }
-.order-recap-tot { font-family: 'JetBrains Mono', 'Inter', monospace; font-size: 13px; font-weight: 800; color: var(--green); white-space: nowrap; }
+.order-recap-mq { font-family: var(--font-mono); font-size: 12px; font-weight: 700; color: var(--dark); white-space: nowrap; }
+.order-recap-tot { font-family: var(--font-mono); font-size: 13px; font-weight: 800; color: var(--green); white-space: nowrap; }
 .order-recap-items { display: flex; flex-direction: column; padding: 4px 0 6px 0; border-top: 1px solid var(--border); }
 .order-recap-card.collapsed .order-recap-items { display: none; }
 .order-recap-item { display: grid; grid-template-columns: 90px 1fr auto auto; gap: 10px; align-items: center; padding: 7px 14px; border-bottom: 1px dashed var(--border); font-size: 11.5px; }
 .order-recap-item:last-child { border-bottom: none; }
-.ori-code { font-family: 'JetBrains Mono', 'Inter', monospace; font-size: 11px; font-weight: 700; color: var(--dark); }
+.ori-code { font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: var(--dark); }
 .ori-desc { color: var(--mid); line-height: 1.35; }
 .ori-desc strong { color: var(--dark); font-weight: 700; }
-.ori-mq { font-family: 'JetBrains Mono', 'Inter', monospace; font-weight: 700; color: var(--dark); white-space: nowrap; }
-.ori-tot { font-family: 'JetBrains Mono', 'Inter', monospace; font-weight: 700; color: var(--green); white-space: nowrap; min-width: 70px; text-align: right; }
+.ori-mq { font-family: var(--font-mono); font-weight: 700; color: var(--dark); white-space: nowrap; }
+.ori-tot { font-family: var(--font-mono); font-weight: 700; color: var(--green); white-space: nowrap; min-width: 70px; text-align: right; }
 .orders-recap-footer { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 14px 4px 14px; margin-top: 6px; border-top: 2px solid var(--border); font-size: 12px; }
 .orders-recap-footer .lbl { font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--mid); font-size: 11px; }
-.orders-recap-footer .val { font-family: 'JetBrains Mono', 'Inter', monospace; font-weight: 800; color: var(--dark); }
+.orders-recap-footer .val { font-family: var(--font-mono); font-weight: 800; color: var(--dark); }
 .orders-recap-footer .val.green { color: var(--green); }
 .orders-recap-actions { display: flex; gap: 8px; }
-.recap-mini-btn { background: none; border: 1px solid var(--border); color: var(--mid); border-radius: 5px; padding: 5px 10px; font-family: 'Inter', sans-serif; font-size: 10.5px; font-weight: 600; cursor: pointer; transition: all 0.15s; -webkit-tap-highlight-color: rgba(0,0,0,0.1); touch-action: manipulation; }
+.recap-mini-btn { background: none; border: 1px solid var(--border); color: var(--mid); border-radius: 5px; padding: 5px 10px; font-family: var(--font-body); font-size: 10.5px; font-weight: 600; cursor: pointer; transition: all 0.15s; -webkit-tap-highlight-color: rgba(0,0,0,0.1); touch-action: manipulation; }
 .recap-mini-btn:hover { border-color: var(--red); color: var(--red); }
 @media (max-width: 700px){
   .order-recap-head { grid-template-columns: auto 1fr auto; }
@@ -1032,7 +1571,7 @@ header {
 .mini-fill { width: 100%; background: var(--dark); border-radius: 2px 2px 0 0; min-height: 2px; }
 .mini-fill-green { background: var(--green); }
 .mini-lbl { font-size: 7px; color: var(--light); }
-.mini-sublbl { font-size: 7.5px; color: var(--green); font-weight: 700; font-family: 'JetBrains Mono','Inter',monospace; line-height: 1; }
+.mini-sublbl { font-size: 7.5px; color: var(--green); font-weight: 700; font-family: var(--font-mono); line-height: 1; }
 
 .stats-empty { text-align: center; padding: 40px; color: var(--light); font-size: 13px; }
 
@@ -1043,16 +1582,16 @@ header {
 
 /* ── INVENTARIO ESPOSITORI ───────────────────────────── */
 .client-tabs{display:flex;border-bottom:2px solid var(--border);}
-.client-tab{padding:10px 22px;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--mid);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.15s;}
+.client-tab{padding:10px 22px;font-family:var(--font-body);font-size:12px;font-weight:600;color:var(--mid);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.15s;}
 .client-tab:hover{color:var(--dark);}
 .client-tab.active{color:var(--red);border-bottom-color:var(--red);}
 .inv-body{padding:16px 20px;}
 .inv-toolbar{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap;}
-.btn-add-esp{background:var(--red);color:white;border:none;border-radius:6px;padding:8px 16px;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;}
+.btn-add-esp{background:var(--red);color:white;border:none;border-radius:6px;padding:8px 16px;font-family:var(--font-body);font-size:12px;font-weight:600;cursor:pointer;}
 .btn-add-esp:hover{background:var(--red-d);}
 .inv-empty{text-align:center;padding:60px 20px;color:var(--light);}
 .inv-empty .ie{font-size:40px;opacity:0.18;margin-bottom:12px;}
-.inv-empty p{font-family:'Playfair Display',serif;font-size:18px;color:var(--mid);}
+.inv-empty p{font-family:var(--font-display);letter-spacing:-0.01em;font-size:18px;color:var(--mid);}
 .esp-list{display:flex;flex-direction:column;gap:14px;}
 .esp-card{border:1.5px solid var(--border);border-radius:10px;overflow:hidden;}
 .esp-card.esp-collapsed .esp-items-wrap{display:none;}
@@ -1075,7 +1614,7 @@ header {
 .esp-rot-tab {
   background: white; border: 1px solid var(--border);
   color: var(--mid); border-radius: 5px;
-  padding: 5px 10px; font-family: 'Inter', sans-serif;
+  padding: 5px 10px; font-family: var(--font-body);
   font-size: 10.5px; font-weight: 700; letter-spacing: 0.04em;
   cursor: pointer; transition: all 0.15s;
   min-height: 28px;
@@ -1133,7 +1672,7 @@ header {
 }
 .esp-rot-slot.filled .esp-rot-slot-num { color: #6B3FA0; }
 .esp-rot-slot-code {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body);
   font-size: 11px; font-weight: 800;
   color: var(--dark);
   letter-spacing: 0.02em;
@@ -1172,10 +1711,111 @@ header {
 }
 .esp-rot-slot-del { right: 3px; }
 .esp-rot-slot-replace { right: 24px; font-size: 12px; }
-.esp-rot-slot-info { right: 45px; font-family: 'Inter', sans-serif; font-style: italic; font-weight: 900; font-size: 11px; }
+.esp-rot-slot-info { right: 45px; font-family: var(--font-body); font-style: italic; font-weight: 900; font-size: 11px; }
 .esp-rot-slot-del:hover { background: var(--red); color: white; }
 .esp-rot-slot-replace:hover { background: #6B3FA0; color: white; }
 .esp-rot-slot-info:hover { background: #3D6FA8; color: white; }
+/* Riga azioni "sposta" in fondo allo slot pieno */
+.esp-rot-slot-actions {
+  display: flex; align-items: center; justify-content: center;
+  gap: 4px;
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px dashed rgba(107,63,160,0.2);
+}
+.esp-rot-slot-mv {
+  border: 1px solid var(--border);
+  background: white;
+  color: var(--mid);
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 800;
+  width: 22px; height: 22px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: all 0.12s;
+  -webkit-tap-highlight-color: rgba(107,63,160,0.2);
+  touch-action: manipulation;
+  padding: 0;
+}
+.esp-rot-slot-mv:hover { border-color: #6B3FA0; color: #6B3FA0; background: #F5EEFC; }
+.esp-rot-slot-mv:active { transform: scale(0.94); }
+
+/* Pallino luminoso di stato sul slot pieno (top-left) */
+.esp-rot-slot-status {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 18px; height: 18px;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 2;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.esp-rot-slot-status-dot {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--st-color, #ccc);
+  display: block;
+  box-shadow:
+    0 0 0 2px white,
+    0 0 6px 2px var(--st-color, rgba(0,0,0,0.2)),
+    inset 0 1px 2px rgba(255,255,255,0.4);
+  transition: transform 0.15s, box-shadow 0.2s;
+}
+.esp-rot-slot-status:hover .esp-rot-slot-status-dot {
+  transform: scale(1.18);
+  box-shadow:
+    0 0 0 2px white,
+    0 0 10px 3px var(--st-color, rgba(0,0,0,0.3)),
+    inset 0 1px 2px rgba(255,255,255,0.4);
+}
+/* Sposta il numero #N a destra del pallino per non sovrapporsi */
+.esp-rot-slot.filled .esp-rot-slot-num { padding-left: 22px; }
+
+/* Tinta leggera lo sfondo dello slot in base allo stato */
+.esp-rot-slot.filled.cs-presente   { border-color: rgba(40,167,69,0.4); }
+.esp-rot-slot.filled.cs-sostituire { border-color: rgba(255,193,7,0.5); background: #FFFCEC; }
+.esp-rot-slot.filled.cs-fuoriprod  { border-color: rgba(220,53,69,0.4); background: #FFF4F5; }
+.esp-rot-slot.filled.cs-ordinato   { border-color: rgba(23,162,184,0.4); background: #EEFAFC; }
+.esp-rot-slot.filled.cs-programma  { border-color: rgba(123,45,139,0.4); background: #F8F0FB; }
+
+/* Menu popup per cambiare stato (allegato al body, position fixed) */
+.slot-status-menu {
+  position: fixed;
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: 7px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+  padding: 4px;
+  z-index: 9999;
+  min-width: 160px;
+}
+.slot-status-menu-item {
+  display: flex; align-items: center; gap: 7px;
+  padding: 6px 9px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--dark);
+  transition: background 0.12s;
+  -webkit-tap-highlight-color: rgba(0,0,0,0.05);
+  touch-action: manipulation;
+}
+.slot-status-menu-item:hover { background: var(--bg); }
+.slot-status-menu-item.active { background: rgba(107,63,160,0.08); color: #6B3FA0; }
+.slot-status-menu-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  display: inline-block; flex-shrink: 0;
+  box-shadow: 0 0 4px var(--dot-color, #ccc);
+  background: var(--dot-color, #ccc);
+}
 
 /* Modal info slot */
 #modal-slot-info .modal { padding: 22px; }
@@ -1189,7 +1829,7 @@ header {
   border: 1.5px solid rgba(0,0,0,0.12); flex-shrink: 0;
 }
 .slot-info-color-name {
-  font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 800;
+  font-family: var(--font-body); font-size: 14px; font-weight: 800;
   color: var(--dark); letter-spacing: 0.02em;
 }
 .slot-info-rows {
@@ -1205,7 +1845,7 @@ header {
   text-transform: uppercase; color: var(--light); flex-shrink: 0;
 }
 .slot-info-val {
-  font-family: 'Inter', sans-serif; font-size: 12.5px; font-weight: 700;
+  font-family: var(--font-body); font-size: 12.5px; font-weight: 700;
   color: var(--dark); text-align: right;
   overflow-wrap: anywhere; word-break: break-word;
 }
@@ -1229,16 +1869,16 @@ header {
 .esp-name-wrap{flex:1;min-width:0;}
 .esp-name-display{font-size:13px;font-weight:700;color:var(--dark);cursor:pointer;}
 .esp-name-display:hover{color:var(--red);}
-.esp-name-input{font-size:13px;font-weight:700;border:1.5px solid var(--red);border-radius:4px;padding:3px 8px;font-family:'Inter',sans-serif;width:100%;outline:none;display:none;}
+.esp-name-input{font-size:13px;font-weight:700;border:1.5px solid var(--red);border-radius:4px;padding:3px 8px;font-family:var(--font-body);width:100%;outline:none;display:none;}
 .esp-count{font-size:10px;color:var(--light);}
-.btn-add-campione{background:var(--white);border:1.5px solid var(--border);color:var(--mid);border-radius:5px;padding:5px 12px;font-family:'Inter',sans-serif;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;}
+.btn-add-campione{background:var(--white);border:1.5px solid var(--border);color:var(--mid);border-radius:5px;padding:5px 12px;font-family:var(--font-body);font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;}
 .btn-add-campione:hover{border-color:var(--red);color:var(--red);}
 .btn-del-esp{background:none;border:1.5px solid transparent;color:var(--mid);font-size:14px;cursor:pointer;padding:8px 11px;border-radius:6px;flex-shrink:0;min-width:40px;min-height:40px;display:inline-flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:rgba(200,16,46,0.25);touch-action:manipulation;}
 .btn-del-esp:hover,.btn-del-esp:active{color:var(--red);background:var(--red-l);border-color:var(--red);}
 .esp-items-wrap{padding:10px 14px;}
 .esp-add-bar{display:flex;gap:8px;margin-bottom:12px;}
 .esp-search-wrap{position:relative;flex:1;}
-.esp-search-input{width:100%;border:1.5px solid var(--border);border-radius:6px;padding:8px 12px;font-family:'Inter',sans-serif;font-size:12px;color:var(--dark);outline:none;}
+.esp-search-input{width:100%;border:1.5px solid var(--border);border-radius:6px;padding:8px 12px;font-family:var(--font-body);font-size:12px;color:var(--dark);outline:none;}
 .esp-search-input:focus{border-color:var(--red);}
 .esp-search-results{position:absolute;z-index:500;background:white;border:1.5px solid var(--border);border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,0.12);max-height:240px;overflow-y:auto;width:100%;display:none;top:100%;left:0;}
 .esp-sr-item{padding:9px 14px;cursor:pointer;border-bottom:1px solid var(--border);font-size:12px;}
@@ -1252,7 +1892,7 @@ header {
 .campione-row.br-provenza{background:#fff9d6;border-left:3px solid #d4b400;}
 .campione-row.br-viva{background:#f0eaff;border-left:3px solid #9b7bd4;}
 .campione-row:last-child{border-bottom:none;}
-.camp-code{font-family:'Inter',sans-serif;font-size:14px;font-weight:800;color:var(--dark);border-radius:5px;padding:2px 8px;background:var(--bg);}
+.camp-code{font-family:var(--font-body);font-size:14px;font-weight:800;color:var(--dark);border-radius:5px;padding:2px 8px;background:var(--bg);}
 .campione-row.br-emil .camp-code{background:#daeef7;color:#1a6080;}
 .campione-row.br-ergon .camp-code{background:#e8e8e8;color:#3a3a3a;}
 .campione-row.br-provenza .camp-code{background:#faf0c0;color:#7a6010;}
@@ -1270,7 +1910,7 @@ header {
 .cst-viva{background:#ede8f5;color:#5a2d82;}
 .camp-color-bold{font-weight:800;color:var(--dark);font-size:11px;}
 .camp-plain-info{font-weight:400;color:var(--mid);font-size:11px;}
-.camp-note-input{border:1.5px solid var(--border);border-radius:4px;padding:4px 8px;font-family:'Inter',sans-serif;font-size:11px;width:130px;outline:none;background:var(--bg);}
+.camp-note-input{border:1.5px solid var(--border);border-radius:4px;padding:4px 8px;font-family:var(--font-body);font-size:11px;width:130px;outline:none;background:var(--bg);}
 .camp-note-input:focus{border-color:var(--red);background:white;}
 .btn-del-camp{background:none;border:1.5px solid transparent;color:var(--mid);font-size:13px;cursor:pointer;padding:7px 10px;border-radius:5px;min-width:36px;min-height:36px;display:inline-flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:rgba(200,16,46,0.25);touch-action:manipulation;}
 .btn-del-camp:hover,.btn-del-camp:active{color:var(--red);background:var(--red-l);border-color:var(--red);}
@@ -1291,7 +1931,7 @@ header {
 .csd-item:hover{background:var(--bg);}
 .csd-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
 .camp-text-label{font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:6px;}
-.camp-free-textarea{width:100%;border:1.5px solid var(--border);border-radius:6px;padding:8px 12px;font-family:'Inter',sans-serif;font-size:12px;color:var(--dark);resize:vertical;min-height:60px;outline:none;background:var(--bg);}
+.camp-free-textarea{width:100%;border:1.5px solid var(--border);border-radius:6px;padding:8px 12px;font-family:var(--font-body);font-size:12px;color:var(--dark);resize:vertical;min-height:60px;outline:none;background:var(--bg);}
 .camp-free-textarea:focus{border-color:var(--red);background:white;}
 
 /* Indicatore bancale */
@@ -1311,7 +1951,7 @@ header {
   background: var(--dark); border-radius: 5px; padding: 5px 10px; margin-top: 5px;
 }
 .pt-label { font-size: 9px; color: rgba(255,255,255,0.6); font-weight: 600; letter-spacing: 0.05em; }
-.pt-val { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 800; color: white; letter-spacing: 0.01em; }
+.pt-val { font-family: var(--font-body); font-size: 14px; font-weight: 800; color: white; letter-spacing: 0.01em; }
 
 @media (max-width: 900px) {
   .kpi-row { grid-template-columns: 1fr 1fr; }
@@ -1526,6 +2166,17 @@ window.FIREBASE_CONFIG = {
       <div class="fg"><label>Formato</label><select id="sel-size" onchange="markSpecialSize()" disabled></select></div>
       <div class="fg"><label>Finitura</label><select id="sel-finish" disabled></select></div>
       <div class="fg"><label>Colore</label><select id="sel-color" disabled></select></div>
+      <div class="fg fg-search">
+        <label for="listino-search">Cerca prodotto</label>
+        <div class="listino-search-wrap">
+          <svg class="listino-search-ic" viewBox="0 0 14 14" fill="none">
+            <circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.4"/>
+            <path d="M9.5 9.5l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+          <input type="text" id="listino-search" class="listino-search-input" placeholder="Codice, serie, colore…" autocomplete="off" oninput="setListinoSearch(this.value)"/>
+          <button type="button" id="listino-search-clear" class="listino-search-clear" onclick="setListinoSearch('');document.getElementById('listino-search').value=''" title="Pulisci">✕</button>
+        </div>
+      </div>
     </div>
   </div>
   <div class="main">
@@ -1539,7 +2190,7 @@ window.FIREBASE_CONFIG = {
       <span class="rbar-count" id="rbar-count"></span>
     </div>
     <div class="grid" id="grid">
-      <div class="empty"><div class="empty-icon">🏛️</div><h3>Seleziona azienda o serie</h3><p>Usa i filtri in alto per trovare i prodotti</p></div>
+      <div class="empty"><div class="empty-icon"><svg viewBox="0 0 48 48" fill="none" width="48" height="48"><path d="M6 10h36M11 22h26M18 34h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><h3>Seleziona azienda o serie</h3><p>Usa i filtri in alto per trovare i prodotti</p></div>
     </div>
   </div>
 </div>
@@ -1567,7 +2218,10 @@ window.FIREBASE_CONFIG = {
       <!-- Right: orders -->
       <div class="order-detail" id="order-detail">
         <div class="no-selection">
-          <div>👈<br>Seleziona un cliente</div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+            <svg viewBox="0 0 48 48" fill="none" width="40" height="40" style="opacity:0.4"><path d="M22 8l-8 8M22 8l-8 -8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 8H40" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+            <span>Seleziona un cliente</span>
+          </div>
         </div>
       </div>
     </div>
@@ -1756,7 +2410,15 @@ window.FIREBASE_CONFIG = {
   </div>
 
   <div class="cp-items" id="cp-items">
-    <div class="cart-empty"><div class="ei">🛒</div><p>Il carrello è vuoto</p></div>
+    <div class="cart-empty"><div class="ei"><svg viewBox="0 0 32 32" fill="none" width="32" height="32"><path d="M4 6h3l3.5 14a2 2 0 0 0 2 1.5h9a2 2 0 0 0 2-1.5L26 10H8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="13" cy="26" r="1.6" stroke="currentColor" stroke-width="1.6"/><circle cx="22" cy="26" r="1.6" stroke="currentColor" stroke-width="1.6"/></svg></div><p>Il carrello è vuoto</p></div>
+  </div>
+  <!-- Toggle compatto sopra al footer: permette di collassare tutta la sezione "Finalizza ordine" -->
+  <div class="cp-fold-bar" id="cp-fold-bar" style="display:none">
+    <button type="button" class="cp-fold-toggle" id="cp-fold-toggle" onclick="toggleCartFold()" aria-expanded="true">
+      <svg class="cp-fold-chev" viewBox="0 0 24 24" fill="none"><polyline points="6 9 12 15 18 9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="cp-fold-title">Finalizza ordine</span>
+      <span class="cp-fold-sum" id="cp-fold-sum">— mq · € —</span>
+    </button>
   </div>
   <div class="cp-footer" id="cp-footer" style="display:none">
     <div class="cp-totals" id="cp-totals">
@@ -1851,26 +2513,135 @@ window.FIREBASE_CONFIG = {
 </div>
 
 <!-- MODAL: gestione tipi espositore personalizzati -->
+<!-- MODAL: condizioni speciali del cliente (prezzi netti, sconti su brand/serie/formato/finitura) -->
+<div class="modal-bg" id="modal-client-rules" style="z-index:520">
+  <div class="modal" style="max-width:640px;width:96vw">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <h3 style="margin:0">Condizioni speciali — <span id="mcr-client-name"></span></h3>
+      <button class="cp-close" onclick="closeModal('modal-client-rules')" style="background:rgba(0,0,0,0.06);color:var(--dark);border:none">✕</button>
+    </div>
+    <p style="font-size:12px;color:var(--mid);margin-bottom:14px">Definisci prezzi netti o sconti speciali che si applicheranno automaticamente quando aggiungi questo cliente al carrello. Le regole vengono valutate dall'alto verso il basso: la prima che combacia con il prodotto viene applicata.</p>
+
+    <!-- Form crea/modifica regola -->
+    <div class="cr-form" id="cr-form">
+      <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+        <div style="flex:1 1 100%">
+          <label class="save-order-lbl" for="cr-name">Nome regola</label>
+          <input type="text" class="modal-input" id="cr-name" placeholder="Es. Prezzi netti Be-Square" maxlength="80" style="margin-bottom:0"/>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+        <div style="flex:1 1 45%">
+          <label class="save-order-lbl">Brand</label>
+          <select class="modal-input" id="cr-brand" style="margin-bottom:0" onchange="_crBrandChange()"></select>
+        </div>
+        <div style="flex:1 1 45%">
+          <label class="save-order-lbl">Serie</label>
+          <select class="modal-input" id="cr-series" style="margin-bottom:0"></select>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+        <div style="flex:1 1 45%">
+          <label class="save-order-lbl">Formati (opz.)</label>
+          <input type="text" class="modal-input" id="cr-sizes" placeholder="Es. 60x60, 30x60" style="margin-bottom:0"/>
+        </div>
+        <div style="flex:1 1 45%">
+          <label class="save-order-lbl">Finiture (opz.)</label>
+          <input type="text" class="modal-input" id="cr-finishes" placeholder="Es. Naturale R10 Rett." style="margin-bottom:0"/>
+        </div>
+      </div>
+
+      <label class="save-order-lbl">Tipo di condizione</label>
+      <div class="cr-effect" style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap">
+        <label class="esp-type-shape-opt" style="flex:1 1 28%">
+          <input type="radio" name="cr-effect" value="net" checked onchange="_crEffectChange()"/>
+          <span>Prezzo netto<br><span class="esp-type-shape-sub">€/mq fisso</span></span>
+        </label>
+        <label class="esp-type-shape-opt" style="flex:1 1 28%">
+          <input type="radio" name="cr-effect" value="std" onchange="_crEffectChange()"/>
+          <span>Sconto comp.<br><span class="esp-type-shape-sub">3 step %</span></span>
+        </label>
+        <label class="esp-type-shape-opt" style="flex:1 1 28%">
+          <input type="radio" name="cr-effect" value="pct" onchange="_crEffectChange()"/>
+          <span>Sconto %<br><span class="esp-type-shape-sub">singolo sul listino</span></span>
+        </label>
+      </div>
+
+      <!-- Input "net" -->
+      <div class="cr-effect-input" id="cr-eff-net">
+        <label class="save-order-lbl" for="cr-net-price">Prezzo netto €/mq</label>
+        <input type="number" min="0" step="0.01" class="modal-input" id="cr-net-price" placeholder="Es. 25.00" style="margin-bottom:0"/>
+      </div>
+      <!-- Input "std" -->
+      <div class="cr-effect-input" id="cr-eff-std" style="display:none">
+        <label class="save-order-lbl">Sconti composti (3 step)</label>
+        <div style="display:flex;align-items:center;gap:4px">
+          <input type="number" min="0" max="99" class="modal-input" id="cr-std-1" placeholder="60" style="margin-bottom:0;width:70px;text-align:right"/>
+          <span>%</span>
+          <span style="color:#6B3FA0;font-weight:800">+</span>
+          <input type="number" min="0" max="99" class="modal-input" id="cr-std-2" placeholder="10" style="margin-bottom:0;width:70px;text-align:right"/>
+          <span>%</span>
+          <span style="color:#6B3FA0;font-weight:800">+</span>
+          <input type="number" min="0" max="99" class="modal-input" id="cr-std-3" placeholder="5" style="margin-bottom:0;width:70px;text-align:right"/>
+          <span>%</span>
+        </div>
+      </div>
+      <!-- Input "pct" -->
+      <div class="cr-effect-input" id="cr-eff-pct" style="display:none">
+        <label class="save-order-lbl" for="cr-pct-val">Sconto % sul prezzo finale</label>
+        <input type="number" min="0" max="99" step="0.5" class="modal-input" id="cr-pct-val" placeholder="Es. 15" style="margin-bottom:0"/>
+      </div>
+
+      <button onclick="_saveClientRule()" class="btn-modal-ok" style="margin-top:14px">+ Aggiungi condizione</button>
+      <button onclick="_cancelClientRuleEdit()" class="btn-modal-cancel" id="cr-cancel-edit" style="margin-left:6px;display:none">Annulla modifica</button>
+    </div>
+
+    <!-- Lista regole esistenti -->
+    <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--border)">
+      <div style="font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--mid);margin-bottom:8px">Condizioni attive</div>
+      <div id="cr-list" style="display:flex;flex-direction:column;gap:6px"></div>
+    </div>
+
+    <div class="modal-actions" style="margin-top:18px">
+      <button class="btn-modal-cancel" onclick="closeModal('modal-client-rules')">Chiudi</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-bg" id="modal-esp-types" style="z-index:520">
   <div class="modal" style="max-width:520px;width:96vw">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
       <h3 style="margin:0">Tipi di espositore personalizzati</h3>
       <button class="cp-close" onclick="closeModal('modal-esp-types')" style="background:rgba(0,0,0,0.06);color:var(--dark);border:none">✕</button>
     </div>
-    <p style="font-size:12px;color:var(--mid);margin-bottom:14px">Crea i tuoi tipi di espositore (es. "30×60 a parete", "Totem 80×80"). Puoi indicare il totale di slot e — se è un girevole — quanti slot per lato.</p>
+    <p style="font-size:12px;color:var(--mid);margin-bottom:14px">Crea i tuoi tipi di espositore (es. "30×60 a parete", "Totem 80×80"). Scegli la forma: <strong>lineare</strong> (un solo lato), <strong>girevole</strong> (due lati con vista destra/sinistra/completo).</p>
 
     <!-- Form crea nuovo tipo -->
     <div class="esp-type-form">
       <label class="save-order-lbl" for="esp-type-name">Nome del tipo</label>
       <input type="text" class="modal-input" id="esp-type-name" placeholder="Es. 30×60 a parete" maxlength="60" style="margin-bottom:8px"/>
+
+      <!-- Forma: lineare o girevole -->
+      <label class="save-order-lbl">Forma</label>
+      <div class="esp-type-shape" style="display:flex;gap:6px;margin-bottom:10px">
+        <label class="esp-type-shape-opt">
+          <input type="radio" name="esp-type-shape" value="line" checked onchange="_updateEspTypeShape()"/>
+          <span>Lineare<br><span class="esp-type-shape-sub">(un solo lato)</span></span>
+        </label>
+        <label class="esp-type-shape-opt">
+          <input type="radio" name="esp-type-shape" value="rot" onchange="_updateEspTypeShape()"/>
+          <span>Girevole<br><span class="esp-type-shape-sub">(due lati)</span></span>
+        </label>
+      </div>
+
       <div style="display:flex;gap:8px;margin-bottom:8px">
         <div style="flex:1">
           <label class="save-order-lbl" for="esp-type-total">Slot totali</label>
           <input type="number" min="1" max="60" class="modal-input" id="esp-type-total" placeholder="Es. 12" style="margin-bottom:0"/>
         </div>
-        <div style="flex:1">
-          <label class="save-order-lbl" for="esp-type-perside">Slot per lato <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--light)">(0 = no girevole)</span></label>
-          <input type="number" min="0" max="30" class="modal-input" id="esp-type-perside" placeholder="0" style="margin-bottom:0"/>
+        <div style="flex:1" id="esp-type-perside-wrap" style="display:none">
+          <label class="save-order-lbl" for="esp-type-perside">Slot per lato</label>
+          <input type="number" min="1" max="30" class="modal-input" id="esp-type-perside" placeholder="Es. 6" style="margin-bottom:0"/>
         </div>
       </div>
       <button onclick="_addCustomEspType()" class="btn-modal-ok" style="margin-top:4px">+ Crea tipo</button>
@@ -1915,7 +2686,7 @@ window.FIREBASE_CONFIG = {
 </div>
 
 <!-- ACCOUNT OVERLAY (Firebase login) -->
-<div id="account-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:400;align-items:center;justify-content:center;padding:18px;font-family:Inter,sans-serif">
+<div id="account-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:400;align-items:center;justify-content:center;padding:18px;font-family:var(--font-body)">
   <div style="background:#fff;border-radius:14px;max-width:380px;width:100%;padding:22px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
     <button onclick="closeAccount()" aria-label="Chiudi" style="position:absolute;top:10px;right:10px;background:none;border:none;cursor:pointer;color:#6B6B6B;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;-webkit-tap-highlight-color:rgba(0,0,0,0.1);touch-action:manipulation">&times;</button>
     <div id="account-body"></div>
@@ -1924,7 +2695,7 @@ window.FIREBASE_CONFIG = {
 <style>#account-overlay.open{display:flex !important}</style>
 
 <!-- SETTINGS OVERLAY (gestione prodotti) -->
-<div id="settings-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:380;align-items:center;justify-content:center;padding:0;font-family:Inter,sans-serif">
+<div id="settings-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:380;align-items:center;justify-content:center;padding:0;font-family:var(--font-body)">
   <div style="background:#fff;border-radius:14px;max-width:920px;width:96%;max-height:92vh;display:flex;flex-direction:column;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.3);overflow:hidden">
     <div style="padding:16px 20px;border-bottom:1px solid #E5E5E5;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0">
       <div>
@@ -1934,12 +2705,12 @@ window.FIREBASE_CONFIG = {
       <button onclick="closeSettings()" aria-label="Chiudi" style="background:none;border:none;cursor:pointer;color:#6B6B6B;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;-webkit-tap-highlight-color:rgba(0,0,0,0.1);touch-action:manipulation">&times;</button>
     </div>
     <div style="padding:14px 20px;border-bottom:1px solid #E5E5E5;display:flex;gap:10px;flex-wrap:wrap;align-items:center;flex-shrink:0">
-      <input id="settings-search" type="text" placeholder="Cerca codice, serie, colore, formato..." oninput="renderSettingsList()" style="flex:1;min-width:200px;border:1.5px solid #E5E5E5;border-radius:6px;padding:9px 12px;font-family:Inter,sans-serif;font-size:13px"/>
-      <select id="settings-brand-filter" onchange="renderSettingsList()" style="border:1.5px solid #E5E5E5;border-radius:6px;padding:9px 10px;font-family:Inter,sans-serif;font-size:13px;background:#fff">
+      <input id="settings-search" type="text" placeholder="Cerca codice, serie, colore, formato..." oninput="renderSettingsList()" style="flex:1;min-width:200px;border:1.5px solid #E5E5E5;border-radius:6px;padding:9px 12px;font-family:var(--font-body);font-size:13px"/>
+      <select id="settings-brand-filter" onchange="renderSettingsList()" style="border:1.5px solid #E5E5E5;border-radius:6px;padding:9px 10px;font-family:var(--font-body);font-size:13px;background:#fff">
         <option value="">Tutti i marchi</option>
       </select>
-      <button onclick="openProductEdit(null)" style="background:#C8102E;color:#fff;border:none;border-radius:6px;padding:9px 16px;font-family:Inter,sans-serif;font-size:13px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:rgba(255,255,255,0.3);touch-action:manipulation">+ Nuovo prodotto</button>
-      <button onclick="openEspTypesManager()" style="background:#5C5145;color:#fff;border:none;border-radius:6px;padding:9px 16px;font-family:Inter,sans-serif;font-size:13px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:rgba(255,255,255,0.3);touch-action:manipulation">🏷️ Tipi espositore</button>
+      <button onclick="openProductEdit(null)" style="background:#C8102E;color:#fff;border:none;border-radius:6px;padding:9px 16px;font-family:var(--font-body);font-size:13px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:rgba(255,255,255,0.3);touch-action:manipulation">+ Nuovo prodotto</button>
+      <button onclick="openEspTypesManager()" style="background:#5C5145;color:#fff;border:none;border-radius:6px;padding:9px 16px;font-family:var(--font-body);font-size:13px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:rgba(255,255,255,0.3);touch-action:manipulation;display:inline-flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" width="14" height="14"><path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9-9-9z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="7.5" cy="7.5" r="1.5" stroke="currentColor" stroke-width="1.5"/></svg>Tipi espositore</button>
     </div>
     <div id="settings-list" style="flex:1;overflow:auto;padding:8px 0"></div>
     <div style="padding:11px 20px;border-top:1px solid #E5E5E5;background:#F7F7F7;font-size:11px;color:#6B6B6B;flex-shrink:0" id="settings-stats">—</div>
@@ -1954,7 +2725,7 @@ window.FIREBASE_CONFIG = {
 .settings-row .pill-edit{background:#FEF7DD;color:#8A6500;margin-left:6px}
 .settings-row .pill-new{background:#E5F1FE;color:#2563D9;margin-left:6px}
 .settings-row .row-actions{display:flex;gap:6px;justify-content:flex-end}
-.settings-row .row-actions button{background:none;border:1.5px solid #E5E5E5;border-radius:5px;padding:5px 9px;font-family:Inter,sans-serif;font-size:11px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:rgba(0,0,0,0.1);touch-action:manipulation}
+.settings-row .row-actions button{background:none;border:1.5px solid #E5E5E5;border-radius:5px;padding:5px 9px;font-family:var(--font-body);font-size:11px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:rgba(0,0,0,0.1);touch-action:manipulation}
 .settings-row .row-actions button:hover{background:#F7F7F7}
 .settings-row .row-actions .btn-edit{color:#1A1A1A}
 .settings-row .row-actions .btn-del{color:#C8102E;border-color:#FFB8C2}
@@ -1969,31 +2740,31 @@ window.FIREBASE_CONFIG = {
 </style>
 
 <!-- PRODUCT EDIT MODAL -->
-<div id="prodedit-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:420;align-items:center;justify-content:center;padding:18px;font-family:Inter,sans-serif">
+<div id="prodedit-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:420;align-items:center;justify-content:center;padding:18px;font-family:var(--font-body)">
   <div style="background:#fff;border-radius:14px;max-width:540px;width:100%;max-height:92vh;overflow:auto;padding:22px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.35)">
     <div style="font-size:16px;font-weight:800;color:#1A1A1A;margin-bottom:6px;letter-spacing:0.04em;text-transform:uppercase" id="prodedit-title">Modifica prodotto</div>
     <div style="font-size:11px;color:#6B6B6B;margin-bottom:16px" id="prodedit-orig">—</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;color:#6B6B6B;letter-spacing:0.06em;text-transform:uppercase">Codice<input id="pe-code" style="border:1.5px solid #E5E5E5;border-radius:6px;padding:9px 11px;font-family:Inter,sans-serif;font-size:13px;text-transform:none"/></label>
-      <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;color:#6B6B6B;letter-spacing:0.06em;text-transform:uppercase">Marchio<input id="pe-brand" list="pe-brand-list" style="border:1.5px solid #E5E5E5;border-radius:6px;padding:9px 11px;font-family:Inter,sans-serif;font-size:13px"/></label>
-      <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;color:#6B6B6B;letter-spacing:0.06em;text-transform:uppercase">Serie<input id="pe-series" list="pe-series-list" style="border:1.5px solid #E5E5E5;border-radius:6px;padding:9px 11px;font-family:Inter,sans-serif;font-size:13px"/></label>
-      <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;color:#6B6B6B;letter-spacing:0.06em;text-transform:uppercase">Formato<input id="pe-size" placeholder="es. 60x60" style="border:1.5px solid #E5E5E5;border-radius:6px;padding:9px 11px;font-family:Inter,sans-serif;font-size:13px"/></label>
-      <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;color:#6B6B6B;letter-spacing:0.06em;text-transform:uppercase">Finitura<input id="pe-finish" style="border:1.5px solid #E5E5E5;border-radius:6px;padding:9px 11px;font-family:Inter,sans-serif;font-size:13px"/></label>
-      <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;color:#6B6B6B;letter-spacing:0.06em;text-transform:uppercase">Colore<input id="pe-color" style="border:1.5px solid #E5E5E5;border-radius:6px;padding:9px 11px;font-family:Inter,sans-serif;font-size:13px"/></label>
-      <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;color:#6B6B6B;letter-spacing:0.06em;text-transform:uppercase">Tipo<select id="pe-type" style="border:1.5px solid #E5E5E5;border-radius:6px;padding:9px 11px;font-family:Inter,sans-serif;font-size:13px;background:#fff"><option value="fondo">Fondo</option><option value="speciale">Speciale</option></select></label>
-      <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;color:#6B6B6B;letter-spacing:0.06em;text-transform:uppercase">Prezzo €/mq<input id="pe-price" type="number" step="0.01" min="0" style="border:1.5px solid #E5E5E5;border-radius:6px;padding:9px 11px;font-family:Inter,sans-serif;font-size:13px"/></label>
-      <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;color:#6B6B6B;letter-spacing:0.06em;text-transform:uppercase;grid-column:1/-1">m²/pallet (opzionale)<input id="pe-m2pal" type="number" step="0.01" min="0" style="border:1.5px solid #E5E5E5;border-radius:6px;padding:9px 11px;font-family:Inter,sans-serif;font-size:13px"/></label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;color:#6B6B6B;letter-spacing:0.06em;text-transform:uppercase">Codice<input id="pe-code" style="border:1.5px solid #E5E5E5;border-radius:6px;padding:9px 11px;font-family:var(--font-body);font-size:13px;text-transform:none"/></label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;color:#6B6B6B;letter-spacing:0.06em;text-transform:uppercase">Marchio<input id="pe-brand" list="pe-brand-list" style="border:1.5px solid #E5E5E5;border-radius:6px;padding:9px 11px;font-family:var(--font-body);font-size:13px"/></label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;color:#6B6B6B;letter-spacing:0.06em;text-transform:uppercase">Serie<input id="pe-series" list="pe-series-list" style="border:1.5px solid #E5E5E5;border-radius:6px;padding:9px 11px;font-family:var(--font-body);font-size:13px"/></label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;color:#6B6B6B;letter-spacing:0.06em;text-transform:uppercase">Formato<input id="pe-size" placeholder="es. 60x60" style="border:1.5px solid #E5E5E5;border-radius:6px;padding:9px 11px;font-family:var(--font-body);font-size:13px"/></label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;color:#6B6B6B;letter-spacing:0.06em;text-transform:uppercase">Finitura<input id="pe-finish" style="border:1.5px solid #E5E5E5;border-radius:6px;padding:9px 11px;font-family:var(--font-body);font-size:13px"/></label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;color:#6B6B6B;letter-spacing:0.06em;text-transform:uppercase">Colore<input id="pe-color" style="border:1.5px solid #E5E5E5;border-radius:6px;padding:9px 11px;font-family:var(--font-body);font-size:13px"/></label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;color:#6B6B6B;letter-spacing:0.06em;text-transform:uppercase">Tipo<select id="pe-type" style="border:1.5px solid #E5E5E5;border-radius:6px;padding:9px 11px;font-family:var(--font-body);font-size:13px;background:#fff"><option value="fondo">Fondo</option><option value="speciale">Speciale</option></select></label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;color:#6B6B6B;letter-spacing:0.06em;text-transform:uppercase">Prezzo €/mq<input id="pe-price" type="number" step="0.01" min="0" style="border:1.5px solid #E5E5E5;border-radius:6px;padding:9px 11px;font-family:var(--font-body);font-size:13px"/></label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;color:#6B6B6B;letter-spacing:0.06em;text-transform:uppercase;grid-column:1/-1">m²/pallet (opzionale)<input id="pe-m2pal" type="number" step="0.01" min="0" style="border:1.5px solid #E5E5E5;border-radius:6px;padding:9px 11px;font-family:var(--font-body);font-size:13px"/></label>
       <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;color:#6B3FA0;letter-spacing:0.06em;text-transform:uppercase;grid-column:1/-1">
         Decoro / sottoserie (opzionale)
-        <input id="pe-subseries" placeholder="es. VARIEE, RIBBED, FANTASIA..." style="border:1.5px solid #D0B8E8;border-radius:6px;padding:9px 11px;font-family:Inter,sans-serif;font-size:13px;text-transform:uppercase;background:#FAF7FD;color:#6B3FA0;font-weight:700;letter-spacing:0.05em"/>
+        <input id="pe-subseries" placeholder="es. VARIEE, RIBBED, FANTASIA..." style="border:1.5px solid #D0B8E8;border-radius:6px;padding:9px 11px;font-family:var(--font-body);font-size:13px;text-transform:uppercase;background:#FAF7FD;color:#6B3FA0;font-weight:700;letter-spacing:0.05em"/>
         <span style="font-size:10px;color:#9876B8;font-weight:500;letter-spacing:0;text-transform:none;line-height:1.3">È il tag viola che appare sotto la serie (es. "VARIEE" su Unique Bourgogne). Lascia vuoto se non è un decoro.</span>
       </label>
     </div>
     <datalist id="pe-brand-list"></datalist>
     <datalist id="pe-series-list"></datalist>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px">
-      <button onclick="closeProductEdit()" style="background:none;border:1.5px solid #E5E5E5;color:#6B6B6B;border-radius:7px;padding:11px 18px;font-family:Inter,sans-serif;font-size:13px;font-weight:600;cursor:pointer;min-height:44px;-webkit-tap-highlight-color:rgba(0,0,0,0.1);touch-action:manipulation">Annulla</button>
-      <button onclick="saveProductEdit()" style="background:#C8102E;color:#fff;border:none;border-radius:7px;padding:11px 22px;font-family:Inter,sans-serif;font-size:13px;font-weight:700;cursor:pointer;min-height:44px;-webkit-tap-highlight-color:rgba(255,255,255,0.3);touch-action:manipulation">Salva</button>
+      <button onclick="closeProductEdit()" style="background:none;border:1.5px solid #E5E5E5;color:#6B6B6B;border-radius:7px;padding:11px 18px;font-family:var(--font-body);font-size:13px;font-weight:600;cursor:pointer;min-height:44px;-webkit-tap-highlight-color:rgba(0,0,0,0.1);touch-action:manipulation">Annulla</button>
+      <button onclick="saveProductEdit()" style="background:#C8102E;color:#fff;border:none;border-radius:7px;padding:11px 22px;font-family:var(--font-body);font-size:13px;font-weight:700;cursor:pointer;min-height:44px;-webkit-tap-highlight-color:rgba(255,255,255,0.3);touch-action:manipulation">Salva</button>
     </div>
   </div>
 </div>
@@ -2041,7 +2812,12 @@ function setOrderRecipient(val){
   try { localStorage.setItem('order_recipient', _orderRecipient); } catch(e){}
   _renderCartOutput();
 }
-function setCartClientId(val){ _cartClientId = val || ''; _renderCartOutput(); }
+function setCartClientId(val){
+  _cartClientId = val || '';
+  _renderCartOutput();
+  // Ri-render del carrello per applicare/rimuovere automaticamente le condizioni speciali del cliente
+  try { updateCartUI(); } catch(_){}
+}
 function setCartRef(val){ _cartRef = String(val||'').slice(0,120); _renderCartOutput(); }
 window.setOrderRecipient = setOrderRecipient;
 window.setCartClientId = setCartClientId;
@@ -2220,13 +2996,13 @@ function listinoConfirm(message, onYes){
   if(!m){
     m = document.createElement('div');
     m.id = 'listino-confirm';
-    m.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);display:none;align-items:center;justify-content:center;z-index:99999;padding:18px;font-family:Inter,sans-serif;';
+    m.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);display:none;align-items:center;justify-content:center;z-index:99999;padding:18px;font-family:var(--font-body);';
     m.innerHTML = `<div style="background:#fff;border-radius:12px;max-width:380px;width:100%;padding:22px;box-shadow:0 10px 40px rgba(0,0,0,0.3)">
       <div id="lc-title" style="font-size:15px;font-weight:700;color:#1A1A1A;margin-bottom:8px">Confermi?</div>
       <div id="lc-msg" style="color:#6B6B6B;font-size:13px;line-height:1.5;margin-bottom:18px;white-space:pre-line"></div>
       <div style="display:flex;gap:10px;justify-content:flex-end">
-        <button id="lc-no" style="background:none;border:1.5px solid #E5E5E5;color:#6B6B6B;border-radius:7px;padding:11px 18px;font-family:Inter,sans-serif;font-size:13px;font-weight:600;cursor:pointer;min-height:44px;-webkit-tap-highlight-color:rgba(0,0,0,0.1);touch-action:manipulation">Annulla</button>
-        <button id="lc-yes" style="background:#C8102E;color:#fff;border:none;border-radius:7px;padding:11px 22px;font-family:Inter,sans-serif;font-size:13px;font-weight:700;cursor:pointer;min-height:44px;-webkit-tap-highlight-color:rgba(255,255,255,0.3);touch-action:manipulation">Conferma</button>
+        <button id="lc-no" style="background:none;border:1.5px solid #E5E5E5;color:#6B6B6B;border-radius:7px;padding:11px 18px;font-family:var(--font-body);font-size:13px;font-weight:600;cursor:pointer;min-height:44px;-webkit-tap-highlight-color:rgba(0,0,0,0.1);touch-action:manipulation">Annulla</button>
+        <button id="lc-yes" style="background:#C8102E;color:#fff;border:none;border-radius:7px;padding:11px 22px;font-family:var(--font-body);font-size:13px;font-weight:700;cursor:pointer;min-height:44px;-webkit-tap-highlight-color:rgba(255,255,255,0.3);touch-action:manipulation">Conferma</button>
       </div>
     </div>`;
     document.body.appendChild(m);
@@ -2251,8 +3027,8 @@ function showSyncToast(msg){
   }
   const isMobile = window.innerWidth < 700;
   t.style.cssText = isMobile
-    ? 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1A1A1A;color:#fff;padding:13px 22px;border-radius:9px;font-family:Inter,sans-serif;font-size:14px;font-weight:600;box-shadow:0 4px 18px rgba(0,0,0,0.35);z-index:99999;opacity:0;transition:opacity 0.2s;pointer-events:none;max-width:90%;text-align:center;'
-    : 'position:fixed;top:70px;right:18px;background:#1A1A1A;color:#fff;padding:11px 18px;border-radius:8px;font-family:Inter,sans-serif;font-size:13px;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,0.25);z-index:99999;opacity:0;transition:opacity 0.2s;pointer-events:none;';
+    ? 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1A1A1A;color:#fff;padding:13px 22px;border-radius:9px;font-family:var(--font-body);font-size:14px;font-weight:600;box-shadow:0 4px 18px rgba(0,0,0,0.35);z-index:99999;opacity:0;transition:opacity 0.2s;pointer-events:none;max-width:90%;text-align:center;'
+    : 'position:fixed;top:70px;right:18px;background:#1A1A1A;color:#fff;padding:11px 18px;border-radius:8px;font-family:var(--font-body);font-size:13px;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,0.25);z-index:99999;opacity:0;transition:opacity 0.2s;pointer-events:none;';
   t.textContent = msg;
   void t.offsetWidth;
   t.style.opacity = '1';
@@ -2619,7 +3395,7 @@ function renderAccountOverlay(){
     return;
   }
   if(!window.fbUser){
-    body.innerHTML = '<div style="text-align:center;padding:18px 8px"><div style="width:64px;height:64px;border-radius:50%;background:#FFF0F2;color:#C8102E;display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 14px">\uD83D\uDD12</div><div style="font-size:16px;font-weight:700;color:#1A1A1A;margin-bottom:8px">Accedi per sincronizzare</div><div style="color:#6B6B6B;font-size:13px;line-height:1.5;margin-bottom:18px">Usa il tuo account Google per salvare automaticamente clienti e ordini nel cloud e ritrovarli su PC e telefono.</div><button onclick="doSignIn()" style="background:#C8102E;color:#fff;border:none;border-radius:8px;padding:12px 22px;font-family:Inter,sans-serif;font-size:14px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:9px;min-height:44px;-webkit-tap-highlight-color:rgba(255,255,255,0.3);touch-action:manipulation"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="#fff" d="M22.5 12.3c0-.8-.1-1.4-.2-2.1H12v3.9h5.9c-.1 1-.7 2.5-2 3.5v2.9h3.2c1.9-1.7 3-4.3 3-7.4 0-.3-.1-.6-.1-.8z"/><path fill="#fff" d="M12 23c2.7 0 5-.9 6.7-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.9-1.7-5.7-4.1H3v2.6C4.7 20.9 8.1 23 12 23z" opacity=".75"/><path fill="#fff" d="M6.3 14.9c-.2-.6-.3-1.3-.3-1.9s.1-1.3.3-1.9V8.5H3.1C2.4 9.9 2 11.4 2 13s.4 3.1 1.1 4.5l3.2-2.6z" opacity=".55"/><path fill="#fff" d="M12 6.4c1.5 0 2.5.6 3 1.2l2.3-2.3C15.9 3.9 14.1 3 12 3 8.1 3 4.7 5.1 3 8.5l3.3 2.6C7.1 8.7 9.4 7 12 7v-.6z" opacity=".4"/></svg>Accedi con Google</button></div>';
+    body.innerHTML = '<div style="text-align:center;padding:18px 8px"><div style="width:64px;height:64px;border-radius:50%;background:#FFF0F2;color:#C8102E;display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 14px">\uD83D\uDD12</div><div style="font-size:16px;font-weight:700;color:#1A1A1A;margin-bottom:8px">Accedi per sincronizzare</div><div style="color:#6B6B6B;font-size:13px;line-height:1.5;margin-bottom:18px">Usa il tuo account Google per salvare automaticamente clienti e ordini nel cloud e ritrovarli su PC e telefono.</div><button onclick="doSignIn()" style="background:#C8102E;color:#fff;border:none;border-radius:8px;padding:12px 22px;font-family:var(--font-body);font-size:14px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:9px;min-height:44px;-webkit-tap-highlight-color:rgba(255,255,255,0.3);touch-action:manipulation"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="#fff" d="M22.5 12.3c0-.8-.1-1.4-.2-2.1H12v3.9h5.9c-.1 1-.7 2.5-2 3.5v2.9h3.2c1.9-1.7 3-4.3 3-7.4 0-.3-.1-.6-.1-.8z"/><path fill="#fff" d="M12 23c2.7 0 5-.9 6.7-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.9-1.7-5.7-4.1H3v2.6C4.7 20.9 8.1 23 12 23z" opacity=".75"/><path fill="#fff" d="M6.3 14.9c-.2-.6-.3-1.3-.3-1.9s.1-1.3.3-1.9V8.5H3.1C2.4 9.9 2 11.4 2 13s.4 3.1 1.1 4.5l3.2-2.6z" opacity=".55"/><path fill="#fff" d="M12 6.4c1.5 0 2.5.6 3 1.2l2.3-2.3C15.9 3.9 14.1 3 12 3 8.1 3 4.7 5.1 3 8.5l3.3 2.6C7.1 8.7 9.4 7 12 7v-.6z" opacity=".4"/></svg>Accedi con Google</button></div>';
     return;
   }
   const u = window.fbUser;
@@ -2630,9 +3406,9 @@ function renderAccountOverlay(){
   body.innerHTML = '<div style="text-align:center;padding:14px 8px">' + photo +
     '<div style="font-size:15px;font-weight:700;color:#1A1A1A;margin-bottom:4px">' + escH(u.displayName||u.email||'Utente') + '</div>' +
     '<div style="font-size:11px;color:#6B6B6B;font-family:monospace;margin-bottom:14px">' + escH(u.email||'') + '</div>' +
-    '<button onclick="cloudPullNow(true)" style="display:block;width:100%;background:#FFF0F2;color:#9E0C24;border:1.5px solid #C8102E;border-radius:8px;padding:11px 14px;font-family:Inter,sans-serif;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:10px;min-height:44px;-webkit-tap-highlight-color:rgba(0,0,0,0.05);touch-action:manipulation">\u21BB Aggiorna ora dal cloud</button>' +
+    '<button onclick="cloudPullNow(true)" style="display:block;width:100%;background:#FFF0F2;color:#9E0C24;border:1.5px solid #C8102E;border-radius:8px;padding:11px 14px;font-family:var(--font-body);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:10px;min-height:44px;-webkit-tap-highlight-color:rgba(0,0,0,0.05);touch-action:manipulation">\u21BB Aggiorna ora dal cloud</button>' +
     '<div style="background:#F7F7F7;border-radius:7px;padding:11px 13px;font-size:11.5px;color:#6B6B6B;line-height:1.5;text-align:left;margin-bottom:12px">I dati vengono salvati automaticamente nel cloud Firebase. Apri il sito da un altro dispositivo e accedi con lo stesso account: ritroverai tutto. Su mobile, se non vedi le ultime modifiche, premi <strong>Aggiorna ora</strong>.</div>' +
-    '<button onclick="doSignOut()" style="display:block;width:100%;background:#fff;color:#6B6B6B;border:1.5px solid #E5E5E5;border-radius:8px;padding:11px 14px;font-family:Inter,sans-serif;font-size:13px;font-weight:600;cursor:pointer;min-height:44px;-webkit-tap-highlight-color:rgba(0,0,0,0.05);touch-action:manipulation">Esci</button>' +
+    '<button onclick="doSignOut()" style="display:block;width:100%;background:#fff;color:#6B6B6B;border:1.5px solid #E5E5E5;border-radius:8px;padding:11px 14px;font-family:var(--font-body);font-size:13px;font-weight:600;cursor:pointer;min-height:44px;-webkit-tap-highlight-color:rgba(0,0,0,0.05);touch-action:manipulation">Esci</button>' +
     '</div>';
 }
 window.renderAccountOverlay = renderAccountOverlay;
@@ -3024,13 +3800,35 @@ const toT = s => s ? s.split(' ').map(w=>w[0].toUpperCase()+w.slice(1).toLowerCa
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
 const fmtDate = ts => new Date(ts).toLocaleDateString('it-IT', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
 
-const hasFilter = () => !!(state.brand || state.series);
+// Ricerca testuale aggiuntiva (oltre ai filtri dropdown)
+let _listinoSearch = '';
+function setListinoSearch(v){
+  _listinoSearch = String(v||'').trim();
+  const clearBtn = document.getElementById('listino-search-clear');
+  if(clearBtn) clearBtn.classList.toggle('visible', _listinoSearch.length > 0);
+  // Re-render dei prodotti
+  try { render(); } catch(_){}
+}
+window.setListinoSearch = setListinoSearch;
+const hasFilter = () => !!(state.brand || state.series || _listinoSearch);
+function _matchesListinoSearch(p){
+  if(!_listinoSearch) return true;
+  const q = _listinoSearch.toLowerCase();
+  return (p.code||'').toLowerCase().includes(q)
+      || (p.series||'').toLowerCase().includes(q)
+      || (p.color||'').toLowerCase().includes(q)
+      || (p.finish||'').toLowerCase().includes(q)
+      || (p.size||'').toLowerCase().includes(q)
+      || (p.subseries||'').toLowerCase().includes(q)
+      || (p.brand||'').toLowerCase().includes(q);
+}
 const filtered = () => PRODUCTS.filter(p =>
   (!state.brand  || p.brand===state.brand)  &&
   (!state.series || p.series===state.series) &&
   (!state.size   || p.size===state.size)     &&
   (!state.finish || p.finish===state.finish) &&
-  (!state.color  || p.color===state.color)
+  (!state.color  || p.color===state.color)   &&
+  _matchesListinoSearch(p)
 );
 const inCart = c => cart.some(x=>x.product.code===c);
 const getEntry = c => cart.find(x=>x.product.code===c);
@@ -3192,7 +3990,7 @@ function cardHTML(p) {
 function renderProducts() {
   const g=$('grid'),rb=$('rbar'),lg=$('legend');
   if(!hasFilter()){
-    g.innerHTML=`<div class="empty"><div class="empty-icon">🏛️</div><h3>Seleziona azienda o serie</h3><p>Usa i filtri in alto per trovare i prodotti</p></div>`;
+    g.innerHTML=`<div class="empty"><div class="empty-icon"><svg viewBox="0 0 48 48" fill="none" width="48" height="48"><path d="M6 10h36M11 22h26M18 34h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><h3>Seleziona azienda o serie</h3><p>Usa i filtri in alto per trovare i prodotti</p></div>`;
     rb.style.display='none'; lg.style.display='none'; return;
   }
   const prods=filtered();
@@ -3203,12 +4001,12 @@ function renderProducts() {
   const speciali=prods.filter(p=>p.type==='speciale');
   $('rbar-count').textContent=`${prods.length} prodott${prods.length===1?'o':'i'} · ${fondi.length} fondi · ${speciali.length} speciali`;
 
-  if(!prods.length){ g.innerHTML=`<div class="empty"><div class="empty-icon">🔍</div><h3>Nessun prodotto trovato</h3><p>Modifica i filtri di ricerca</p></div>`; return; }
+  if(!prods.length){ g.innerHTML=`<div class="empty"><div class="empty-icon"><svg viewBox="0 0 48 48" fill="none" width="44" height="44"><circle cx="21" cy="21" r="13" stroke="currentColor" stroke-width="2.2"/><path d="M31 31l10 10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></div><h3>Nessun prodotto trovato</h3><p>Modifica i filtri di ricerca</p></div>`; return; }
 
   let html='';
   if(fondi.length){
     html+=`<div class="section-header">
-      <div class="section-icon">☐</div>
+      <div class="section-icon"><svg viewBox="0 0 24 24" fill="none" width="14" height="14"><rect x="4" y="4" width="16" height="16" rx="1.5" stroke="currentColor" stroke-width="1.8"/></svg></div>
       <div class="section-title">Fondi</div>
       <div class="section-count">${fondi.length} prodotti</div>
     </div>`;
@@ -3316,11 +4114,40 @@ function clearCart(){ cart=[]; render(); updateCartUI(); }
 // Calcola il prezzo unitario finale di un item del carrello applicando il suo sconto specifico
 function cartItemFinalUnit(item){
   if(!item || !item.product) return 0;
-  const base = prezzoCorretto(item.product, item.mq);
+  const p = item.product;
   const d = item.discount || {type:'none'};
+  // Tipo "std": sconto composto a 3 step direttamente sul prezzo di listino (sostituisce DA/DB)
+  if(d.type === 'std' && Array.isArray(d.std) && d.std.length){
+    let pf = p.price || 0;
+    d.std.forEach(s => {
+      const v = parseFloat(s);
+      if(isFinite(v) && v > 0 && v < 100) pf *= (1 - v/100);
+    });
+    return pf;
+  }
+  const base = prezzoCorretto(p, item.mq);
   if(d.type === 'pct5')   return base * 0.95;
   if(d.type === 'pct10')  return base * 0.90;
   if(d.type === 'custom' && typeof d.customPrice === 'number' && d.customPrice >= 0) return d.customPrice;
+  // Se non c'è uno sconto esplicito e c'è un cliente selezionato, prova ad applicare le regole speciali
+  if(d.type === 'none' || !d.type){
+    const cid = (typeof _cartClientId !== 'undefined') ? _cartClientId : '';
+    if(cid){
+      const rule = _findClientRule(cid, p);
+      if(rule){
+        if(rule.effect === 'net' && typeof rule.netPrice === 'number') return rule.netPrice;
+        if(rule.effect === 'std' && Array.isArray(rule.std)){
+          let pf = p.price || 0;
+          rule.std.forEach(s => {
+            const v = parseFloat(s);
+            if(isFinite(v) && v > 0 && v < 100) pf *= (1 - v/100);
+          });
+          return pf;
+        }
+        if(rule.effect === 'pct' && typeof rule.pct === 'number') return base * (1 - rule.pct/100);
+      }
+    }
+  }
   return base;
 }
 function cartItemFinalTot(item){
@@ -3333,8 +4160,29 @@ function setCartItemDiscType(code, type){
   if(!item.discount) item.discount = {type:'none', customPrice:null};
   item.discount.type = type;
   if(type !== 'custom') item.discount.customPrice = null;
+  // Inizializza i 3 step "std" con i valori predefiniti del prodotto
+  // (sotto/sopra bancale) se l'utente sceglie il tipo 'std' per la prima volta
+  if(type === 'std' && (!Array.isArray(item.discount.std) || !item.discount.std.length)){
+    const p = item.product;
+    const sopraBancale = p.m2_pallet && (parseFloat(item.mq)||0) >= p.m2_pallet;
+    // Default: -60% -10% -5% (sotto bancale) oppure -60% -10% -10% (sopra bancale)
+    item.discount.std = sopraBancale ? [60, 10, 10] : [60, 10, 5];
+  }
   updateCartUI();
 }
+function setCartItemStd(code, idx, val){
+  const item = cart.find(c => c && c.product && c.product.code === code);
+  if(!item) return;
+  if(!item.discount) item.discount = {type:'std'};
+  if(!Array.isArray(item.discount.std)) item.discount.std = [60, 10, 5];
+  const i = parseInt(idx,10);
+  const v = parseFloat(String(val||'').replace(',', '.'));
+  item.discount.std[i] = (isFinite(v) && v >= 0 && v < 100) ? v : 0;
+  item.discount.type = 'std';
+  _updateCartItemRow(code);
+  _updateCartFooter();
+}
+window.setCartItemStd = setCartItemStd;
 function setCartItemCustomPrice(code, val){
   const item = cart.find(c => c && c.product && c.product.code === code);
   if(!item) return;
@@ -3391,7 +4239,7 @@ function _updateCartItemRow(code){
   const finalTot = cartItemFinalTot(item);
   const d = item.discount || {type:'none', customPrice:null};
   const dType = d.type || 'none';
-  const hasDisc = (dType === 'pct5' || dType === 'pct10' || (dType === 'custom' && d.customPrice !== null));
+  const hasDisc = (dType === 'pct5' || dType === 'pct10' || (dType === 'custom' && d.customPrice !== null) || (dType === 'std' && Array.isArray(d.std) && d.std.length));
   const noPriceYet = (dType === 'custom' && d.customPrice === null);
 
   // Totale
@@ -3437,7 +4285,39 @@ function _updateCartFooter(){
   const valEl = document.getElementById('cp-tot-val');
   if(mqEl) mqEl.textContent = totMq.toFixed(2) + ' mq';
   if(valEl) valEl.textContent = fmt(totVal);
+  // Aggiorna anche il riepilogo nella fold-bar (sempre visibile)
+  const sumEl = document.getElementById('cp-fold-sum');
+  if(sumEl) sumEl.textContent = totMq.toFixed(2) + ' mq · ' + fmt(totVal);
+  const foldBar = document.getElementById('cp-fold-bar');
+  if(foldBar) foldBar.style.display = cartValido.length ? 'block' : 'none';
 }
+
+/* Toggle apri/chiudi tendina "Finalizza ordine" del carrello */
+function toggleCartFold(){
+  const cp = document.getElementById('cp');
+  if(!cp) return;
+  const isClosed = cp.classList.toggle('fold-closed');
+  try { localStorage.setItem('cart_fold_closed', isClosed ? '1' : '0'); } catch(e){}
+  const tog = document.getElementById('cp-fold-toggle');
+  if(tog) tog.setAttribute('aria-expanded', isClosed ? 'false' : 'true');
+}
+window.toggleCartFold = toggleCartFold;
+/* Applica lo stato salvato all'apertura della pagina */
+(function _initCartFoldState(){
+  try {
+    var closed = localStorage.getItem('cart_fold_closed') === '1';
+    var apply = function(){
+      var cp = document.getElementById('cp');
+      if(cp){
+        if(closed) cp.classList.add('fold-closed');
+        var tog = document.getElementById('cp-fold-toggle');
+        if(tog) tog.setAttribute('aria-expanded', closed ? 'false' : 'true');
+      }
+    };
+    if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', apply);
+    else apply();
+  } catch(e){}
+})();
 
 function updateCartUI(){
   const n=cart.length;
@@ -3445,7 +4325,7 @@ function updateCartUI(){
   $('cart-btn').className='cart-btn'+(n>0?' active':'');
   $('cp-sub').textContent=n>0?`${n} prodott${n===1?'o':'i'}`:'Nessun prodotto';
   const items=$('cp-items'), footer=$('cp-footer');
-  if(!n){ items.innerHTML=`<div class="cart-empty"><div class="ei">🛒</div><p>Il carrello è vuoto</p></div>`; footer.style.display='none'; return; }
+  if(!n){ items.innerHTML=`<div class="cart-empty"><div class="ei"><svg viewBox="0 0 32 32" fill="none" width="32" height="32"><path d="M4 6h3l3.5 14a2 2 0 0 0 2 1.5h9a2 2 0 0 0 2-1.5L26 10H8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="13" cy="26" r="1.6" stroke="currentColor" stroke-width="1.6"/><circle cx="22" cy="26" r="1.6" stroke="currentColor" stroke-width="1.6"/></svg></div><p>Il carrello è vuoto</p></div>`; footer.style.display='none'; return; }
   footer.style.display='flex';
 
   // Filtra eventuali righe con product undefined (sicurezza)
@@ -3473,6 +4353,9 @@ function updateCartUI(){
     if(dType === 'pct5')  discBadge = '<span class="ci-disc-badge">−5%</span>';
     if(dType === 'pct10') discBadge = '<span class="ci-disc-badge">−10%</span>';
     if(dType === 'custom' && d.customPrice !== null) discBadge = '<span class="ci-disc-badge custom">'+fmt(d.customPrice)+'/mq</span>';
+    if(dType === 'std' && Array.isArray(d.std) && d.std.length){
+      discBadge = '<span class="ci-disc-badge std">−'+d.std[0]+'% −'+d.std[1]+'% −'+d.std[2]+'%</span>';
+    }
 
     // Info bancali da mettere sotto il valore mq
     let bancaliHtml = '';
@@ -3530,10 +4413,34 @@ function updateCartUI(){
         <button type="button" class="ci-disc-btn${dType==='pct5'?' active':''}" onclick="setCartItemDiscType('${p.code}','pct5')">−5%</button>
         <button type="button" class="ci-disc-btn${dType==='pct10'?' active':''}" onclick="setCartItemDiscType('${p.code}','pct10')">−10%</button>
         <button type="button" class="ci-disc-btn${dType==='custom'?' active':''}" onclick="setCartItemDiscType('${p.code}','custom')">€/mq</button>
+        <button type="button" class="ci-disc-btn${dType==='std'?' active':''}" onclick="setCartItemDiscType('${p.code}','std')" title="Modifica gli sconti standard (paletta)">Std</button>
       </div>
       <div class="ci-disc-custom-wrap" id="ci-disc-custom-${p.code}" style="${customWrapStyle}">
         <input type="number" step="0.01" min="0" placeholder="Prezzo personalizzato €/mq (es. 12.50)" value="${customVal}" oninput="setCartItemCustomPrice('${p.code}', this.value)" class="ci-disc-custom-input"/>
       </div>
+      ${(() => {
+        const isStd = dType === 'std';
+        const std = (d.std && d.std.length) ? d.std : (p.m2_pallet && mq >= p.m2_pallet ? [60,10,10] : [60,10,5]);
+        return `<div class="ci-disc-std-wrap" id="ci-disc-std-${p.code}" style="${isStd?'':'display:none;'}">
+          <div class="ci-disc-std-lbl">Sconti standard (${p.m2_pallet && mq >= p.m2_pallet ? 'sopra paletta' : 'sotto paletta'}):</div>
+          <div class="ci-disc-std-row">
+            <div class="ci-disc-std-step">
+              <input type="number" min="0" max="99" step="1" value="${std[0]||0}" oninput="setCartItemStd('${p.code}',0,this.value)" class="ci-disc-std-input"/>
+              <span class="ci-disc-std-unit">%</span>
+            </div>
+            <span class="ci-disc-std-sep">+</span>
+            <div class="ci-disc-std-step">
+              <input type="number" min="0" max="99" step="1" value="${std[1]||0}" oninput="setCartItemStd('${p.code}',1,this.value)" class="ci-disc-std-input"/>
+              <span class="ci-disc-std-unit">%</span>
+            </div>
+            <span class="ci-disc-std-sep">+</span>
+            <div class="ci-disc-std-step">
+              <input type="number" min="0" max="99" step="1" value="${std[2]||0}" oninput="setCartItemStd('${p.code}',2,this.value)" class="ci-disc-std-input"/>
+              <span class="ci-disc-std-unit">%</span>
+            </div>
+          </div>
+        </div>`;
+      })()}
     </div>`;
   }).join('');
 
@@ -3563,6 +4470,58 @@ function openCart(){
   setTimeout(()=>{ const inp=$('cp-search-input'); if(inp) inp.focus(); }, 200);
 }
 function closeCart(){ $('overlay').classList.remove('open'); $('cp').classList.remove('open'); }
+
+/* ── Gestione tastiera virtuale mobile per il carrello ─────────────────────
+   Quando la tastiera apre, riduciamo l'altezza del pannello carrello a quella
+   visibile (visualViewport.height) e scrolliamo l'input attivo in vista. */
+(function _setupCartKeyboardHandling(){
+  if(typeof window === 'undefined' || !window.visualViewport) return;
+  var vv = window.visualViewport;
+  var rafScheduled = false;
+  function applyVV(){
+    rafScheduled = false;
+    var cp = document.getElementById('cp');
+    if(!cp) return;
+    var winH = window.innerHeight || document.documentElement.clientHeight;
+    var vvH = vv.height;
+    var diff = winH - vvH;
+    // Se la differenza è apprezzabile, è probabile sia la tastiera
+    if(diff > 120){
+      cp.style.height = vvH + 'px';
+      cp.style.maxHeight = vvH + 'px';
+      cp.classList.add('kbd-open');
+      // Se c'è un input focalizzato dentro il carrello, scrolla per vederlo
+      var act = document.activeElement;
+      if(act && cp.contains(act) && (act.tagName === 'INPUT' || act.tagName === 'TEXTAREA' || act.tagName === 'SELECT')){
+        try { act.scrollIntoView({block:'center', behavior:'smooth'}); } catch(_){}
+      }
+    } else {
+      // Tastiera chiusa: ripristina altezza dinamica
+      cp.style.height = '';
+      cp.style.maxHeight = '';
+      cp.classList.remove('kbd-open');
+    }
+  }
+  function schedule(){
+    if(rafScheduled) return;
+    rafScheduled = true;
+    requestAnimationFrame(applyVV);
+  }
+  vv.addEventListener('resize', schedule);
+  vv.addEventListener('scroll', schedule);
+  // Anche quando un input riceve focus, scrolla in vista dopo che la tastiera si è aperta
+  document.addEventListener('focusin', function(ev){
+    var cp = document.getElementById('cp');
+    if(!cp || !cp.classList.contains('open')) return;
+    if(!cp.contains(ev.target)) return;
+    if(ev.target.tagName !== 'INPUT' && ev.target.tagName !== 'TEXTAREA' && ev.target.tagName !== 'SELECT') return;
+    // Aspetta che la tastiera sia effettivamente aperta
+    setTimeout(function(){
+      try { ev.target.scrollIntoView({block:'center', behavior:'smooth'}); } catch(_){}
+      applyVV();
+    }, 300);
+  });
+})();
 
 /* ── Toggle carrello a schermo intero ─────────────────────────────────────── */
 function toggleCartFullscreen(){
@@ -3617,12 +4576,29 @@ function cartSearch(q){
   if(!q){ resultsEl.classList.remove('visible'); resultsEl.innerHTML=''; return; }
 
   const ql = q.toLowerCase();
-  // Cerca per codice (priorità) o serie o colore
-  const matches = PRODUCTS.filter(p =>
-    p.code.toLowerCase().includes(ql) ||
-    p.series.toLowerCase().includes(ql) ||
-    (p.color && p.color.toLowerCase().includes(ql))
-  ).slice(0, 10);
+  // Cerca su tutti i campi rilevanti con scoring (match più precisi prima)
+  const scored = [];
+  PRODUCTS.forEach(p => {
+    const code = (p.code||'').toLowerCase();
+    const series = (p.series||'').toLowerCase();
+    const color = (p.color||'').toLowerCase();
+    const finish = (p.finish||'').toLowerCase();
+    const size = (p.size||'').toLowerCase();
+    const subseries = (p.subseries||'').toLowerCase();
+    let score = -1;
+    if(code === ql) score = 100;
+    else if(code.startsWith(ql)) score = 90;
+    else if(series.startsWith(ql)) score = 80;
+    else if(code.includes(ql)) score = 70;
+    else if(series.includes(ql)) score = 60;
+    else if(color.includes(ql)) score = 50;
+    else if(subseries.includes(ql)) score = 40;
+    else if(finish.includes(ql)) score = 30;
+    else if(size.includes(ql)) score = 20;
+    if(score >= 0) scored.push({p, score});
+  });
+  scored.sort((a,b) => b.score - a.score);
+  const matches = scored.slice(0, 30).map(x => x.p);
 
   if(!matches.length){
     resultsEl.innerHTML = '<div class="cp-sr-none">Nessun prodotto trovato</div>';
@@ -3689,7 +4665,7 @@ function cartSearchClear(){
 function copyCart(){
   navigator.clipboard.writeText($('cp-output').textContent).then(()=>{
     const b=$('btn-copy'); b.textContent='✓ Copiato!'; b.classList.add('ok');
-    setTimeout(()=>{ b.textContent='📋 Copia'; b.classList.remove('ok'); },2000);
+    setTimeout(()=>{ b.innerHTML='<svg class="btn-ic" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="8" y="6" width="12" height="14" rx="2" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M16 6V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Copia</span>'; b.classList.remove('ok'); },2000);
   });
 }
 
@@ -3855,7 +4831,7 @@ function _populateMerchModalMenu(){
   var types = _loadCustomEspTypes();
   if(!types.length){
     menu.innerHTML = '<div style="padding:12px;text-align:center;font-size:11px;color:var(--mid);font-weight:600">Nessun tipo definito.</div>'
-      + '<div onclick="closeModal(\'modal-save-esp\');closeCart();openSettings();setTimeout(openEspTypesManager,200);_closeMerchMenu();" style="padding:8px 12px;cursor:pointer;font-size:11px;font-weight:700;color:var(--mid);text-align:center;background:var(--bg);letter-spacing:0.06em;text-transform:uppercase;border-top:1px solid var(--border)">⚙ Crea tipo</div>';
+      + '<div onclick="closeModal(\'modal-save-esp\');closeCart();openSettings();setTimeout(openEspTypesManager,200);_closeMerchMenu();" style="padding:8px 12px;cursor:pointer;font-size:11px;font-weight:700;color:var(--mid);text-align:center;background:var(--bg);letter-spacing:0.06em;text-transform:uppercase;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" width="13" height="13"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>Crea tipo</div>';
     return;
   }
   var h = '';
@@ -3867,7 +4843,7 @@ function _populateMerchModalMenu(){
       + '<div style="font-size:10px;color:var(--mid);font-weight:600;margin-top:2px">'+sub+'</div>'
       + '</div>';
   });
-  h+='<div onclick="closeModal(\'modal-save-esp\');closeCart();openSettings();setTimeout(openEspTypesManager,200);_closeMerchMenu();" style="padding:8px 12px;cursor:pointer;font-size:11px;font-weight:700;color:var(--mid);text-align:center;background:var(--bg);letter-spacing:0.06em;text-transform:uppercase">⚙ Gestisci tipi</div>';
+  h+='<div onclick="closeModal(\'modal-save-esp\');closeCart();openSettings();setTimeout(openEspTypesManager,200);_closeMerchMenu();" style="padding:8px 12px;cursor:pointer;font-size:11px;font-weight:700;color:var(--mid);text-align:center;background:var(--bg);letter-spacing:0.06em;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" width="13" height="13"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6"/><path d="M12 2v3M12 19v3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M2 12h3M19 12h3M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Gestisci tipi</div>';
   menu.innerHTML = h;
 }
 window._populateMerchModalMenu = _populateMerchModalMenu;
@@ -4041,18 +5017,58 @@ function setClientSearchMode(mode, btn){
   document.querySelectorAll('.csm-btn').forEach(b=>b.classList.toggle('active', b===btn));
   const inp = $('client-search');
   if(inp){
-    inp.placeholder = (mode === 'sample')
-      ? 'Cerca campione (codice, serie, colore)...'
-      : 'Cerca cliente...';
+    if(mode === 'sample') inp.placeholder = 'Cerca campione (codice, serie, colore)...';
+    else if(mode === 'series') inp.placeholder = 'Cerca serie (mostra tutti i colori/formati)...';
+    else inp.placeholder = 'Cerca cliente...';
   }
   renderClientList();
+  // Se siamo in modalità series e c'è un cliente selezionato + un filtro, ri-render del dettaglio cliente
+  if(mode === 'series' && selectedClient){ try { renderOrderDetail(); } catch(_){} }
 }
 window.setClientSearchMode = setClientSearchMode;
 
-function filterClients(q){ clientFilter=(q||'').toLowerCase().trim(); renderClientList(); }
+function filterClients(q){
+  clientFilter=(q||'').toLowerCase().trim();
+  renderClientList();
+}
 
-// Restituisce la lista di campioni di un cliente che matchano la query (max 5)
-function _matchClientSamples(c, q){
+/* Filtro per ricerca campioni DENTRO il singolo cliente selezionato */
+var _clientInnerFilter = '';
+function setClientInnerSearch(q){
+  _clientInnerFilter = (q||'').trim();
+  if(!selectedClient) return;
+  // Aggiorniamo solo gli elementi che cambiano (per non perdere il focus dell'input)
+  // 1) Toggle visibility del bottone "pulisci"
+  var clr = document.getElementById('cs-client-search-clear');
+  if(clr) clr.style.display = _clientInnerFilter ? 'flex' : 'none';
+  // 2) Aggiorna il riepilogo aggregato (lo inseriamo/rimuoviamo prima dei tab)
+  var existing = document.querySelector('.od-header')?.parentElement?.querySelector('.cs-aggregate');
+  if(existing) existing.remove();
+  if(_clientInnerFilter){
+    var aggregateHtml = _renderClientSeriesAggregate(clients[selectedClient], _clientInnerFilter);
+    var tabsEl = document.querySelector('.client-tabs');
+    if(tabsEl){
+      var wrap = document.createElement('div');
+      wrap.innerHTML = aggregateHtml;
+      tabsEl.parentNode.insertBefore(wrap.firstChild, tabsEl);
+    }
+  }
+}
+window.setClientInnerSearch = setClientInnerSearch;
+
+// Reset del filtro per-cliente quando si cambia cliente
+var _origSelectClient = (typeof selectClient === 'function') ? selectClient : null;
+if(_origSelectClient){
+  selectClient = function(id){
+    _clientInnerFilter = '';
+    _origSelectClient(id);
+  };
+  window.selectClient = selectClient;
+}
+
+// Restituisce la lista di campioni di un cliente che matchano la query.
+// Se onlySeries=true cerca solo nel campo "series"
+function _matchClientSamples(c, q, onlySeries){
   if(!q) return [];
   const esps = (c && c.espositori) || [];
   const out = [];
@@ -4060,10 +5076,16 @@ function _matchClientSamples(c, q){
     if(!e || !Array.isArray(e.items)) continue;
     for(const it of e.items){
       if(!it) continue;
-      const hay = [
-        it.code||'', it.series||'', it.color||'', it.finish||'', it.size||'', it.brand||'', e.name||''
-      ].join(' ').toLowerCase();
-      if(hay.includes(q)) out.push({ esp: e.name||'', item: it });
+      let match;
+      if(onlySeries){
+        match = (it.series||'').toLowerCase().includes(q);
+      } else {
+        const hay = [
+          it.code||'', it.series||'', it.color||'', it.finish||'', it.size||'', it.brand||'', e.name||''
+        ].join(' ').toLowerCase();
+        match = hay.includes(q);
+      }
+      if(match) out.push({ esp: e.name||'', item: it });
     }
   }
   return out;
@@ -4073,14 +5095,15 @@ function renderClientList(){
   const el=$('client-items');
   const allClients = Object.values(clients).filter(c => c && c.id && c.name);
   let arr;
-  if(clientSearchMode === 'sample' && clientFilter){
+  if((clientSearchMode === 'sample' || clientSearchMode === 'series') && clientFilter){
+    const onlySeries = (clientSearchMode === 'series');
     // Filtra i clienti che hanno almeno un campione corrispondente
     arr = allClients
-      .map(c => ({ c, hits: _matchClientSamples(c, clientFilter) }))
+      .map(c => ({ c, hits: _matchClientSamples(c, clientFilter, onlySeries) }))
       .filter(x => x.hits.length > 0)
       .sort((a,b) => b.hits.length - a.hits.length || a.c.name.localeCompare(b.c.name));
     if(!arr.length){
-      el.innerHTML = '<div class="no-clients">Nessun campione trovato.</div>';
+      el.innerHTML = '<div class="no-clients">Nessun '+(onlySeries?'cliente con questa serie':'campione')+' trovato.</div>';
       return;
     }
     el.innerHTML = arr.map(({c, hits})=>{
@@ -4141,15 +5164,289 @@ function renderOrderDetail(){
   }
   var h='<div class="od-header">';
   h+='<div class="od-title">'+c.name+'</div>';
-  h+='<div class="od-actions"><button class="btn-del-client" data-cid="'+c.id+'" onclick="deleteClient(this.dataset.cid)">\uD83D\uDDD1 Elimina</button></div>';
+  h+='<div class="od-actions">';
+  h+='<button class="btn-del-client btn-icon-only" data-cid="'+c.id+'" onclick="renameClient(this.dataset.cid)" style="border-color:#3D6FA8;color:#3D6FA8;min-width:34px;width:34px;height:34px;min-height:34px;padding:0;display:inline-flex;align-items:center;justify-content:center" title="Rinomina cliente" aria-label="Rinomina cliente"><svg viewBox="0 0 24 24" fill="none" width="12" height="12"><path d="M14.5 4.5l5 5L8 21H3v-5L14.5 4.5z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 6l5 5" stroke="currentColor" stroke-width="1.7"/></svg></button>';
+  h+='<button class="btn-del-client" data-cid="'+c.id+'" onclick="openClientRules(this.dataset.cid)" style="border-color:#6B3FA0;color:#6B3FA0;display:inline-flex;align-items:center;gap:5px" title="Condizioni speciali (prezzi netti, sconti)"><svg viewBox="0 0 24 24" fill="none" width="13" height="13"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6"/><path d="M12 2v3M12 19v3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M2 12h3M19 12h3M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Condizioni</button>';
+  h+='<button class="btn-del-client" data-cid="'+c.id+'" onclick="deleteClient(this.dataset.cid)" style="display:inline-flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" width="13" height="13"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M5 6l1 14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-14M10 11v6M14 11v6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Elimina</button>';
   h+='</div>';
+  h+='</div>';
+  // Barra di ricerca DENTRO il cliente: cerca campioni (serie/colore/formato/finitura/codice) tra TUTTI gli espositori del cliente
+  h+='<div class="cs-search-wrap">';
+  h+='<svg class="cs-search-ic" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.4"/><path d="M9.5 9.5l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>';
+  h+='<input type="text" id="cs-client-search" class="cs-search-input" placeholder="Cerca nei campioni di '+_esc(c.name)+' (serie, colore, formato, codice)..." value="'+_esc(_clientInnerFilter)+'" oninput="setClientInnerSearch(this.value)" autocomplete="off"/>';
+  h+='<button type="button" class="cs-search-clear" id="cs-client-search-clear" onclick="setClientInnerSearch(\'\');document.getElementById(\'cs-client-search\').value=\'\'" style="display:'+(_clientInnerFilter?'flex':'none')+'" title="Pulisci">\u2715</button>';
+  h+='</div>';
+  // Riepilogo aggregato campioni se c'\u00E8 un filtro attivo per questo cliente
+  if(_clientInnerFilter){
+    h += _renderClientSeriesAggregate(c, _clientInnerFilter);
+  }
+  // SVG icone minimal per le tab
+  var _icOrdini = '<svg viewBox="0 0 24 24" fill="none" width="14" height="14" style="vertical-align:-2px;margin-right:5px"><path d="M5 8.5L12 4l7 4.5v7L12 20l-7-4.5v-7z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M5 8.5L12 13l7-4.5M12 13v7" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+  var _icInv    = '<svg viewBox="0 0 24 24" fill="none" width="14" height="14" style="vertical-align:-2px;margin-right:5px"><path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9-9-9z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="7.5" cy="7.5" r="1.5" stroke="currentColor" stroke-width="1.4"/></svg>';
+  var _icCamp   = '<svg viewBox="0 0 24 24" fill="none" width="14" height="14" style="vertical-align:-2px;margin-right:5px"><rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M8 8h8M8 12h8M8 16h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
   h+='<div class="client-tabs">';
-  h+='<button class="client-tab'+(tab==='ordini'?' active':'')+'" data-cid="'+c.id+'" data-tab="ordini" onclick="_setTab(this.dataset.cid,this.dataset.tab)">\uD83D\uDCE6 Ordini</button>';
-  h+='<button class="client-tab'+(tab==='inventario'?' active':'')+'" data-cid="'+c.id+'" data-tab="inventario" onclick="_setTab(this.dataset.cid,this.dataset.tab)">\uD83C\uDFF7\uFE0F Inventario</button>';
+  h+='<button class="client-tab'+(tab==='ordini'?' active':'')+'" data-cid="'+c.id+'" data-tab="ordini" onclick="_setTab(this.dataset.cid,this.dataset.tab)">'+_icOrdini+'Ordini</button>';
+  h+='<button class="client-tab'+(tab==='inventario'?' active':'')+'" data-cid="'+c.id+'" data-tab="inventario" onclick="_setTab(this.dataset.cid,this.dataset.tab)">'+_icInv+'Inventario</button>';
+  h+='<button class="client-tab'+(tab==='campioni'?' active':'')+'" data-cid="'+c.id+'" data-tab="campioni" onclick="_setTab(this.dataset.cid,this.dataset.tab)">'+_icCamp+'Campioni</button>';
   h+='</div>';
+  // Calcola il body in base alla tab (ora con anche "campioni")
+  if(tab === 'campioni'){
+    bodyHtml = _renderClientCampioniTree(c);
+  }
   h+=bodyHtml;
   od.innerHTML=h;
 }
+
+/* \u2500\u2500 TAB "Campioni": vista albero gerarchica Azienda > Serie > Formato > Colore \u2500\u2500 */
+var _suggestMode = {}; // {cid: true/false} - se mostrare suggerimenti (colori mancanti)
+function _toggleSuggest(cid){
+  _suggestMode[cid] = !_suggestMode[cid];
+  renderOrderDetail();
+}
+window._toggleSuggest = _toggleSuggest;
+
+function _renderClientCampioniTree(c){
+  // Raccoglie TUTTI i campioni del cliente da tutti gli espositori
+  var owned = []; // array di item del cliente
+  (c.espositori||[]).forEach(function(e){
+    (e.items||[]).forEach(function(it){
+      if(it && it.code) owned.push({item: it, esp: e.name||''});
+    });
+  });
+  if(!owned.length){
+    return '<div class="od-empty"><div class="oi">\uD83D\uDCCB</div><p>Nessun campione</p><span>Aggiungi campioni agli espositori del cliente per vederli qui.</span></div>';
+  }
+  // Raggruppa per Brand > Serie > (Formato + Finitura)
+  var tree = {};
+  owned.forEach(function(o){
+    var it = o.item;
+    var b = (it.brand||'(Senza marchio)').toUpperCase();
+    var s = (it.series||'(Senza serie)').toUpperCase();
+    var fmt = it.size ? (it.size+' cm') : '(Senza formato)';
+    var fin = it.finish || '';
+    var k = fmt + (fin ? ' \u00B7 '+fin : '');
+    tree[b] = tree[b] || {};
+    tree[b][s] = tree[b][s] || {};
+    tree[b][s][k] = tree[b][s][k] || [];
+    tree[b][s][k].push(o);
+  });
+
+  var suggest = !!_suggestMode[c.id];
+  // Conta totali
+  var totItems = owned.length;
+  var brandCount = Object.keys(tree).length;
+  var seriesCount = 0;
+  Object.values(tree).forEach(function(t){ seriesCount += Object.keys(t).length; });
+
+  var h = '<div class="cs-tree">';
+  h += '<div class="cs-tree-toolbar">';
+  h += '<div class="cs-tree-sum">'+totItems+' campion'+(totItems===1?'e':'i')+' &middot; '+brandCount+' marchi &middot; '+seriesCount+' seri'+(seriesCount===1?'e':'i')+'</div>';
+  h += '<button class="cs-suggest-btn'+(suggest?' active':'')+'" onclick="_toggleSuggest(\''+c.id+'\')" title="Mostra anche i colori che il cliente NON ha (suggerimenti)">';
+  h += '<svg viewBox="0 0 24 24" fill="none" style="width:14px;height:14px;vertical-align:middle;margin-right:4px"><path d="M9 21h6M12 3a6 6 0 0 0-3.5 10.9c.4.3.6.7.5 1.1L9 17h6l0-2c-.1-.4.1-.8.5-1.1A6 6 0 0 0 12 3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+  h += '<span>Suggerimenti</span>';
+  h += '</button>';
+  h += '</div>';
+
+  // Sort brand in ordine specifico (EMILCERAMICA, ERGON, PROVENZA, VIVA, ...)
+  var BRAND_ORDER = {'EMILCERAMICA':1,'ERGON':2,'PROVENZA':3,'VIVA':4};
+  var sortedBrands = Object.keys(tree).sort(function(a,b){
+    var oa = BRAND_ORDER[a] || 99, ob = BRAND_ORDER[b] || 99;
+    if(oa !== ob) return oa - ob;
+    return a.localeCompare(b);
+  });
+
+  sortedBrands.forEach(function(b){
+    var brandData = tree[b];
+    var brandSeriesCount = Object.keys(brandData).length;
+    h += '<div class="cs-tree-brand">';
+    h += '<div class="cs-tree-brand-head">'+toT(b)+' <span class="cs-tree-cnt">('+brandSeriesCount+' seri'+(brandSeriesCount===1?'e':'i')+')</span></div>';
+    var sortedSeries = Object.keys(brandData).sort();
+    sortedSeries.forEach(function(s){
+      var seriesData = brandData[s];
+      // Raccoglie tutti i colori posseduti dal cliente per questa serie (cross-formato/finitura)
+      var ownedColorsInSeries = {};
+      Object.values(seriesData).forEach(function(arr){
+        arr.forEach(function(o){
+          if(!o.item.color) return;
+          var k = o.item.color.toUpperCase();
+          if(!ownedColorsInSeries[k]) ownedColorsInSeries[k] = o.item.color;
+        });
+      });
+      // Conta TOTALE colori disponibili nel listino per questa serie
+      var totalColorsInListino = (function(){
+        var set = {};
+        PRODUCTS.forEach(function(p){
+          if((p.brand||'').toUpperCase() !== b) return;
+          if((p.series||'').toUpperCase() !== s) return;
+          if(!p.color) return;
+          set[p.color.toUpperCase()] = true;
+        });
+        return Object.keys(set).length;
+      })();
+      var ownedCount = Object.keys(ownedColorsInSeries).length;
+      var countStr;
+      if(totalColorsInListino > 0){
+        countStr = ownedCount + ' su ' + totalColorsInListino + ' color' + (totalColorsInListino===1?'e':'i');
+      } else {
+        countStr = ownedCount + ' color' + (ownedCount===1?'e':'i');
+      }
+      h += '<div class="cs-tree-series">';
+      h += '<div class="cs-tree-series-head">'+_esc(s)+' <span class="cs-tree-cnt">'+countStr+'</span></div>';
+
+      // ── VISTA SEMPLIFICATA (default): tutti i colori, posseduti+mancanti, pillole senza swatch ──
+      var allListinoColors = (function(){
+        var map = {};
+        PRODUCTS.forEach(function(p){
+          if((p.brand||'').toUpperCase() !== b) return;
+          if((p.series||'').toUpperCase() !== s) return;
+          if(!p.color) return;
+          map[p.color.toUpperCase()] = p.color;
+        });
+        return map;
+      })();
+      // Unisce posseduti (per cliente) + tutti listino, deduplicato
+      var combined = {};
+      Object.keys(ownedColorsInSeries).forEach(function(k){ combined[k] = {name: ownedColorsInSeries[k], owned: true}; });
+      Object.keys(allListinoColors).forEach(function(k){
+        if(!combined[k]) combined[k] = {name: allListinoColors[k], owned: false};
+      });
+      var combArr = Object.values(combined).sort(function(a,b){
+        if(a.owned !== b.owned) return a.owned ? -1 : 1; // posseduti prima
+        return a.name.localeCompare(b.name);
+      });
+      h += '<div class="cs-tree-simple">';
+      combArr.forEach(function(c){
+        h += '<span class="cs-color-simple '+(c.owned?'owned':'missing')+'">'+_esc(c.name)+'</span>';
+      });
+      h += '</div>';
+
+      // ── DETTAGLI (tendina collassabile) con la vista completa per formato/finitura ──
+      h += '<details class="cs-tree-details">';
+      h += '<summary class="cs-tree-details-summary"><span>Dettagli per formato e finitura</span><svg class="cs-tree-details-chev" viewBox="0 0 24 24" fill="none" width="14" height="14"><polyline points="6 9 12 15 18 9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>';
+      h += '<div class="cs-tree-details-body">';
+      var sortedFmts = Object.keys(seriesData).sort();
+      sortedFmts.forEach(function(fmtKey){
+        var arr = seriesData[fmtKey];
+        var presentColors = {};
+        arr.forEach(function(o){
+          var col = o.item.color || '(senza colore)';
+          if(!presentColors[col.toUpperCase()]) presentColors[col.toUpperCase()] = { name: col, items: [] };
+          presentColors[col.toUpperCase()].items.push(o);
+        });
+        var presentArr = Object.values(presentColors).sort(function(a,b){return a.name.localeCompare(b.name);});
+        h += '<div class="cs-tree-fmt">';
+        h += '<div class="cs-tree-fmt-head">'+_esc(fmtKey)+'</div>';
+        h += '<div class="cs-tree-colors">';
+        presentArr.forEach(function(p){
+          var firstIt = p.items[0].item;
+          var colorMeta = _colorMeta(firstIt.color||'');
+          var swatchBg = colorMeta ? colorMeta.swatch : '#ccc';
+          var espNames = [...new Set(p.items.map(function(x){return x.esp;}))].join(', ');
+          h += '<div class="cs-color-chip owned" title="'+_esc(espNames)+'">'
+             + '<span class="cs-color-swatch" style="background:'+swatchBg+'"></span>'
+             + '<span class="cs-color-name">'+_esc(p.name)+'</span>'
+             + '<span class="cs-color-cnt">'+p.items.length+'</span>'
+             + '</div>';
+        });
+        h += '</div></div>';
+      });
+
+      // \u2500\u2500 SUGGERIMENTI: colori mancanti A LIVELLO DI SERIE (cross-formato/finitura) \u2500\u2500
+      // Prendiamo tutti i colori della serie dal listino PRODUCTS e mostriamo quelli che il cliente NON ha ancora
+      if(suggest){
+        var poolSeries = PRODUCTS.filter(function(p){
+          return (p.brand||'').toUpperCase() === b && (p.series||'').toUpperCase() === s;
+        });
+        // Estrai un solo prodotto per colore (preferendo Naturale come finitura pi\u00F9 comune)
+        var allColors = {};
+        poolSeries.forEach(function(p){
+          if(!p.color) return;
+          var k = p.color.toUpperCase();
+          if(!allColors[k]) allColors[k] = p;
+        });
+        var missingColors = [];
+        Object.keys(allColors).forEach(function(k){
+          if(!ownedColorsInSeries[k]) missingColors.push(allColors[k]);
+        });
+        missingColors.sort(function(a,b){return (a.color||'').localeCompare(b.color||'');});
+        if(missingColors.length){
+          h += '<div class="cs-tree-suggest">';
+          h += '<div class="cs-tree-suggest-head"><svg viewBox="0 0 24 24" fill="none" width="13" height="13" style="vertical-align:-2px;margin-right:4px"><path d="M9 21h6M12 3a6 6 0 0 0-3.5 10.9c.4.3.6.7.5 1.1L9 17h6l0-2c-.1-.4.1-.8.5-1.1A6 6 0 0 0 12 3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>Colori suggeriti per <strong>'+_esc(s)+'</strong> <span class="cs-tree-cnt">('+missingColors.length+' non '+(missingColors.length===1?'presente':'presenti')+')</span></div>';
+          h += '<div class="cs-tree-colors">';
+          missingColors.forEach(function(p){
+            var colorMeta = _colorMeta(p.color||'');
+            var swatchBg = colorMeta ? colorMeta.swatch : '#ccc';
+            h += '<div class="cs-color-chip suggested" title="Suggerito: codice '+_esc(p.code)+' &middot; '+_esc(p.size||'')+(p.finish?' '+_esc(p.finish):'')+'">'
+               + '<span class="cs-color-swatch" style="background:'+swatchBg+'"></span>'
+               + '<span class="cs-color-name">'+_esc(p.color)+'</span>'
+               + '<span class="cs-color-sug">+</span>'
+               + '</div>';
+          });
+          h += '</div></div>';
+        } else {
+          h += '<div class="cs-tree-suggest cs-tree-suggest-full">\u2713 Il cliente ha gi\u00E0 tutti i colori disponibili di questa serie</div>';
+        }
+      }
+      // Chiusura body e tendina dettagli
+      h += '</div></details>';
+      h += '</div>';
+    });
+    h += '</div>';
+  });
+  h += '</div>';
+  return h;
+}
+window._renderClientCampioniTree = _renderClientCampioniTree;
+
+/* Renderizza il riepilogo aggregato dei campioni della serie cercata per il cliente,
+   indipendentemente da quale espositore li contiene. */
+function _renderClientSeriesAggregate(c, q){
+  var hits = _matchClientSamples(c, q.toLowerCase(), true);
+  if(!hits.length){
+    return '<div class="cs-aggregate cs-aggregate-empty">Nessun campione trovato per la serie "'+_esc(q)+'"</div>';
+  }
+  // Raggruppa per (series + finish + size)
+  var groups = {};
+  hits.forEach(function(h){
+    var it = h.item;
+    var key = (it.series||'')+'|'+(it.finish||'')+'|'+(it.size||'');
+    if(!groups[key]) groups[key] = { series:it.series||'', finish:it.finish||'', size:it.size||'', items:[] };
+    groups[key].items.push({ item: it, esp: h.esp });
+  });
+  var groupArr = Object.values(groups).sort(function(a,b){
+    return (a.series||'').localeCompare(b.series||'') ||
+           (a.finish||'').localeCompare(b.finish||'') ||
+           (a.size||'').localeCompare(b.size||'');
+  });
+  var seriesNames = [...new Set(hits.map(function(h){return h.item.series||'';}))];
+  var html = '<div class="cs-aggregate">';
+  html += '<div class="cs-aggregate-title">Riepilogo serie ricerca: <strong>"'+_esc(q)+'"</strong></div>';
+  html += '<div class="cs-aggregate-summary">'+hits.length+' campion'+(hits.length===1?'e':'i')+' &middot; '+seriesNames.length+' seri'+(seriesNames.length===1?'e':'i')+' &middot; '+Object.keys(groups).length+' format'+(Object.keys(groups).length===1?'o':'i')+'/finitur'+(Object.keys(groups).length===1?'a':'e')+'</div>';
+  html += '<div class="cs-aggregate-list">';
+  groupArr.forEach(function(g){
+    var head = toT(g.series||'') + (g.size?' &middot; '+g.size+' cm':'') + (g.finish?' &middot; '+g.finish:'');
+    html += '<div class="cs-aggregate-group">';
+    html += '<div class="cs-aggregate-group-head">'+head+' <span style="color:var(--mid);font-weight:600">('+g.items.length+' campion'+(g.items.length===1?'e':'i')+')</span></div>';
+    html += '<div class="cs-aggregate-group-items">';
+    g.items.forEach(function(p){
+      var it = p.item;
+      var colorMeta = _colorMeta(it.color);
+      var swatch = colorMeta ? '<span class="cs-aggregate-swatch" style="background:'+colorMeta.swatch+'"></span>' : '';
+      var statInfo = _statInfo(it.status||'presente');
+      html += '<div class="cs-aggregate-item">';
+      html += '<span class="cs-aggregate-dot" style="background:'+(statInfo.dot||'#ccc')+'" title="'+(statInfo.label||'')+'"></span>';
+      html += swatch;
+      html += '<span class="cs-aggregate-code">'+_esc(it.code||'')+'</span>';
+      html += '<span class="cs-aggregate-color">'+_esc(it.color||'')+'</span>';
+      html += '<span class="cs-aggregate-esp">in '+_esc(p.esp||'')+'</span>';
+      html += '</div>';
+    });
+    html += '</div></div>';
+  });
+  html += '</div></div>';
+  return html;
+}
+window._renderClientSeriesAggregate = _renderClientSeriesAggregate;
 
 function renderOrderCard(clientId, o){
   const total=o.items.reduce((s,i)=>s+itemTot(i),0);
@@ -4166,7 +5463,7 @@ function renderOrderCard(clientId, o){
         <div class="order-summary">${summary}</div>
       </div>
       <div style="display:flex;align-items:center;gap:10px">
-        <button class="order-del" onclick="event.stopPropagation();deleteOrder('${clientId}','${o.id}')" title="Elimina ordine">🗑</button>
+        <button class="order-del" onclick="event.stopPropagation();deleteOrder('${clientId}','${o.id}')" title="Elimina ordine"><svg viewBox="0 0 24 24" fill="none" width="14" height="14"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M5 6l1 14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-14M10 11v6M14 11v6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <span class="order-toggle">▼</span>
       </div>
     </div>
@@ -4181,7 +5478,7 @@ function renderOrderCard(clientId, o){
         </div>`;
       }).join('')}
       <div class="order-foot">
-        <span class="order-text" onclick="copyOrderText('${o.id}')">📋 Copia testo ordine</span>
+        <span class="order-text" onclick="copyOrderText('${o.id}')" style="display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" width="12" height="12"><rect x="8" y="6" width="12" height="14" rx="2" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M16 6V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Copia testo ordine</span>
         <div style="display:flex;align-items:baseline;gap:8px">
           <span class="order-total-label">Totale scontato B</span>
           <span class="order-total">${fmt(total)}</span>
@@ -4218,6 +5515,231 @@ function deleteOrder(clientId, orderId){
     renderClientList();
   });
 }
+
+/* ── CONDIZIONI SPECIALI PER CLIENTE ──────────────────────────────────────
+   Permette di definire prezzi netti o sconti speciali su combinazioni di
+   brand/serie/formato/finitura. Le regole sono salvate in clients[id].pricingRules.
+   Quando un cliente è selezionato nel carrello, le regole vengono applicate
+   automaticamente ai prodotti corrispondenti. */
+
+var _crEditingClientId = null;
+var _crEditingRuleId = null;
+
+function _getClientRules(cid){
+  if(!clients[cid]) return [];
+  if(!Array.isArray(clients[cid].pricingRules)) clients[cid].pricingRules = [];
+  return clients[cid].pricingRules;
+}
+
+function openClientRules(cid){
+  if(!clients[cid]){ alert('Cliente non trovato.'); return; }
+  _crEditingClientId = cid;
+  _crEditingRuleId = null;
+  document.getElementById('mcr-client-name').textContent = clients[cid].name;
+  // Popola select brand
+  var brandSel = document.getElementById('cr-brand');
+  brandSel.innerHTML = '<option value="">Tutti</option>';
+  var brands = [...new Set(PRODUCTS.map(function(p){return p.brand;}).filter(Boolean))].sort();
+  brands.forEach(function(b){
+    var o = document.createElement('option'); o.value = b; o.textContent = toT(b); brandSel.appendChild(o);
+  });
+  _crBrandChange();
+  _crEffectChange();
+  _resetClientRuleForm();
+  _renderClientRulesList();
+  document.getElementById('modal-client-rules').classList.add('open');
+}
+window.openClientRules = openClientRules;
+
+function _crBrandChange(){
+  var brandSel = document.getElementById('cr-brand');
+  var seriesSel = document.getElementById('cr-series');
+  seriesSel.innerHTML = '<option value="">Tutte</option>';
+  var b = brandSel.value;
+  var pool = b ? PRODUCTS.filter(function(p){return p.brand === b;}) : PRODUCTS;
+  var series = [...new Set(pool.map(function(p){return p.series;}).filter(Boolean))].sort();
+  series.forEach(function(s){
+    var o = document.createElement('option'); o.value = s; o.textContent = toT(s); seriesSel.appendChild(o);
+  });
+}
+window._crBrandChange = _crBrandChange;
+
+function _crEffectChange(){
+  var sel = document.querySelector('input[name="cr-effect"]:checked');
+  var v = sel ? sel.value : 'net';
+  document.getElementById('cr-eff-net').style.display = (v === 'net') ? '' : 'none';
+  document.getElementById('cr-eff-std').style.display = (v === 'std') ? '' : 'none';
+  document.getElementById('cr-eff-pct').style.display = (v === 'pct') ? '' : 'none';
+}
+window._crEffectChange = _crEffectChange;
+
+function _resetClientRuleForm(){
+  _crEditingRuleId = null;
+  ['cr-name','cr-net-price','cr-std-1','cr-std-2','cr-std-3','cr-pct-val','cr-sizes','cr-finishes'].forEach(function(id){
+    var el = document.getElementById(id); if(el) el.value = '';
+  });
+  var brandSel = document.getElementById('cr-brand'); if(brandSel) brandSel.value = '';
+  _crBrandChange();
+  var radio = document.querySelector('input[name="cr-effect"][value="net"]'); if(radio) radio.checked = true;
+  _crEffectChange();
+  var btn = document.querySelector('#cr-form .btn-modal-ok'); if(btn) btn.textContent = '+ Aggiungi condizione';
+  var cancelBtn = document.getElementById('cr-cancel-edit'); if(cancelBtn) cancelBtn.style.display = 'none';
+}
+
+function _cancelClientRuleEdit(){ _resetClientRuleForm(); }
+window._cancelClientRuleEdit = _cancelClientRuleEdit;
+
+function _saveClientRule(){
+  if(!_crEditingClientId) return;
+  var nm = (document.getElementById('cr-name').value || '').trim();
+  var brand = document.getElementById('cr-brand').value || '';
+  var series = document.getElementById('cr-series').value || '';
+  var sizesRaw = (document.getElementById('cr-sizes').value || '').trim();
+  var finishesRaw = (document.getElementById('cr-finishes').value || '').trim();
+  var effect = (document.querySelector('input[name="cr-effect"]:checked')||{}).value || 'net';
+  // Crea la regola
+  var rule = {
+    id: _crEditingRuleId || uid(),
+    name: nm || ('Condizione ' + ((_getClientRules(_crEditingClientId).length||0)+1)),
+    brand: brand,
+    series: series,
+    sizes: sizesRaw ? sizesRaw.split(',').map(function(s){return s.trim();}).filter(Boolean) : [],
+    finishes: finishesRaw ? finishesRaw.split(',').map(function(s){return s.trim().toLowerCase();}).filter(Boolean) : [],
+    effect: effect
+  };
+  if(effect === 'net'){
+    var np = parseFloat(document.getElementById('cr-net-price').value);
+    if(!isFinite(np) || np < 0){ alert('Inserisci un prezzo netto valido.'); return; }
+    rule.netPrice = np;
+  } else if(effect === 'std'){
+    var s1 = parseFloat(document.getElementById('cr-std-1').value) || 0;
+    var s2 = parseFloat(document.getElementById('cr-std-2').value) || 0;
+    var s3 = parseFloat(document.getElementById('cr-std-3').value) || 0;
+    if(s1 === 0 && s2 === 0 && s3 === 0){ alert('Inserisci almeno uno sconto non nullo.'); return; }
+    rule.std = [s1, s2, s3];
+  } else if(effect === 'pct'){
+    var pv = parseFloat(document.getElementById('cr-pct-val').value);
+    if(!isFinite(pv) || pv <= 0 || pv >= 100){ alert('Inserisci uno sconto % valido (0-99).'); return; }
+    rule.pct = pv;
+  }
+  var rules = _getClientRules(_crEditingClientId);
+  if(_crEditingRuleId){
+    var idx = rules.findIndex(function(r){return r.id === _crEditingRuleId;});
+    if(idx >= 0) rules[idx] = rule;
+  } else {
+    rules.push(rule);
+  }
+  saveClients({immediate:true});
+  _resetClientRuleForm();
+  _renderClientRulesList();
+}
+window._saveClientRule = _saveClientRule;
+
+function _editClientRule(rid){
+  if(!_crEditingClientId) return;
+  var rule = _getClientRules(_crEditingClientId).find(function(r){return r.id === rid;});
+  if(!rule) return;
+  _crEditingRuleId = rid;
+  document.getElementById('cr-name').value = rule.name || '';
+  document.getElementById('cr-brand').value = rule.brand || '';
+  _crBrandChange();
+  document.getElementById('cr-series').value = rule.series || '';
+  document.getElementById('cr-sizes').value = (rule.sizes||[]).join(', ');
+  document.getElementById('cr-finishes').value = (rule.finishes||[]).join(', ');
+  var radio = document.querySelector('input[name="cr-effect"][value="'+(rule.effect||'net')+'"]');
+  if(radio) radio.checked = true;
+  _crEffectChange();
+  if(rule.effect === 'net') document.getElementById('cr-net-price').value = rule.netPrice || '';
+  if(rule.effect === 'std'){
+    document.getElementById('cr-std-1').value = (rule.std||[])[0] || '';
+    document.getElementById('cr-std-2').value = (rule.std||[])[1] || '';
+    document.getElementById('cr-std-3').value = (rule.std||[])[2] || '';
+  }
+  if(rule.effect === 'pct') document.getElementById('cr-pct-val').value = rule.pct || '';
+  var btn = document.querySelector('#cr-form .btn-modal-ok'); if(btn) btn.textContent = '✓ Salva modifiche';
+  var cancelBtn = document.getElementById('cr-cancel-edit'); if(cancelBtn) cancelBtn.style.display = '';
+}
+window._editClientRule = _editClientRule;
+
+function _delClientRule(rid){
+  if(!_crEditingClientId) return;
+  listinoConfirm('Eliminare questa condizione speciale?', function(){
+    clients[_crEditingClientId].pricingRules = _getClientRules(_crEditingClientId).filter(function(r){return r.id !== rid;});
+    saveClients({immediate:true});
+    _renderClientRulesList();
+  });
+}
+window._delClientRule = _delClientRule;
+
+function _renderClientRulesList(){
+  var el = document.getElementById('cr-list');
+  if(!el || !_crEditingClientId) return;
+  var rules = _getClientRules(_crEditingClientId);
+  if(!rules.length){
+    el.innerHTML = '<div style="font-size:12px;color:var(--light);text-align:center;padding:14px;background:var(--bg);border-radius:6px;border:1px dashed var(--border)">Nessuna condizione speciale.</div>';
+    return;
+  }
+  el.innerHTML = rules.map(function(r){
+    var crit = [];
+    if(r.brand) crit.push('<b>'+toT(r.brand)+'</b>');
+    if(r.series) crit.push(toT(r.series));
+    if(r.sizes && r.sizes.length) crit.push(r.sizes.join('/'));
+    if(r.finishes && r.finishes.length) crit.push(r.finishes.join('/'));
+    var critStr = crit.length ? crit.join(' · ') : '<i>Tutti i prodotti</i>';
+    var effStr = '';
+    if(r.effect === 'net') effStr = '<span style="color:#1A7A3C;font-weight:800">Netto '+fmt(r.netPrice||0)+'/mq</span>';
+    else if(r.effect === 'std') effStr = '<span style="color:#6B3FA0;font-weight:800">−'+(r.std||[0,0,0]).join('% −')+'%</span>';
+    else if(r.effect === 'pct') effStr = '<span style="color:#C8102E;font-weight:800">−'+r.pct+'%</span>';
+    return '<div style="display:flex;align-items:center;gap:8px;padding:9px 11px;background:white;border:1px solid var(--border);border-radius:6px">'
+      + '<div style="flex:1;min-width:0">'
+      + '<div style="font-size:12.5px;font-weight:800;color:var(--dark)">'+_esc(r.name||'(senza nome)')+'</div>'
+      + '<div style="font-size:10.5px;color:var(--mid);margin-top:2px">'+critStr+' → '+effStr+'</div>'
+      + '</div>'
+      + '<button onclick="_editClientRule(\''+r.id+'\')" style="background:none;border:1.5px solid var(--border);color:var(--mid);width:30px;height:30px;border-radius:50%;cursor:pointer;display:inline-flex;align-items:center;justify-content:center" title="Modifica"><svg viewBox="0 0 24 24" fill="none" width="13" height="13"><path d="M14.5 4.5l5 5L8 21H3v-5L14.5 4.5z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 6l5 5" stroke="currentColor" stroke-width="1.7"/></svg></button>'
+      + '<button onclick="_delClientRule(\''+r.id+'\')" style="background:none;border:1.5px solid var(--border);color:var(--mid);width:30px;height:30px;border-radius:50%;cursor:pointer;display:inline-flex;align-items:center;justify-content:center" title="Elimina"><svg viewBox="0 0 24 24" fill="none" width="14" height="14"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M5 6l1 14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-14M10 11v6M14 11v6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>'
+      + '</div>';
+  }).join('');
+}
+
+/* Restituisce la regola applicabile (la prima) a un prodotto per il cliente specificato */
+function _findClientRule(cid, product){
+  if(!cid || !product || !clients[cid]) return null;
+  var rules = _getClientRules(cid);
+  for(var i=0;i<rules.length;i++){
+    var r = rules[i];
+    if(r.brand && product.brand !== r.brand) continue;
+    if(r.series && product.series !== r.series) continue;
+    if(r.sizes && r.sizes.length && !r.sizes.some(function(s){return (product.size||'').toLowerCase() === s.toLowerCase();})) continue;
+    if(r.finishes && r.finishes.length && !r.finishes.some(function(f){return (product.finish||'').toLowerCase().indexOf(f) !== -1;})) continue;
+    return r;
+  }
+  return null;
+}
+window._findClientRule = _findClientRule;
+
+/* Rinomina cliente con prompt */
+function renameClient(id){
+  if(!clients[id]){ alert('Cliente non trovato.'); return; }
+  var current = clients[id].name || '';
+  var nm = prompt('Nuovo nome per il cliente:', current);
+  if(nm === null) return;
+  nm = nm.trim();
+  if(!nm){ alert('Il nome non può essere vuoto.'); return; }
+  if(nm === current) return;
+  // Verifica che non esista già un altro cliente con questo nome
+  var dup = Object.values(clients).some(function(c){ return c && c.id !== id && c.name && c.name.toLowerCase() === nm.toLowerCase(); });
+  if(dup){
+    if(!confirm('Esiste già un altro cliente con questo nome. Procedere comunque?')) return;
+  }
+  clients[id].name = nm;
+  saveClients({immediate:true});
+  renderClientList();
+  renderOrderDetail();
+  // Aggiorna anche il pannello carrello (select cliente)
+  try { _refreshCartClientSelect(); _renderCartOutput(); } catch(_){}
+  if(typeof showSyncToast === 'function') showSyncToast('✓ Cliente rinominato in "'+nm+'"');
+}
+window.renameClient = renameClient;
 
 function deleteClient(id){
   if(!clients[id]) return;
@@ -4263,7 +5785,7 @@ function _renderInv(c){
         + '<div style="font-size:10px;color:var(--mid);font-weight:600;margin-top:2px">'+sub+'</div>'
         + '</div>';
     });
-    h+='<div onclick="closeSettings();openSettings();setTimeout(openEspTypesManager,200);_closeMerchMenu();" style="padding:8px 12px;cursor:pointer;font-size:11px;font-weight:700;color:var(--mid);text-align:center;background:var(--bg);letter-spacing:0.06em;text-transform:uppercase">⚙ Gestisci tipi</div>';
+    h+='<div onclick="closeSettings();openSettings();setTimeout(openEspTypesManager,200);_closeMerchMenu();" style="padding:8px 12px;cursor:pointer;font-size:11px;font-weight:700;color:var(--mid);text-align:center;background:var(--bg);letter-spacing:0.06em;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" width="13" height="13"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6"/><path d="M12 2v3M12 19v3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M2 12h3M19 12h3M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Gestisci tipi</div>';
     h+='</div>';
     h+='</div>';
   } else {
@@ -4271,7 +5793,7 @@ function _renderInv(c){
     h+='<button class="btn-add-esp" style="background:#6B3FA0;margin-left:4px" data-cid="'+c.id+'" onclick="_addEspRot(this.dataset.cid)">+ 60×120 girevole</button>';
     h+='<button class="btn-add-esp" style="background:#3D6FA8;margin-left:4px" data-cid="'+c.id+'" onclick="_addEspRot10(this.dataset.cid)">+ 120×120 girevole</button>';
   }
-  h+='<button class="btn-add-esp" style="background:var(--dark);margin-left:4px" data-cid="'+c.id+'" onclick="_exportXls(this.dataset.cid)">📥 Esporta XLS</button>';
+  h+='<button class="btn-add-esp" style="background:var(--dark);margin-left:4px;display:inline-flex;align-items:center;gap:6px" data-cid="'+c.id+'" onclick="_exportXls(this.dataset.cid)"><svg viewBox="0 0 24 24" fill="none" width="14" height="14"><path d="M12 4v12M7 11l5 5 5-5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 18v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Esporta XLS</button>';
   if(tot>0)h+='<span style="font-size:11px;color:var(--mid)">'+tot+' campion'+(tot===1?'e':'i')+' \u00b7 '+esps.length+' espositore'+(esps.length===1?'':'i')+'</span>';
   h+='</div>';
   if(!esps.length){
@@ -4676,7 +6198,12 @@ function _editCustomEspType(id){
   var perEl  = document.getElementById('esp-type-perside');
   if(nameEl) nameEl.value = t.name || '';
   if(totEl)  totEl.value  = t.total || '';
-  if(perEl)  perEl.value  = t.perSide || 0;
+  if(perEl)  perEl.value  = t.perSide || '';
+  // Pre-seleziona la forma in base al perSide
+  var isRot = t.perSide && t.perSide > 0;
+  var shapeRadio = document.querySelector('input[name="esp-type-shape"][value="'+(isRot?'rot':'line')+'"]');
+  if(shapeRadio) shapeRadio.checked = true;
+  _updateEspTypeShape();
   // Cambia il testo del bottone
   var btn = document.querySelector('.esp-type-form .btn-modal-ok');
   if(btn) btn.textContent = '✓ Salva modifiche';
@@ -4709,6 +6236,10 @@ function _cancelEditEspType(){
   ['esp-type-name','esp-type-total','esp-type-perside'].forEach(function(id){
     var el = document.getElementById(id); if(el) el.value='';
   });
+  // Reset radio "forma" su "lineare"
+  var lineRadio = document.querySelector('input[name="esp-type-shape"][value="line"]');
+  if(lineRadio) lineRadio.checked = true;
+  if(typeof _updateEspTypeShape === 'function') _updateEspTypeShape();
   var btn = document.querySelector('.esp-type-form .btn-modal-ok');
   if(btn) btn.textContent = '+ Crea tipo';
   var cancelBtn = document.getElementById('esp-type-cancel-edit');
@@ -4717,13 +6248,27 @@ function _cancelEditEspType(){
   if(formWrap) formWrap.classList.remove('editing');
 }
 window._cancelEditEspType = _cancelEditEspType;
+function _updateEspTypeShape(){
+  var shape = document.querySelector('input[name="esp-type-shape"]:checked');
+  var shapeVal = shape ? shape.value : 'line';
+  var perWrap = document.getElementById('esp-type-perside-wrap');
+  if(perWrap){
+    // Mostra solo se "girevole"
+    perWrap.style.display = (shapeVal === 'rot') ? '' : 'none';
+  }
+}
+window._updateEspTypeShape = _updateEspTypeShape;
+
 function _addCustomEspType(){
   var nm = (document.getElementById('esp-type-name').value || '').trim();
   var tot = parseInt(document.getElementById('esp-type-total').value, 10);
-  var per = parseInt(document.getElementById('esp-type-perside').value, 10);
+  var shape = document.querySelector('input[name="esp-type-shape"]:checked');
+  var shapeVal = shape ? shape.value : 'line';
+  var per = (shapeVal === 'rot') ? parseInt(document.getElementById('esp-type-perside').value, 10) : 0;
   if(!nm){ alert('Inserisci un nome per il tipo.'); return; }
   if(!tot || tot < 1 || tot > 60){ alert('Inserisci un numero valido di slot totali (1-60).'); return; }
-  if(per && per > 0){
+  if(shapeVal === 'rot'){
+    if(!per || per < 1){ alert('Per un espositore girevole indica gli slot per lato (almeno 1).'); return; }
     if(per > tot/2 + 1){ alert('Slot per lato troppo alto rispetto al totale. Per un girevole, perSide ≤ total/2.'); return; }
   }
   var types = _loadCustomEspTypes();
@@ -4787,7 +6332,11 @@ function _renderRotGrid(cid, e){
       var swatch = colorMeta ? '<span class="esp-rot-swatch" style="background:'+colorMeta.swatch+'"></span>' : '';
       var seriesShort = item.series ? toT(item.series) : '';
       var colorShort  = item.color || '';
-      return '<div class="esp-rot-slot filled" data-slot="'+idx+'">'
+      // Stato del campione (presente/sostituire/fuoriprod/ordinato/programma)
+      var statInfo = _statInfo(item.status||'presente');
+      var statusDot = '<button class="esp-rot-slot-status" onclick="event.stopPropagation();_toggleSlotStatusMenu(this,\''+e.id+'\','+idx+')" title="Stato: '+(statInfo.label||'Nessuno')+'" style="--st-color:'+(statInfo.dot||'#ccc')+'"><span class="esp-rot-slot-status-dot"></span></button>';
+      return '<div class="esp-rot-slot filled '+(statInfo.cls||'')+'" data-slot="'+idx+'">'
+        + statusDot
         + '<div class="esp-rot-slot-num">#'+slotNum+'</div>'
         + '<div class="esp-rot-slot-code">'+_esc(item.code||'')+'</div>'
         + '<div class="esp-rot-slot-series">'+_esc(seriesShort)+'</div>'
@@ -4795,6 +6344,11 @@ function _renderRotGrid(cid, e){
         + '<button class="esp-rot-slot-info" onclick="event.stopPropagation();_showSlotInfo(\''+e.id+'\','+idx+')" title="Informazioni">i</button>'
         + '<button class="esp-rot-slot-del" onclick="event.stopPropagation();_remRotSlot(\''+e.id+'\','+idx+')" title="Rimuovi">✕</button>'
         + '<button class="esp-rot-slot-replace" onclick="event.stopPropagation();_pickRotSlot(\''+e.id+'\','+idx+')" title="Sostituisci">↻</button>'
+        + '<div class="esp-rot-slot-actions">'
+          + '<button class="esp-rot-slot-mv" onclick="event.stopPropagation();_moveRotSlot(\''+e.id+'\','+idx+',-1)" title="Sposta indietro">←</button>'
+          + '<button class="esp-rot-slot-mv" onclick="event.stopPropagation();_moveRotSlotTo(\''+e.id+'\','+idx+')" title="Sposta in slot...">⇄</button>'
+          + '<button class="esp-rot-slot-mv" onclick="event.stopPropagation();_moveRotSlot(\''+e.id+'\','+idx+',1)" title="Sposta avanti">→</button>'
+        + '</div>'
         + '</div>';
     }
     return '<div class="esp-rot-slot empty" data-slot="'+idx+'" onclick="_pickRotSlot(\''+e.id+'\','+idx+')">'
@@ -4917,6 +6471,165 @@ function _showSlotInfo(eid, slotIdx){
 }
 window._showSlotInfo = _showSlotInfo;
 
+/* Sposta un campione di una posizione (-1 indietro, +1 avanti).
+   Se la posizione di destinazione è occupata, scambia i due campioni.
+   Se è vuota, sposta il campione. Wrap-around ai bordi (0 ↔ total-1). */
+function _moveRotSlot(eid, slotIdx, direction){
+  var cid=null,cids=Object.keys(clients);
+  for(var k=0;k<cids.length;k++){
+    if(_getEsps(cids[k]).find(function(e){return e.id===eid;})){ cid = cids[k]; break; }
+  }
+  if(!cid) return;
+  var e = _getEsps(cid).find(function(x){return x.id===eid;});
+  if(!e) return;
+  var idx = parseInt(slotIdx,10);
+  var dir = parseInt(direction,10) || 0;
+  if(!dir) return;
+  var total = _rotTotal(e);
+  if(!total) return;
+  var newIdx = idx + dir;
+  // Wrap-around
+  if(newIdx < 0) newIdx = total - 1;
+  if(newIdx >= total) newIdx = 0;
+  var srcItem = e.items.find(function(x){return x.slot === idx;});
+  var dstItem = e.items.find(function(x){return x.slot === newIdx;});
+  if(!srcItem) return;
+  if(dstItem){
+    // Scambia gli slot dei due item
+    srcItem.slot = newIdx;
+    dstItem.slot = idx;
+  } else {
+    // Sposta semplicemente il campione
+    srcItem.slot = newIdx;
+  }
+  saveClients({immediate:true});
+  renderOrderDetail();
+}
+window._moveRotSlot = _moveRotSlot;
+
+/* Sposta in uno slot specifico chiesto via prompt. */
+function _moveRotSlotTo(eid, slotIdx){
+  var cid=null,cids=Object.keys(clients);
+  for(var k=0;k<cids.length;k++){
+    if(_getEsps(cids[k]).find(function(e){return e.id===eid;})){ cid = cids[k]; break; }
+  }
+  if(!cid) return;
+  var e = _getEsps(cid).find(function(x){return x.id===eid;});
+  if(!e) return;
+  var idx = parseInt(slotIdx,10);
+  var total = _rotTotal(e);
+  var target = prompt('Sposta in quale slot? (1-'+total+')', String(idx+1));
+  if(target === null) return;
+  var newIdx = parseInt(target,10) - 1;
+  if(isNaN(newIdx) || newIdx < 0 || newIdx >= total){ alert('Slot non valido.'); return; }
+  if(newIdx === idx) return;
+  var srcItem = e.items.find(function(x){return x.slot === idx;});
+  var dstItem = e.items.find(function(x){return x.slot === newIdx;});
+  if(!srcItem) return;
+  if(dstItem){
+    srcItem.slot = newIdx;
+    dstItem.slot = idx;
+  } else {
+    srcItem.slot = newIdx;
+  }
+  saveClients({immediate:true});
+  renderOrderDetail();
+}
+window._moveRotSlotTo = _moveRotSlotTo;
+
+/* Apre/chiude il menu di scelta stato per uno slot del Merch.
+   Il menu viene allegato al body (position:fixed) per non essere tagliato dall'overflow:hidden dello slot. */
+function _toggleSlotStatusMenu(btn, eid, slotIdx){
+  // Se è già aperto un menu per lo stesso slot, chiudilo (toggle)
+  var existing = document.getElementById('slot-status-menu-open');
+  if(existing){
+    existing.remove();
+    // Se cliccavi lo stesso pulsante, fermati qui (toggle off)
+    if(existing.dataset.btn === btn.getAttribute('data-key')) return;
+  }
+  var cid=null,cids=Object.keys(clients);
+  for(var k=0;k<cids.length;k++){
+    if(_getEsps(cids[k]).find(function(e){return e.id===eid;})){ cid = cids[k]; break; }
+  }
+  if(!cid) return;
+  var e = _getEsps(cid).find(function(x){return x.id===eid;});
+  if(!e) return;
+  var idx = parseInt(slotIdx,10);
+  var item = e.items.find(function(x){return x.slot === idx;});
+  if(!item) return;
+  var currentStatus = item.status || 'presente';
+  // Crea il menu
+  var menu = document.createElement('div');
+  menu.id = 'slot-status-menu-open';
+  menu.className = 'slot-status-menu';
+  var html = '';
+  _STATI.forEach(function(s){
+    if(!s.id) return; // salta "Nessuno" (vuoto)
+    var active = (s.id === currentStatus) ? ' active' : '';
+    html += '<div class="slot-status-menu-item'+active+'" onclick="_setSlotStatus(\''+e.id+'\','+idx+',\''+s.id+'\')">'
+      + '<span class="slot-status-menu-dot" style="--dot-color:'+s.dot+'"></span>'
+      + '<span>'+s.label+'</span>'
+      + '</div>';
+  });
+  menu.innerHTML = html;
+  document.body.appendChild(menu);
+  // Posiziona il menu accanto al pulsante (sotto, allineato a sinistra). Aggiusta se va fuori dallo schermo.
+  var rect = btn.getBoundingClientRect();
+  var top = rect.bottom + 4;
+  var left = rect.left;
+  // Misura il menu per evitare di uscire dallo schermo
+  var menuW = menu.offsetWidth || 160;
+  var menuH = menu.offsetHeight || 200;
+  var vw = window.innerWidth, vh = window.innerHeight;
+  if(left + menuW > vw - 8) left = vw - menuW - 8;
+  if(left < 8) left = 8;
+  if(top + menuH > vh - 8) top = rect.top - menuH - 4; // mostra sopra se non c'è spazio sotto
+  if(top < 8) top = 8;
+  menu.style.top  = top + 'px';
+  menu.style.left = left + 'px';
+  // Chiudi al click esterno (al prossimo tick per non chiudere subito)
+  setTimeout(function(){
+    document.addEventListener('mousedown', _closeSlotStatusMenuOnce);
+    document.addEventListener('touchstart', _closeSlotStatusMenuOnce, {passive:true});
+  }, 0);
+}
+window._toggleSlotStatusMenu = _toggleSlotStatusMenu;
+
+function _closeSlotStatusMenuOnce(ev){
+  var menu = document.getElementById('slot-status-menu-open');
+  if(!menu) {
+    document.removeEventListener('mousedown', _closeSlotStatusMenuOnce);
+    document.removeEventListener('touchstart', _closeSlotStatusMenuOnce);
+    return;
+  }
+  if(menu.contains(ev.target) || (ev.target.closest && ev.target.closest('.esp-rot-slot-status'))) return;
+  menu.remove();
+  document.removeEventListener('mousedown', _closeSlotStatusMenuOnce);
+  document.removeEventListener('touchstart', _closeSlotStatusMenuOnce);
+}
+
+/* Imposta lo stato di un campione in uno slot del Merch */
+function _setSlotStatus(eid, slotIdx, statusId){
+  var cid=null,cids=Object.keys(clients);
+  for(var k=0;k<cids.length;k++){
+    if(_getEsps(cids[k]).find(function(e){return e.id===eid;})){ cid = cids[k]; break; }
+  }
+  if(!cid) return;
+  var e = _getEsps(cid).find(function(x){return x.id===eid;});
+  if(!e) return;
+  var idx = parseInt(slotIdx,10);
+  var item = e.items.find(function(x){return x.slot === idx;});
+  if(!item) return;
+  item.status = statusId;
+  saveClients({immediate:true});
+  var menu = document.getElementById('slot-status-menu-open');
+  if(menu) menu.remove();
+  document.removeEventListener('mousedown', _closeSlotStatusMenuOnce);
+  document.removeEventListener('touchstart', _closeSlotStatusMenuOnce);
+  renderOrderDetail();
+}
+window._setSlotStatus = _setSlotStatus;
+
 function _remRotSlot(eid, slotIdx){
   var cid=null,cids=Object.keys(clients);
   for(var k=0;k<cids.length;k++){
@@ -4982,9 +6695,30 @@ function _srch(eid,q){
   if(!q.trim()){res.style.display='none';return;}
   _ST[eid]=setTimeout(function(){
     var ql=q.toLowerCase();
-    var found=PRODUCTS.filter(function(p){
-      return p.type==='fondo'&&(p.code.toLowerCase().startsWith(ql)||p.series.toLowerCase().includes(ql)||(p.color||'').toLowerCase().includes(ql));
-    }).slice(0,10);
+    // Cerca con includes (non startsWith) su tutti i campi rilevanti, su tutti i tipi.
+    // Scoring: match esatto > inizio codice > inizio serie > includes generico.
+    var scored = [];
+    PRODUCTS.forEach(function(p){
+      var code = (p.code||'').toLowerCase();
+      var series = (p.series||'').toLowerCase();
+      var color = (p.color||'').toLowerCase();
+      var finish = (p.finish||'').toLowerCase();
+      var size = (p.size||'').toLowerCase();
+      var subseries = (p.subseries||'').toLowerCase();
+      var score = -1;
+      if(code === ql) score = 100;
+      else if(code.startsWith(ql)) score = 90;
+      else if(series.startsWith(ql)) score = 80;
+      else if(code.includes(ql)) score = 70;
+      else if(series.includes(ql)) score = 60;
+      else if(color.includes(ql)) score = 50;
+      else if(subseries.includes(ql)) score = 40;
+      else if(finish.includes(ql)) score = 30;
+      else if(size.includes(ql)) score = 20;
+      if(score >= 0) scored.push({p:p, score:score});
+    });
+    scored.sort(function(a,b){ return b.score - a.score; });
+    var found = scored.slice(0, 30).map(function(x){return x.p;});
     if(!found.length){res.style.display='none';return;}
     var h='';
     found.forEach(function(p){
@@ -5111,6 +6845,23 @@ function _exportXls(cid){
   var esps=_getEsps(cid);
   if(!esps.length){alert('Nessun espositore da esportare.');return;}
 
+  // Verifica che la libreria XLSX sia stata caricata (da CDN)
+  if(typeof XLSX === 'undefined' || !XLSX.utils){
+    var msg = 'Libreria Excel non caricata.\n\n'
+      + 'Probabilmente il browser ha bloccato il download della libreria da Internet.\n\n'
+      + 'Possibili cause:\n'
+      + '• Stai aprendo il file in modalità anteprima (es. anteprima di OneDrive) che blocca le risorse esterne\n'
+      + '• Non sei connesso a Internet\n'
+      + '• Un antivirus/firewall blocca cdnjs.cloudflare.com\n\n'
+      + 'Soluzione: apri il file direttamente con il browser (doppio click sul file index.html) e assicurati di essere online.\n\n'
+      + 'Vuoi esportare comunque in CSV (formato testo) come alternativa?';
+    if(confirm(msg)){
+      _exportCsv(cid);
+    }
+    return;
+  }
+
+  try {
   var wb=XLSX.utils.book_new();
   var wsData=[];
 
@@ -5189,7 +6940,66 @@ function _exportXls(cid){
 
   XLSX.utils.book_append_sheet(wb, ws, c.name.substring(0,31));
   XLSX.writeFile(wb, 'Inventario_'+c.name.replace(/[^a-zA-Z0-9]/g,'_')+'.xlsx');
+  } catch(err){
+    console.error('Errore export XLS:', err);
+    if(confirm('Errore nell\'export Excel: '+err.message+'\n\nVuoi esportare in CSV (testo) come alternativa?')){
+      _exportCsv(cid);
+    }
+  }
 }
+
+/* Esporta inventario come CSV (fallback senza libreria esterna) */
+function _exportCsv(cid){
+  var c=clients[cid];
+  if(!c){alert('Cliente non trovato.');return;}
+  var esps=_getEsps(cid);
+  if(!esps.length){alert('Nessun espositore da esportare.');return;}
+  function _csvEsc(s){
+    s = String(s == null ? '' : s);
+    if(/[",;\n\r]/.test(s)) return '"'+s.replace(/"/g,'""')+'"';
+    return s;
+  }
+  var statusLabels={
+    'presente':'Presente','sostituire':'Da sostituire',
+    'fuoriprod':'Fuori produzione','ordinato':'Ordinato','programma':'In programma'
+  };
+  var lines = [];
+  lines.push(['Espositore','Serie','Colore','Finitura','Formato','Codice','Stato','Note','Slot'].map(_csvEsc).join(';'));
+  esps.forEach(function(e){
+    if(!e.items.length){
+      lines.push([_csvEsc(e.name), '(nessun campione)','','','','','','',''].join(';'));
+    } else {
+      e.items.forEach(function(item){
+        lines.push([
+          _csvEsc(e.name),
+          _csvEsc(item.series||''),
+          _csvEsc(item.color||''),
+          _csvEsc(item.finish||''),
+          _csvEsc(item.size?(item.size+' cm'):''),
+          _csvEsc(item.code||''),
+          _csvEsc(statusLabels[item.status||'presente']||''),
+          _csvEsc(item.note||''),
+          (typeof item.slot === 'number' ? (item.slot+1) : '')
+        ].join(';'));
+      });
+    }
+    lines.push(''); // riga vuota separatrice
+  });
+  // BOM UTF-8 per Excel
+  var csv = '﻿' + lines.join('\r\n');
+  var blob = new Blob([csv], {type: 'text/csv;charset=utf-8'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'Inventario_'+c.name.replace(/[^a-zA-Z0-9]/g,'_')+'.csv';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function(){
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, 100);
+}
+window._exportCsv = _exportCsv;
 
 // ── MODALS ────────────────────────────────────────────────────────────────────
 function closeModal(id){ $(id).classList.remove('open'); }
@@ -5454,6 +7264,46 @@ function renderRankAnni(ordini, targetId) {
   );
 }
 
+/* Stato ordinamento delle tabelle (per cliente e prodotti).
+   Valori: 'eur-desc' (default), 'eur-asc', 'ord-desc' */
+var _sortClienti  = (function(){ try { return localStorage.getItem('sort_clienti') || 'eur-desc'; } catch(e){ return 'eur-desc'; } })();
+var _sortProdotti = (function(){ try { return localStorage.getItem('sort_prodotti') || 'ord-desc'; } catch(e){ return 'ord-desc'; } })();
+
+function setSortClienti(mode){
+  _sortClienti = mode;
+  try { localStorage.setItem('sort_clienti', mode); } catch(e){}
+  try { renderStats(); } catch(e){}
+}
+window.setSortClienti = setSortClienti;
+function setSortProdotti(mode){
+  _sortProdotti = mode;
+  try { localStorage.setItem('sort_prodotti', mode); } catch(e){}
+  try { renderStats(); } catch(e){}
+}
+window.setSortProdotti = setSortProdotti;
+
+/* Restituisce HTML dei chip filtri per le tabelle */
+function _sortChipsHtml(targetSetter, current){
+  var modes = [
+    {id:'eur-desc', lbl:'€ ↓ (più alto)'},
+    {id:'eur-asc',  lbl:'€ ↑ (più basso)'},
+    {id:'ord-desc', lbl:'Ordini ↓'}
+  ];
+  return '<div class="stats-sort-chips">'
+    + modes.map(function(m){
+        return '<button class="stats-sort-chip'+(current===m.id?' active':'')+'" onclick="'+targetSetter+'(\''+m.id+'\')">'+m.lbl+'</button>';
+      }).join('')
+    + '</div>';
+}
+
+function _applySort(arr, mode){
+  var s = arr.slice();
+  if(mode === 'eur-asc')  s.sort(function(a,b){ return a.val - b.val; });
+  else if(mode === 'ord-desc') s.sort(function(a,b){ return b.n - a.n; });
+  else /* eur-desc */     s.sort(function(a,b){ return b.val - a.val; });
+  return s;
+}
+
 function renderRankClienti(ordini) {
   const map = {};
   ordini.forEach(({client:c, order:o}) => {
@@ -5462,11 +7312,12 @@ function renderRankClienti(ordini) {
     map[c.id].mq  += o.items.reduce((s,i) => s + (parseFloat(i.mq)||0), 0);
     map[c.id].n++;
   });
-  const all = Object.values(map).sort((a,b) => b.val - a.val);
-  const lista = all.slice(0, 10);
-  const max = lista[0]?.val || 1;
-  $('rank-clienti').innerHTML = lista.length
-    ? lista.map((x, i) => `<div class="rank-item">
+  const allSorted = _applySort(Object.values(map), _sortClienti);
+  // Top 10 sempre per fatturato decrescente (per il grafico)
+  const top10 = Object.values(map).sort((a,b) => b.val - a.val).slice(0, 10);
+  const max = top10[0]?.val || 1;
+  $('rank-clienti').innerHTML = top10.length
+    ? top10.map((x, i) => `<div class="rank-item">
         <span class="rank-pos">${i+1}</span>
         <div class="rank-bar-wrap">
           <div class="rank-bar rb-dark" style="width:${Math.round(x.val/max*100)}%">
@@ -5476,15 +7327,20 @@ function renderRankClienti(ordini) {
         <span class="rank-val">${fmt(x.val)}</span>
       </div>`).join('')
     : '<div class="stats-empty">Nessun dato</div>';
-  // Tabella: tutti i clienti
-  const totN = all.reduce((s,x)=>s+x.n,0);
-  const totMq = all.reduce((s,x)=>s+x.mq,0);
-  const totEur = all.reduce((s,x)=>s+x.val,0);
-  _renderStatsTable('table-clienti',
-    [{label:'#'},{label:'Cliente'},{label:'Ordini',num:true},{label:'Mq',num:true},{label:'Fatturato',num:true}],
-    all.map((x,i)=>[i+1, x.name, x.n, x.mq.toFixed(2), '<span class="col-green">'+fmt(x.val)+'</span>']),
-    ['', 'Totale', totN, totMq.toFixed(2), '<span class="col-green">'+fmt(totEur)+'</span>']
-  );
+  // Tabella: tutti i clienti, ordinati come selezionato
+  const totN = allSorted.reduce((s,x)=>s+x.n,0);
+  const totMq = allSorted.reduce((s,x)=>s+x.mq,0);
+  const totEur = allSorted.reduce((s,x)=>s+x.val,0);
+  const wrap = document.getElementById('table-clienti');
+  if(wrap){
+    var chips = _sortChipsHtml('setSortClienti', _sortClienti);
+    wrap.innerHTML = chips + '<div id="table-clienti-inner"></div>';
+    _renderStatsTable('table-clienti-inner',
+      [{label:'#'},{label:'Cliente'},{label:'Ordini',num:true},{label:'Mq',num:true},{label:'Fatturato',num:true}],
+      allSorted.map((x,i)=>[i+1, x.name, x.n, x.mq.toFixed(2), '<span class="col-green">'+fmt(x.val)+'</span>']),
+      ['', 'Totale', totN, totMq.toFixed(2), '<span class="col-green">'+fmt(totEur)+'</span>']
+    );
+  }
 }
 
 function renderRankSerie(ordini) {
@@ -5530,11 +7386,11 @@ function renderRankProdotti(ordini) {
       map[i.code].val += itemTot(i);
     });
   });
-  const all = Object.values(map).sort((a,b) => b.n-a.n);
-  const lista = all.slice(0, 20);
-  const max = lista[0]?.n || 1;
-  $('rank-prodotti').innerHTML = lista.length
-    ? lista.map((x, i) => `<div class="rank-item">
+  // Grafico: top 20 sempre per "Volte" (numero ordini)
+  const top20 = Object.values(map).sort((a,b) => b.n - a.n).slice(0, 20);
+  const max = top20[0]?.n || 1;
+  $('rank-prodotti').innerHTML = top20.length
+    ? top20.map((x, i) => `<div class="rank-item">
         <span class="rank-pos">${i+1}</span>
         <div class="rank-bar-wrap">
           <div class="rank-bar rb-green" style="width:${Math.round(x.n/max*100)}%">
@@ -5544,15 +7400,21 @@ function renderRankProdotti(ordini) {
         <span class="rank-val">${x.n}x</span>
       </div>`).join('')
     : '<div class="stats-empty">Nessun dato</div>';
-  // Tabella
-  const totN = all.reduce((s,x)=>s+x.n,0);
-  const totMq = all.reduce((s,x)=>s+x.mq,0);
-  const totEur = all.reduce((s,x)=>s+x.val,0);
-  _renderStatsTable('table-prodotti',
-    [{label:'#'},{label:'Codice'},{label:'Serie'},{label:'Colore'},{label:'Volte',num:true},{label:'Mq',num:true},{label:'Fatturato',num:true}],
-    all.map((x,i)=>[i+1, x.code, x.series?toT(x.series):'—', x.color||'—', x.n, x.mq.toFixed(2), '<span class="col-green">'+fmt(x.val)+'</span>']),
-    ['', '', '', 'Totale', totN, totMq.toFixed(2), '<span class="col-green">'+fmt(totEur)+'</span>']
-  );
+  // Tabella: ordinata come da filtro selezionato
+  const allSorted = _applySort(Object.values(map), _sortProdotti);
+  const totN = allSorted.reduce((s,x)=>s+x.n,0);
+  const totMq = allSorted.reduce((s,x)=>s+x.mq,0);
+  const totEur = allSorted.reduce((s,x)=>s+x.val,0);
+  const wrap = document.getElementById('table-prodotti');
+  if(wrap){
+    var chips = _sortChipsHtml('setSortProdotti', _sortProdotti);
+    wrap.innerHTML = chips + '<div id="table-prodotti-inner"></div>';
+    _renderStatsTable('table-prodotti-inner',
+      [{label:'#'},{label:'Codice'},{label:'Serie'},{label:'Colore'},{label:'Volte',num:true},{label:'Mq',num:true},{label:'Fatturato',num:true}],
+      allSorted.map((x,i)=>[i+1, x.code, x.series?toT(x.series):'—', x.color||'—', x.n, x.mq.toFixed(2), '<span class="col-green">'+fmt(x.val)+'</span>']),
+      ['', '', '', 'Totale', totN, totMq.toFixed(2), '<span class="col-green">'+fmt(totEur)+'</span>']
+    );
+  }
 }
 
 function renderClientStats() {
@@ -5674,6 +7536,10 @@ function renderClientStats() {
     </div>`;
   }).join('');
 
+  // Calcoli aggiuntivi per la tabella per-mese (serve anche conteggio ordini per mese)
+  const ordcMese = new Array(12).fill(0);
+  ordini.forEach(o => { ordcMese[new Date(o.date).getMonth()]++; });
+
   body.innerHTML = `<div class="client-stats-grid">
 
     <!-- Serie più ordinate -->
@@ -5690,6 +7556,15 @@ function renderClientStats() {
           <span class="rank-val">${mq.toFixed(1)} mq</span>
         </div>`).join('')}
       </div>
+      <div class="stats-table-wrap">
+        <table class="stats-table">
+          <thead><tr><th>#</th><th>Serie</th><th class="num">Mq</th></tr></thead>
+          <tbody>
+            ${serieList.map(([s,mq],i)=>`<tr><td>${i+1}</td><td>${toT(s)}</td><td class="num">${mq.toFixed(2)}</td></tr>`).join('')}
+          </tbody>
+          <tfoot><tr><td></td><td>Totale</td><td class="num">${(serieList.reduce((s,[,mq])=>s+mq,0)).toFixed(2)}</td></tr></tfoot>
+        </table>
+      </div>
     </div>
 
     <!-- Storico mq mese per mese -->
@@ -5700,6 +7575,15 @@ function renderClientStats() {
           <div class="mini-fill" style="height:${Math.round(mq/maxMese*54)}px" title="${mq.toFixed(1)} mq"></div>
           <div class="mini-lbl">${MESI[i]}</div>
         </div>`).join('')}
+      </div>
+      <div class="stats-table-wrap">
+        <table class="stats-table">
+          <thead><tr><th>Mese</th><th class="num">Ordini</th><th class="num">Mq</th></tr></thead>
+          <tbody>
+            ${MESI.map((m,i)=>`<tr><td>${m}</td><td class="num">${ordcMese[i]}</td><td class="num">${mqMese[i].toFixed(2)}</td></tr>`).join('')}
+          </tbody>
+          <tfoot><tr><td>Totale</td><td class="num">${ordcMese.reduce((s,n)=>s+n,0)}</td><td class="num">${mqMese.reduce((s,n)=>s+n,0).toFixed(2)}</td></tr></tfoot>
+        </table>
       </div>
     </div>
 
@@ -5712,6 +7596,15 @@ function renderClientStats() {
           <div class="mini-lbl">${MESI[i]}</div>
           <div class="mini-sublbl">${v ? fmtCompact(v) : ''}</div>
         </div>`).join('')}
+      </div>
+      <div class="stats-table-wrap">
+        <table class="stats-table">
+          <thead><tr><th>Mese</th><th class="num">Ordini</th><th class="num">Fatturato</th></tr></thead>
+          <tbody>
+            ${MESI.map((m,i)=>`<tr><td>${m}</td><td class="num">${ordcMese[i]}</td><td class="num"><span class="col-green">${fmt(fattMese[i])}</span></td></tr>`).join('')}
+          </tbody>
+          <tfoot><tr><td>Totale</td><td class="num">${ordcMese.reduce((s,n)=>s+n,0)}</td><td class="num"><span class="col-green">${fmt(fattMese.reduce((s,n)=>s+n,0))}</span></td></tr></tfoot>
+        </table>
       </div>
     </div>
 
@@ -5729,6 +7622,15 @@ function renderClientStats() {
           <span class="rank-val">${fmt(v.val)}</span>
         </div>`).join('') : '<div class="stats-empty">Nessun dato</div>'}
       </div>
+      <div class="stats-table-wrap">
+        <table class="stats-table">
+          <thead><tr><th>Anno</th><th class="num">Ordini</th><th class="num">Fatturato</th></tr></thead>
+          <tbody>
+            ${annoList.length ? annoList.map(([anno,v])=>`<tr><td>${anno}</td><td class="num">${v.n}</td><td class="num"><span class="col-green">${fmt(v.val)}</span></td></tr>`).join('') : '<tr><td colspan="3" style="text-align:center;color:var(--light)">Nessun dato</td></tr>'}
+          </tbody>
+          <tfoot><tr><td>Totale</td><td class="num">${annoList.reduce((s,[,v])=>s+v.n,0)}</td><td class="num"><span class="col-green">${fmt(annoList.reduce((s,[,v])=>s+v.val,0))}</span></td></tr></tfoot>
+        </table>
+      </div>
     </div>
 
     <!-- Riepilogo numerico -->
@@ -5737,15 +7639,15 @@ function renderClientStats() {
       <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px">
         <div>
           <div style="font-size:10px;color:var(--mid);font-weight:600;letter-spacing:0.1em;text-transform:uppercase">Ordini</div>
-          <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700">${ordini.length}</div>
+          <div style="font-family:var(--font-display);letter-spacing:-0.01em;font-size:22px;font-weight:700">${ordini.length}</div>
         </div>
         <div>
           <div style="font-size:10px;color:var(--mid);font-weight:600;letter-spacing:0.1em;text-transform:uppercase">Mq totali</div>
-          <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700">${totMq.toFixed(1)}</div>
+          <div style="font-family:var(--font-display);letter-spacing:-0.01em;font-size:22px;font-weight:700">${totMq.toFixed(1)}</div>
         </div>
         <div>
           <div style="font-size:10px;color:var(--mid);font-weight:600;letter-spacing:0.1em;text-transform:uppercase">Fatturato (sconto B)</div>
-          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--green)">${fmt(totVal)}</div>
+          <div style="font-family:var(--font-display);letter-spacing:-0.01em;font-size:20px;font-weight:700;color:var(--green)">${fmt(totVal)}</div>
         </div>
       </div>
     </div>
