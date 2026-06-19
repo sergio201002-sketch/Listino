@@ -2832,8 +2832,8 @@ window.FIREBASE_CONFIG = {
       <button onclick="closeSettings()" aria-label="Chiudi" style="background:none;border:none;cursor:pointer;color:#6B6B6B;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;-webkit-tap-highlight-color:rgba(0,0,0,0.1);touch-action:manipulation">&times;</button>
     </div>
     <div style="padding:14px 20px;border-bottom:1px solid #E5E5E5;display:flex;gap:10px;flex-wrap:wrap;align-items:center;flex-shrink:0">
-      <input id="settings-search" type="text" placeholder="Cerca codice, serie, colore, formato..." oninput="renderSettingsList()" style="flex:1;min-width:200px;border:1.5px solid #E5E5E5;border-radius:6px;padding:9px 12px;font-family:var(--font-body);font-size:13px"/>
-      <select id="settings-brand-filter" onchange="renderSettingsList()" style="border:1.5px solid #E5E5E5;border-radius:6px;padding:9px 10px;font-family:var(--font-body);font-size:13px;background:#fff">
+      <input id="settings-search" type="text" placeholder="Cerca serie, sottoserie, colore..." oninput="_renderActiveSettingsTab()" style="flex:1;min-width:200px;border:1.5px solid #E5E5E5;border-radius:6px;padding:9px 12px;font-family:var(--font-body);font-size:13px"/>
+      <select id="settings-brand-filter" onchange="_renderActiveSettingsTab()" style="border:1.5px solid #E5E5E5;border-radius:6px;padding:9px 10px;font-family:var(--font-body);font-size:13px;background:#fff">
         <option value="">Tutti i marchi</option>
       </select>
       <button onclick="openProductEdit(null)" style="background:#C8102E;color:#fff;border:none;border-radius:6px;padding:9px 16px;font-family:var(--font-body);font-size:13px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:rgba(255,255,255,0.3);touch-action:manipulation">+ Nuovo prodotto</button>
@@ -3674,9 +3674,10 @@ async function prodsetInit(user){
         const remote = JSON.parse(snap.data().data);
         if(remote && typeof remote === 'object'){
           productSettings = {
-            overrides: remote.overrides || {},
-            additions: Array.isArray(remote.additions) ? remote.additions : [],
-            removals:  Array.isArray(remote.removals)  ? remote.removals  : []
+            overrides:     remote.overrides && typeof remote.overrides === 'object' ? remote.overrides : {},
+            additions:     Array.isArray(remote.additions) ? remote.additions : [],
+            removals:      Array.isArray(remote.removals)  ? remote.removals  : [],
+            subseriesMode: remote.subseriesMode && typeof remote.subseriesMode === 'object' ? remote.subseriesMode : {}
           };
           _saveProductSettingsLocal();
           applyProductSettings();
@@ -3699,9 +3700,10 @@ async function prodsetInit(user){
       const remote = JSON.parse(d.data);
       if(remote && typeof remote === 'object'){
         productSettings = {
-          overrides: remote.overrides || {},
-          additions: Array.isArray(remote.additions) ? remote.additions : [],
-          removals:  Array.isArray(remote.removals)  ? remote.removals  : []
+          overrides:     remote.overrides && typeof remote.overrides === 'object' ? remote.overrides : {},
+          additions:     Array.isArray(remote.additions) ? remote.additions : [],
+          removals:      Array.isArray(remote.removals)  ? remote.removals  : [],
+          subseriesMode: remote.subseriesMode && typeof remote.subseriesMode === 'object' ? remote.subseriesMode : {}
         };
         _saveProductSettingsLocal();
         applyProductSettings();
@@ -3767,13 +3769,25 @@ function setSubseriesMode(btn){
 }
 window.setSubseriesMode = setSubseriesMode;
 
+function _renderActiveSettingsTab(){
+  if(_settingsTab === 'sezioni') renderSezioniTab();
+  else renderSettingsList();
+}
+window._renderActiveSettingsTab = _renderActiveSettingsTab;
+
 function renderSezioniTab(){
   const el = document.getElementById('sezioni-list');
   if(!el) return;
+  const q     = (document.getElementById('settings-search')?.value || '').toLowerCase().trim();
+  const brand = document.getElementById('settings-brand-filter')?.value || '';
   // Raccogli tutti i decori (type=fondo, subseries≠null) raggruppati per serie
-  const decoriProds = PRODUCTS.filter(p => p.type === 'fondo' && p.subseries);
+  let decoriProds = PRODUCTS.filter(p => p.type === 'fondo' && p.subseries);
+  if(brand) decoriProds = decoriProds.filter(p => p.brand === brand);
+  if(q)     decoriProds = decoriProds.filter(p =>
+    ((p.series||'') + ' ' + (p.subseries||'') + ' ' + (p.brand||'')).toLowerCase().includes(q)
+  );
   if(!decoriProds.length){
-    el.innerHTML = '<div style="text-align:center;color:#6B6B6B;font-size:13px;padding:36px 18px">Nessun decoro / variante trovato.</div>';
+    el.innerHTML = '<div style="text-align:center;color:#6B6B6B;font-size:13px;padding:36px 18px">Nessun risultato.</div>';
     return;
   }
   const bySeries = {};
@@ -4413,26 +4427,40 @@ function _buildCselColor(pool3){
   const trigger=$('sel-color-trigger'), panel=$('sel-color-panel');
   const active=hasFilter();
   trigger.disabled=!active;
-  const fondiColors=[...new Set(pool3.filter(p=>p.type==='fondo'&&!p.subseries).map(p=>p.color).filter(Boolean))].sort();
+  // Rispetta subseriesMode: fondo/variant → sezione Fondi; decoro → sezione Decori
+  const _sm=productSettings.subseriesMode||{};
+  function _csm(p){ return p.subseries?(_sm[(p.series||'')+'::'+p.subseries]||'decoro'):null; }
+  const fondiPool=pool3.filter(p=>p.type==='fondo'&&(!p.subseries||_csm(p)==='fondo'));
+  const variantPool=pool3.filter(p=>p.type==='fondo'&&p.subseries&&_csm(p)==='variant');
+  const decoriPool=pool3.filter(p=>p.type==='fondo'&&p.subseries&&_csm(p)==='decoro');
+  const fondiColors=[...new Set(fondiPool.map(p=>p.color).filter(Boolean))].sort();
   const specialiColors=[...new Set(pool3.filter(p=>p.type==='speciale').map(p=>p.color).filter(Boolean))].sort();
-  const decoriPool=pool3.filter(p=>p.type==='fondo'&&p.subseries);
-  const subseries=[...new Set(decoriPool.map(p=>p.subseries))].sort();
+  const variantSubs=[...new Set(variantPool.map(p=>p.subseries))].sort();
+  const decoriSubs=[...new Set(decoriPool.map(p=>p.subseries))].sort();
   let html=`<div class="csel-all${!state.color?' selected':''}" data-val="">— Tutti i colori —</div>`;
-  if(fondiColors.length){
-    html+=`<div class="csel-section s-fondi"><svg viewBox="0 0 14 14" fill="none" width="10" height="10"><rect x="1" y="1" width="12" height="12" rx="1" stroke="white" stroke-width="1.6"/></svg>Fondi</div>`;
+  const svgFondo=`<svg viewBox="0 0 14 14" fill="none" width="10" height="10"><rect x="1" y="1" width="12" height="12" rx="1" stroke="white" stroke-width="1.6"/></svg>`;
+  const svgDecoro=`<svg viewBox="0 0 14 14" fill="none" width="10" height="10"><path d="M7 1l1.8 4H13l-3.5 2.6 1.3 4L7 9.3 3.2 11.6l1.3-4L1 5h4.2z" stroke="white" stroke-width="1.4" stroke-linejoin="round"/></svg>`;
+  if(fondiColors.length||variantSubs.length){
+    html+=`<div class="csel-section s-fondi">${svgFondo}Fondi</div>`;
     fondiColors.forEach(c=>{ html+=`<div class="csel-opt${state.color===c?' selected':''}" data-val="${c}">${c}</div>`; });
+    variantSubs.forEach(sub=>{
+      const cols=[...new Set(variantPool.filter(p=>p.subseries===sub).map(p=>p.color).filter(Boolean))].sort();
+      if(!cols.length) return;
+      html+=`<div class="csel-section s-fondi" style="opacity:0.75;padding-left:18px;font-size:9px">◇ VARIANTE ${sub}</div>`;
+      cols.forEach(c=>{ html+=`<div class="csel-opt${state.color===c?' selected':''}" data-val="${c}">${c}</div>`; });
+    });
   }
-  subseries.forEach(sub=>{
+  decoriSubs.forEach(sub=>{
     const cols=[...new Set(decoriPool.filter(p=>p.subseries===sub).map(p=>p.color).filter(Boolean))].sort();
     if(!cols.length) return;
-    html+=`<div class="csel-section s-decori"><svg viewBox="0 0 14 14" fill="none" width="10" height="10"><path d="M7 1l1.8 4H13l-3.5 2.6 1.3 4L7 9.3 3.2 11.6l1.3-4L1 5h4.2z" stroke="white" stroke-width="1.4" stroke-linejoin="round"/></svg>Decori · ${sub}</div>`;
+    html+=`<div class="csel-section s-decori">${svgDecoro}Decori · ${sub}</div>`;
     cols.forEach(c=>{ html+=`<div class="csel-opt${state.color===c?' selected':''}" data-val="${c}">${c}</div>`; });
   });
   if(specialiColors.length){
     html+=`<div class="csel-section s-speciali">▲ Pezzi Speciali</div>`;
     specialiColors.forEach(c=>{ html+=`<div class="csel-opt${state.color===c?' selected':''}" data-val="${c}">${c}</div>`; });
   }
-  if(!fondiColors.length&&!subseries.length&&!specialiColors.length){
+  if(!fondiColors.length&&!variantSubs.length&&!decoriSubs.length&&!specialiColors.length){
     [...new Set(pool3.map(p=>p.color).filter(Boolean))].sort().forEach(c=>{ html+=`<div class="csel-opt${state.color===c?' selected':''}" data-val="${c}">${c}</div>`; });
   }
   panel.innerHTML=html;
