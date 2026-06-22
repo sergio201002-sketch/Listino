@@ -1121,6 +1121,29 @@ header {
 }
 .cs-suggest-btn:hover { border-color: #8A6500; color: #8A6500; }
 .cs-suggest-btn.active { background: #FEF7DD; border-color: #E5C661; color: #8A6500; box-shadow: 0 0 0 3px rgba(229,198,97,0.18); }
+.cs-import-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: #1A1A1A; color: #fff;
+  border: none; border-radius: 6px;
+  padding: 6px 13px;
+  font-family: var(--font-body); font-size: 11.5px; font-weight: 700;
+  letter-spacing: 0.03em; cursor: pointer; min-height: 32px;
+  -webkit-tap-highlight-color: rgba(255,255,255,0.2); touch-action: manipulation;
+  transition: background 0.15s;
+}
+.cs-import-btn:hover { background: #333; }
+/* Modal import codici */
+#modal-import-ordine { z-index: 350; }
+.imp-preview { margin-top: 10px; display: flex; flex-direction: column; gap: 4px; max-height: 220px; overflow-y: auto; }
+.imp-found-row { display: flex; align-items: center; gap: 8px; padding: 6px 9px; background: #F0FAF3; border: 1px solid #B8E4C5; border-radius: 6px; font-size: 12px; }
+.imp-found-row .imp-code { font-weight: 800; color: #1A7A3C; font-size: 11px; background: #D4F0DF; padding: 2px 7px; border-radius: 4px; font-family: var(--font-display); letter-spacing: 0.05em; }
+.imp-found-row .imp-info { flex: 1; color: #1A1A1A; }
+.imp-found-row .imp-skip { font-size: 10px; color: #999; margin-left: auto; white-space: nowrap; }
+.imp-notfound-row { display: flex; align-items: center; gap: 8px; padding: 5px 9px; background: #FFF5F5; border: 1px solid #FFCDD2; border-radius: 6px; font-size: 11px; color: #B71C1C; }
+.imp-notfound-row .imp-code { font-weight: 800; background: #FFCDD2; padding: 2px 7px; border-radius: 4px; font-family: var(--font-display); }
+.imp-preview-summary { font-size: 11.5px; color: var(--mid); font-weight: 700; margin-bottom: 4px; }
+.imp-textarea { width: 100%; box-sizing: border-box; border: 1.5px solid var(--border); border-radius: 7px; padding: 10px 12px; font-family: var(--font-body); font-size: 12.5px; resize: vertical; min-height: 110px; outline: none; transition: border-color 0.15s; }
+.imp-textarea:focus { border-color: #1A1A1A; }
 
 .cs-tree-brand {
   background: white;
@@ -2808,6 +2831,28 @@ window.FIREBASE_CONFIG = {
     <div class="modal-actions">
       <button class="btn-modal-cancel" onclick="closeModal('modal-save-esp')">Annulla</button>
       <button class="btn-modal-ok" onclick="_saveToEsp()">Aggiungi</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Importa campioni da testo ordine -->
+<div class="modal-bg" id="modal-import-ordine">
+  <div class="modal" style="max-width:500px;width:96%">
+    <h3 style="margin:0 0 4px">Importa campioni da ordine</h3>
+    <p style="font-size:12px;color:var(--mid);margin:0 0 14px">Incolla il testo dell'ordine: i codici prodotto vengono trovati automaticamente.</p>
+    <label style="font-size:11px;font-weight:700;color:var(--mid);display:block;margin-bottom:4px">Cliente</label>
+    <select class="modal-input" id="imp-modal-client" style="padding:10px 14px;margin-bottom:10px" onchange="_impModalLoadEsp()"></select>
+    <label style="font-size:11px;font-weight:700;color:var(--mid);display:block;margin-bottom:4px">Espositore</label>
+    <div style="display:flex;gap:6px;margin-bottom:10px;align-items:center">
+      <select class="modal-input" id="imp-modal-esp" style="padding:10px 14px;flex:1"></select>
+      <button onclick="_impModalNew()" class="modal-new-esp-btn" style="white-space:nowrap">+ Nuovo</button>
+    </div>
+    <label style="font-size:11px;font-weight:700;color:var(--mid);display:block;margin-bottom:4px">Testo ordine</label>
+    <textarea id="imp-order-text" class="imp-textarea" placeholder="Incolla qui il testo dell'ordine (es. email, PDF, foglio Excel)…" oninput="_impAnalyze()"></textarea>
+    <div id="imp-preview-area" style="margin-top:10px"></div>
+    <div class="modal-actions" style="margin-top:14px">
+      <button class="btn-modal-cancel" onclick="closeModal('modal-import-ordine')">Annulla</button>
+      <button class="btn-modal-ok" id="imp-btn-add" onclick="_impAddToEsp()" disabled style="opacity:0.4">Aggiungi campioni</button>
     </div>
   </div>
 </div>
@@ -5678,10 +5723,17 @@ function renderOrderDetail(){
   var _icOrdini = '<svg viewBox="0 0 24 24" fill="none" width="14" height="14" style="vertical-align:-2px;margin-right:5px"><path d="M5 8.5L12 4l7 4.5v7L12 20l-7-4.5v-7z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M5 8.5L12 13l7-4.5M12 13v7" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>';
   var _icInv    = '<svg viewBox="0 0 24 24" fill="none" width="14" height="14" style="vertical-align:-2px;margin-right:5px"><path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9-9-9z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="7.5" cy="7.5" r="1.5" stroke="currentColor" stroke-width="1.4"/></svg>';
   var _icCamp   = '<svg viewBox="0 0 24 24" fill="none" width="14" height="14" style="vertical-align:-2px;margin-right:5px"><rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M8 8h8M8 12h8M8 16h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
-  h+='<div class="client-tabs">';
+  h+='<div class="client-tabs" style="display:flex;align-items:center;justify-content:space-between;gap:6px">';
+  h+='<div style="display:flex">';
   h+='<button class="client-tab'+(tab==='ordini'?' active':'')+'" data-cid="'+c.id+'" data-tab="ordini" onclick="_setTab(this.dataset.cid,this.dataset.tab)">'+_icOrdini+'Ordini</button>';
   h+='<button class="client-tab'+(tab==='inventario'?' active':'')+'" data-cid="'+c.id+'" data-tab="inventario" onclick="_setTab(this.dataset.cid,this.dataset.tab)">'+_icInv+'Inventario</button>';
   h+='<button class="client-tab'+(tab==='campioni'?' active':'')+'" data-cid="'+c.id+'" data-tab="campioni" onclick="_setTab(this.dataset.cid,this.dataset.tab)">'+_icCamp+'Campioni</button>';
+  h+='</div>';
+  if(tab==='campioni'){
+    h+='<button class="cs-import-btn" style="margin-right:8px;flex-shrink:0" onclick="openImportOrdine(\''+c.id+'\')" title="Importa campioni da testo ordine">';
+    h+='<svg viewBox="0 0 24 24" fill="none" style="width:13px;height:13px"><path d="M12 3v10m0 0-3-3m3 3 3-3M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    h+=' Importa da ordine</button>';
+  }
   h+='</div>';
   // Calcola il body in base alla tab (ora con anche "campioni")
   if(tab === 'campioni'){
@@ -5739,7 +5791,7 @@ function _renderClientCampioniTree(c){
   h += '<svg viewBox="0 0 24 24" fill="none" style="width:14px;height:14px;vertical-align:middle;margin-right:4px"><path d="M9 21h6M12 3a6 6 0 0 0-3.5 10.9c.4.3.6.7.5 1.1L9 17h6l0-2c-.1-.4.1-.8.5-1.1A6 6 0 0 0 12 3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>';
   h += '<span>Suggerimenti</span>';
   h += '</button>';
-  h += '</div>';
+  h += '</div>'; // close cs-tree-toolbar
 
   // Sort brand in ordine specifico (EMILCERAMICA, ERGON, PROVENZA, VIVA, ...)
   var BRAND_ORDER = {'EMILCERAMICA':1,'ERGON':2,'PROVENZA':3,'VIVA':4};
@@ -5891,6 +5943,163 @@ function _renderClientCampioniTree(c){
   return h;
 }
 window._renderClientCampioniTree = _renderClientCampioniTree;
+
+/* ── IMPORTA CAMPIONI DA ORDINE ─────────────────────────────────────────────── */
+var _impTargetCid = null; // cliente pre-selezionato all'apertura
+
+function openImportOrdine(cid){
+  _impTargetCid = cid || null;
+  // Popola select clienti
+  var sel = $('imp-modal-client');
+  sel.innerHTML = '';
+  Object.values(clients).sort(function(a,b){ return a.name.localeCompare(b.name); }).forEach(function(c){
+    var o = document.createElement('option');
+    o.value = c.id; o.textContent = c.name;
+    if(c.id === cid) o.selected = true;
+    sel.appendChild(o);
+  });
+  _impModalLoadEsp();
+  $('imp-order-text').value = '';
+  $('imp-preview-area').innerHTML = '';
+  $('imp-btn-add').disabled = true;
+  $('imp-btn-add').style.opacity = '0.4';
+  $('modal-import-ordine').classList.add('open');
+  setTimeout(function(){ $('imp-order-text').focus(); }, 150);
+}
+window.openImportOrdine = openImportOrdine;
+
+function _impModalLoadEsp(){
+  var cid = $('imp-modal-client').value;
+  var sel = $('imp-modal-esp');
+  sel.innerHTML = '';
+  if(!cid || !clients[cid]) return;
+  var esps = _getEsps(cid);
+  if(!esps.length){
+    var o = document.createElement('option'); o.value = ''; o.textContent = '(nessun espositore — creane uno)'; sel.appendChild(o);
+  } else {
+    esps.forEach(function(e){ var o=document.createElement('option'); o.value=e.id; o.textContent=e.name+' ('+e.items.length+' campioni)'; sel.appendChild(o); });
+  }
+  // Rianalizza con il nuovo cliente
+  _impAnalyze();
+}
+window._impModalLoadEsp = _impModalLoadEsp;
+
+function _impModalNew(){
+  var cid = $('imp-modal-client').value;
+  if(!cid){ alert('Seleziona prima un cliente.'); return; }
+  var esps = _getEsps(cid);
+  var newEsp = {id:uid(), name:'Espositore '+(esps.length+1), items:[], freeText:'', collapsed:false};
+  esps.push(newEsp);
+  saveClients({immediate:true});
+  _impModalLoadEsp();
+  $('imp-modal-esp').value = newEsp.id;
+}
+window._impModalNew = _impModalNew;
+
+/* Analizza il testo incollato e aggiorna la preview */
+function _impAnalyze(){
+  var text = ($('imp-order-text').value || '').toUpperCase();
+  var cid  = $('imp-modal-client').value;
+  var eid  = $('imp-modal-esp').value;
+  var area = $('imp-preview-area');
+
+  // Costruisci set dei campioni già in espositore
+  var alreadyCodes = {};
+  if(cid && clients[cid] && eid){
+    var esp = _getEsps(cid).find(function(e){ return e.id === eid; });
+    if(esp) esp.items.forEach(function(i){ if(i.code) alreadyCodes[i.code] = true; });
+  }
+
+  // Estrai tutti i codici prodotto dal testo (pattern: E + 3 alfanumerici)
+  var rawCodes = (text.match(/\bE[A-Z0-9]{3}\b/g) || []);
+  // Deduplicazione mantenendo ordine
+  var seen = {}, uniq = [];
+  rawCodes.forEach(function(c){ if(!seen[c]){ seen[c]=true; uniq.push(c); } });
+
+  if(!uniq.length){
+    area.innerHTML = '';
+    $('imp-btn-add').disabled = true;
+    $('imp-btn-add').style.opacity = '0.4';
+    return;
+  }
+
+  // Mappa prodotti per codice
+  var prodMap = {};
+  (typeof PRODUCTS !== 'undefined' ? PRODUCTS : []).forEach(function(p){ if(p.code) prodMap[p.code] = p; });
+
+  var found = [], notFound = [];
+  uniq.forEach(function(code){
+    if(prodMap[code]) found.push({code:code, p:prodMap[code], dup:!!alreadyCodes[code]});
+    else notFound.push(code);
+  });
+
+  var newCount = found.filter(function(f){ return !f.dup; }).length;
+  var h = '<div class="imp-preview-summary">';
+  h += found.length+' codic'+(found.length===1?'e':'i')+' trovato'+(found.length===1?'':'i');
+  if(notFound.length) h += ' &middot; <span style="color:#B71C1C">'+notFound.length+' non riconosciuto'+(notFound.length===1?'':'i')+'</span>';
+  if(found.some(function(f){return f.dup;})) h += ' &middot; <span style="color:#999">'+(found.length-newCount)+' già presenti</span>';
+  h += '</div><div class="imp-preview">';
+  found.forEach(function(f){
+    var p = f.p;
+    h += '<div class="imp-found-row">';
+    h += '<span class="imp-code">'+_esc(f.code)+'</span>';
+    h += '<span class="imp-info">'+_esc(p.series||'')+(p.color?' &middot; '+_esc(p.color):'')+(p.size?' &middot; '+_esc(p.size)+' cm':'')+'</span>';
+    if(f.dup) h += '<span class="imp-skip">già presente</span>';
+    h += '</div>';
+  });
+  if(notFound.length){
+    h += '<div style="margin-top:6px;font-size:10.5px;color:var(--mid);font-weight:700;letter-spacing:0.04em">NON RICONOSCIUTI</div>';
+    notFound.forEach(function(c){
+      h += '<div class="imp-notfound-row"><span class="imp-code">'+_esc(c)+'</span><span>codice non trovato nel listino</span></div>';
+    });
+  }
+  h += '</div>';
+  area.innerHTML = h;
+
+  var canAdd = newCount > 0 && eid;
+  $('imp-btn-add').disabled = !canAdd;
+  $('imp-btn-add').style.opacity = canAdd ? '1' : '0.4';
+  $('imp-btn-add').textContent = canAdd ? 'Aggiungi '+newCount+' campion'+(newCount===1?'e':'i') : 'Aggiungi campioni';
+}
+window._impAnalyze = _impAnalyze;
+
+function _impAddToEsp(){
+  var cid = $('imp-modal-client').value;
+  var eid = $('imp-modal-esp').value;
+  if(!cid || !clients[cid]){ alert('Seleziona un cliente.'); return; }
+  if(!eid){ alert('Seleziona o crea un espositore.'); return; }
+  var esp = _getEsps(cid).find(function(e){ return e.id === eid; });
+  if(!esp){ alert('Espositore non trovato.'); return; }
+
+  var text = ($('imp-order-text').value || '').toUpperCase();
+  var rawCodes = (text.match(/\bE[A-Z0-9]{3}\b/g) || []);
+  var seen = {}, uniq = [];
+  rawCodes.forEach(function(c){ if(!seen[c]){ seen[c]=true; uniq.push(c); } });
+
+  var prodMap = {};
+  (typeof PRODUCTS !== 'undefined' ? PRODUCTS : []).forEach(function(p){ if(p.code) prodMap[p.code] = p; });
+
+  var existing = {};
+  esp.items.forEach(function(i){ if(i.code) existing[i.code] = true; });
+
+  var added = 0, skipped = 0;
+  uniq.forEach(function(code){
+    var p = prodMap[code];
+    if(!p) return;
+    if(existing[code]){ skipped++; return; }
+    esp.items.push({id:uid(), code:p.code, series:p.series, brand:p.brand||'', color:p.color||'', finish:p.finish||'', size:p.size||'', note:'', status:'presente'});
+    existing[code] = true;
+    added++;
+  });
+
+  saveClients({immediate:true});
+  closeModal('modal-import-ordine');
+  try { renderOrderDetail(); } catch(_){}
+  var msg = 'Aggiunti '+added+' campion'+(added===1?'e':'i')+' a "'+esp.name+'" di '+clients[cid].name+'!';
+  if(skipped > 0) msg += '\n('+skipped+' già presenti, ignorati)';
+  alert(msg);
+}
+window._impAddToEsp = _impAddToEsp;
 
 /* Renderizza il riepilogo aggregato dei campioni della serie cercata per il cliente,
    indipendentemente da quale espositore li contiene. */
