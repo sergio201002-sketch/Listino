@@ -1349,6 +1349,48 @@ header {
 
 .order-del { background: none; border: none; color: var(--light); font-size: 12px; cursor: pointer; padding: 3px 6px; border-radius: 3px; transition: all 0.15s; }
 .order-del:hover { color: var(--red); background: var(--red-l); }
+.order-edit-btn { background: none; border: none; color: var(--light); cursor: pointer; padding: 3px 6px; border-radius: 3px; transition: all 0.15s; display: inline-flex; align-items: center; justify-content: center; }
+.order-edit-btn:hover { color: #3D6FA8; background: #EBF3FC; }
+/* Modal modifica ordine */
+#modal-edit-order { z-index: 350; }
+.oe-row { display: grid; grid-template-columns: 70px 1fr 90px 70px 28px; gap: 6px; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+.oe-row:last-child { border-bottom: none; }
+.oe-row .oe-code { font-family: var(--font-display); font-weight: 800; font-size: 11px; color: #1A6080; background: #daeef7; padding: 2px 6px; border-radius: 4px; }
+.oe-row .oe-desc { color: var(--mid); font-size: 11px; }
+.oe-row .oe-mq-inp { width: 100%; border: 1.5px solid var(--border); border-radius: 5px; padding: 5px 7px; font-family: var(--font-body); font-size: 13px; font-weight: 700; text-align: right; font-size: 16px; transform: scale(0.81); transform-origin: right center; }
+.oe-row .oe-mq-inp:focus { border-color: #1A1A1A; outline: none; }
+.oe-row .oe-tot { font-weight: 800; text-align: right; font-size: 12px; }
+.oe-row .oe-del { background: none; border: none; color: var(--light); cursor: pointer; font-size: 16px; line-height: 1; padding: 2px 4px; border-radius: 3px; }
+.oe-row .oe-del:hover { color: var(--red); }
+.oe-head { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--mid); padding: 4px 0 6px; border-bottom: 2px solid var(--border); display: grid; grid-template-columns: 70px 1fr 90px 70px 28px; gap: 6px; }
+.oe-foot { display: flex; justify-content: space-between; align-items: baseline; padding-top: 10px; margin-top: 4px; border-top: 2px solid var(--border); }
+.oe-grand { font-size: 15px; font-weight: 800; color: var(--green); }
+.oe-list { max-height: 380px; overflow-y: auto; margin: 8px 0; }
+/* Riga discount nel modal ordine */
+.oe-card { border-bottom: 1px solid var(--border); padding: 8px 0 10px; }
+.oe-card:last-child { border-bottom: none; }
+.oe-card-top { display: grid; grid-template-columns: 66px 1fr 88px 68px 26px; gap: 6px; align-items: center; }
+.oe-card-disc { margin-top: 6px; padding: 7px 8px; background: #F9F9F9; border: 1px solid var(--border); border-radius: 6px; display: flex; flex-direction: column; gap: 5px; }
+.oe-disc-row { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+.oe-disc-lbl { font-size: 10.5px; font-weight: 700; color: var(--mid); text-transform: uppercase; letter-spacing: 0.05em; min-width: 54px; }
+.oe-disc-btn { border: 1.5px solid var(--border); background: var(--white); color: var(--mid); border-radius: 5px; padding: 3px 9px; font-family: var(--font-body); font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.12s; }
+.oe-disc-btn.active { background: #1A1A1A; border-color: #1A1A1A; color: #fff; }
+.oe-disc-custom-inp { border: 1.5px solid var(--border); border-radius: 5px; padding: 4px 8px; font-family: var(--font-body); font-size: 13px; width: 100%; box-sizing: border-box; margin-top: 2px; font-size: 16px; transform: scale(0.875); transform-origin: left center; }
+.oe-disc-custom-inp:focus { outline: none; border-color: #1A1A1A; }
+.oe-disc-std-row { display: flex; align-items: center; gap: 3px; flex-wrap: wrap; margin-top: 2px; }
+.oe-disc-std-step { display: flex; align-items: center; border: 1.5px solid #B7A3D6; border-radius: 5px; overflow: hidden; }
+.oe-disc-std-inp { width: 44px; border: none; background: none; text-align: center; font-family: var(--font-body); font-size: 16px; font-weight: 700; padding: 3px 2px; transform: scale(0.78); transform-origin: center; }
+.oe-disc-std-inp:focus { outline: none; }
+.oe-disc-std-unit { font-size: 10px; font-weight: 700; color: var(--mid); padding-right: 4px; }
+.oe-disc-std-sep { font-size: 11px; font-weight: 800; color: #6B3FA0; margin: 0 1px; }
+.oe-disc-std-add { border: 1.5px dashed #6B3FA0; background: none; color: #6B3FA0; border-radius: 5px; width: 22px; height: 22px; font-size: 15px; font-weight: 700; cursor: pointer; margin-left: 3px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.oe-disc-std-add:hover { background: #6B3FA0; color: #fff; }
+.oe-disc-std-del { border: none; background: none; color: var(--mid); font-size: 13px; cursor: pointer; padding: 0 2px; }
+.oe-disc-std-del:hover { color: var(--red); }
+.oe-price-row { display: flex; align-items: center; gap: 6px; font-size: 11px; margin-top: 2px; }
+.oe-price-base { color: var(--mid); }
+.oe-price-base.strike { text-decoration: line-through; }
+.oe-price-final { font-weight: 800; color: var(--green); }
 
 .od-empty { padding: 60px 20px; text-align: center; color: var(--light); }
 .od-empty .oi { font-size: 40px; margin-bottom: 12px; opacity: 0.2; }
@@ -2831,6 +2873,27 @@ window.FIREBASE_CONFIG = {
     <div class="modal-actions">
       <button class="btn-modal-cancel" onclick="closeModal('modal-save-esp')">Annulla</button>
       <button class="btn-modal-ok" onclick="_saveToEsp()">Aggiungi</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Modifica ordine -->
+<div class="modal-bg" id="modal-edit-order">
+  <div class="modal" style="max-width:560px;width:96%">
+    <h3 style="margin:0 0 12px">Modifica ordine</h3>
+    <label style="font-size:11px;font-weight:700;color:var(--mid);display:block;margin-bottom:4px">Riferimento</label>
+    <input id="oe-ref" class="modal-input" type="text" placeholder="Es. Preventivo #123" style="padding:9px 12px;margin-bottom:14px"/>
+    <div class="oe-list" id="oe-rows"></div>
+    <div class="oe-foot">
+      <span style="font-size:11.5px;color:var(--mid);font-weight:700" id="oe-count"></span>
+      <div style="display:flex;align-items:baseline;gap:8px">
+        <span style="font-size:11px;color:var(--mid);font-weight:600">Totale scontato B</span>
+        <span class="oe-grand" id="oe-grand">€ 0,00</span>
+      </div>
+    </div>
+    <div class="modal-actions" style="margin-top:14px">
+      <button class="btn-modal-cancel" onclick="closeModal('modal-edit-order')">Annulla</button>
+      <button class="btn-modal-ok" onclick="_saveEditedOrder()">Salva modifiche</button>
     </div>
   </div>
 </div>
@@ -5316,6 +5379,7 @@ function saveOrder(){
               if(d.type === 'custom') out.discount.customPrice = d.customPrice;
               if(d.type === 'pct5')   out.discount.pct = 5;
               if(d.type === 'pct10')  out.discount.pct = 10;
+              if(d.type === 'std' && Array.isArray(d.std)) out.discount.std = d.std.slice();
             }
             return out;
           });
@@ -6166,6 +6230,7 @@ function renderOrderCard(clientId, o){
         <div class="order-summary">${summary}</div>
       </div>
       <div style="display:flex;align-items:center;gap:10px">
+        <button class="order-edit-btn" onclick="event.stopPropagation();openEditOrder('${clientId}','${o.id}')" title="Modifica ordine"><svg viewBox="0 0 24 24" fill="none" width="14" height="14"><path d="M14.5 4.5l5 5L8 21H3v-5L14.5 4.5z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 6l5 5" stroke="currentColor" stroke-width="1.7"/></svg></button>
         <button class="order-del" onclick="event.stopPropagation();deleteOrder('${clientId}','${o.id}')" title="Elimina ordine"><svg viewBox="0 0 24 24" fill="none" width="14" height="14"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M5 6l1 14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-14M10 11v6M14 11v6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <span class="order-toggle">▼</span>
       </div>
@@ -6218,6 +6283,237 @@ function deleteOrder(clientId, orderId){
     renderClientList();
   });
 }
+
+/* ── MODIFICA ORDINE ─────────────────────────────────────────────────────── */
+var _oeClientId = null;
+var _oeOrderId  = null;
+
+function openEditOrder(clientId, orderId){
+  var c = clients[clientId];
+  if(!c) return;
+  var o = c.orders.find(function(x){ return x.id === orderId; });
+  if(!o) return;
+  _oeClientId = clientId;
+  _oeOrderId  = orderId;
+  // Deep copy con discount
+  window._oeItems = o.items.map(function(i){
+    var it = Object.assign({}, i);
+    it.discount = i.discount ? Object.assign({}, i.discount, i.discount.std ? {std: i.discount.std.slice()} : {}) : {type:'none'};
+    return it;
+  });
+  document.getElementById('oe-ref').value = o.ref || '';
+  _oeRenderRows();
+  document.getElementById('modal-edit-order').classList.add('open');
+}
+window.openEditOrder = openEditOrder;
+
+/* Calcola prezzo unitario finale per un item ordine rispettando discount */
+function _oeCalcUnit(it){
+  var d = it.discount || {type:'none'};
+  var baseUnit = (it.m2_pallet && parseFloat(it.mq) >= it.m2_pallet) ? it.price * DB : it.price * DA;
+  if(d.type === 'std' && Array.isArray(d.std) && d.std.length){
+    var pf = it.price || 0;
+    d.std.forEach(function(s){ var v=parseFloat(s); if(isFinite(v)&&v>0&&v<100) pf*=(1-v/100); });
+    return pf;
+  }
+  if(d.type === 'pct5')  return baseUnit * 0.95;
+  if(d.type === 'pct10') return baseUnit * 0.90;
+  if(d.type === 'custom' && typeof d.customPrice === 'number' && d.customPrice >= 0) return d.customPrice;
+  return baseUnit;
+}
+
+function _oeCalcTot(it){ return _oeCalcUnit(it) * (parseFloat(it.mq)||0); }
+
+function _oeRenderRows(){
+  var items = window._oeItems;
+  var el = document.getElementById('oe-rows');
+  if(!el) return;
+  if(!items.length){
+    el.innerHTML = '<div style="padding:18px;text-align:center;color:var(--mid);font-size:12px">Nessun prodotto</div>';
+    document.getElementById('oe-count').textContent = '0 prodotti';
+    document.getElementById('oe-grand').textContent = fmt(0);
+    return;
+  }
+  var h = '';
+  items.forEach(function(it, idx){
+    var desc = [it.color, it.finish, it.size ? it.size+' cm' : ''].filter(Boolean).join(' · ');
+    var d = it.discount || {type:'none'};
+    var dType = d.type || 'none';
+    var baseUnit = (it.m2_pallet && parseFloat(it.mq) >= it.m2_pallet) ? it.price * DB : it.price * DA;
+    var finalUnit = _oeCalcUnit(it);
+    var finalTot  = _oeCalcTot(it);
+    var hasDisc = dType === 'pct5' || dType === 'pct10' || (dType==='custom'&&d.customPrice!==null) || (dType==='std'&&Array.isArray(d.std)&&d.std.length);
+
+    h += '<div class="oe-card" id="oe-card-'+idx+'">';
+    // Riga principale
+    h += '<div class="oe-card-top">';
+    h += '<span class="oe-code">'+_esc(it.code)+'</span>';
+    h += '<div><div style="font-weight:700;font-size:11.5px">'+_esc(it.series||'')+'</div><div class="oe-desc">'+_esc(desc)+'</div></div>';
+    h += '<input class="oe-mq-inp" type="number" min="0" step="0.01" value="'+it.mq+'" inputmode="decimal" oninput="_oeUpdateMq('+idx+',this.value)"/>';
+    h += '<span class="oe-tot" id="oe-tot-'+idx+'">'+fmt(finalTot)+'</span>';
+    h += '<button class="oe-del" onclick="_oeRemove('+idx+')" title="Rimuovi">×</button>';
+    h += '</div>';
+
+    // Prezzi
+    h += '<div class="oe-price-row" id="oe-price-row-'+idx+'">';
+    h += '<span class="oe-price-base'+(hasDisc?' strike':'')+'" id="oe-base-'+idx+'">'+fmt(baseUnit)+'/mq</span>';
+    if(hasDisc) h += '<span style="color:var(--mid)">→</span><span class="oe-price-final" id="oe-final-'+idx+'">'+fmt(finalUnit)+'/mq</span>';
+    else h += '<span class="oe-price-final" id="oe-final-'+idx+'" style="display:none">'+fmt(finalUnit)+'/mq</span>';
+    h += '</div>';
+
+    // Controlli sconto
+    h += '<div class="oe-card-disc">';
+    h += '<div class="oe-disc-row">';
+    h += '<span class="oe-disc-lbl">Sconto:</span>';
+    h += '<button class="oe-disc-btn'+(dType==='none'?' active':'')+'" onclick="_oeSetDisc('+idx+',\'none\')">No</button>';
+    h += '<button class="oe-disc-btn'+(dType==='pct5'?' active':'')+'" onclick="_oeSetDisc('+idx+',\'pct5\')">&minus;5%</button>';
+    h += '<button class="oe-disc-btn'+(dType==='pct10'?' active':'')+'" onclick="_oeSetDisc('+idx+',\'pct10\')">&minus;10%</button>';
+    h += '<button class="oe-disc-btn'+(dType==='custom'?' active':'')+'" onclick="_oeSetDisc('+idx+',\'custom\')">€/mq</button>';
+    h += '<button class="oe-disc-btn'+(dType==='std'?' active':'')+'" onclick="_oeSetDisc('+idx+',\'std\')" title="Sconti standard composti">Std</button>';
+    h += '</div>';
+    // Custom price input
+    h += '<div id="oe-custom-'+idx+'" style="'+(dType==='custom'?'':'display:none')+'">';
+    h += '<input class="oe-disc-custom-inp" type="number" step="0.01" min="0" placeholder="Prezzo €/mq (es. 12.50)"'
+       + ' value="'+(d.customPrice!=null?d.customPrice:'')+'" oninput="_oeSetCustomPrice('+idx+',this.value)"/>';
+    h += '</div>';
+    // Std steps
+    var std = (dType==='std' && Array.isArray(d.std) && d.std.length) ? d.std : (it.m2_pallet && parseFloat(it.mq)>=it.m2_pallet ? [60,10,10] : [60,10,5]);
+    h += '<div id="oe-std-'+idx+'" style="'+(dType==='std'?'':'display:none')+'">';
+    h += '<div style="font-size:10px;color:var(--mid);font-weight:700;margin-bottom:3px">Sconti composti (su prezzo listino):</div>';
+    h += '<div class="oe-disc-std-row" id="oe-std-row-'+idx+'">';
+    std.forEach(function(v, si){
+      if(si>0) h += '<span class="oe-disc-std-sep">+</span>';
+      h += '<div class="oe-disc-std-step"><input type="number" min="0" max="99" step="1" class="oe-disc-std-inp" value="'+(v||0)+'" oninput="_oeSetStd('+idx+','+si+',this.value)"/><span class="oe-disc-std-unit">%</span></div>';
+      if(std.length>1 && si===std.length-1) h += '<button class="oe-disc-std-del" onclick="_oeRemStd('+idx+')" title="Rimuovi step">×</button>';
+    });
+    h += '<button class="oe-disc-std-add" onclick="_oeAddStd('+idx+')" title="Aggiungi step">+</button>';
+    h += '</div></div>';
+    h += '</div>'; // oe-card-disc
+    h += '</div>'; // oe-card
+  });
+  el.innerHTML = h;
+  _oeUpdateGrand();
+}
+window._oeRenderRows = _oeRenderRows;
+
+function _oeUpdateGrand(){
+  var items = window._oeItems;
+  var total = items.reduce(function(s,i){ return s+_oeCalcTot(i); }, 0);
+  var n = items.length;
+  document.getElementById('oe-count').textContent = n+' prodott'+(n===1?'o':'i');
+  document.getElementById('oe-grand').textContent = fmt(total);
+}
+
+/* Aggiorna solo i valori numerici di una card senza re-render (preserva focus) */
+function _oeUpdateCard(idx){
+  var it = window._oeItems[idx];
+  var d = it.discount || {type:'none'};
+  var dType = d.type || 'none';
+  var baseUnit = (it.m2_pallet && parseFloat(it.mq) >= it.m2_pallet) ? it.price * DB : it.price * DA;
+  var finalUnit = _oeCalcUnit(it);
+  var finalTot  = _oeCalcTot(it);
+  var hasDisc = dType==='pct5'||dType==='pct10'||(dType==='custom'&&d.customPrice!==null)||(dType==='std'&&Array.isArray(d.std)&&d.std.length);
+
+  var totEl = document.getElementById('oe-tot-'+idx);
+  var baseEl = document.getElementById('oe-base-'+idx);
+  var finEl  = document.getElementById('oe-final-'+idx);
+  if(totEl) totEl.textContent = fmt(finalTot);
+  if(baseEl){ baseEl.textContent = fmt(baseUnit)+'/mq'; baseEl.classList.toggle('strike', hasDisc); }
+  if(finEl){ finEl.textContent = fmt(finalUnit)+'/mq'; finEl.style.display = hasDisc ? '' : 'none'; }
+  _oeUpdateGrand();
+}
+
+function _oeUpdateMq(idx, val){
+  var v = parseFloat(val);
+  if(isNaN(v) || v < 0) return;
+  window._oeItems[idx].mq = v;
+  _oeUpdateCard(idx);
+}
+window._oeUpdateMq = _oeUpdateMq;
+
+function _oeSetDisc(idx, type){
+  var it = window._oeItems[idx];
+  if(!it.discount) it.discount = {type:'none'};
+  it.discount.type = type;
+  if(type !== 'custom') it.discount.customPrice = null;
+  if(type === 'std' && (!Array.isArray(it.discount.std) || !it.discount.std.length)){
+    var sob = it.m2_pallet && parseFloat(it.mq) >= it.m2_pallet;
+    it.discount.std = sob ? [60,10,10] : [60,10,5];
+  }
+  // Re-render solo questa card
+  _oeRenderRows();
+}
+window._oeSetDisc = _oeSetDisc;
+
+function _oeSetCustomPrice(idx, val){
+  var v = parseFloat(String(val||'').replace(',','.'));
+  window._oeItems[idx].discount.customPrice = (isFinite(v) && v >= 0) ? v : null;
+  _oeUpdateCard(idx);
+}
+window._oeSetCustomPrice = _oeSetCustomPrice;
+
+function _oeSetStd(idx, si, val){
+  var v = parseFloat(String(val||'').replace(',','.'));
+  var it = window._oeItems[idx];
+  if(!Array.isArray(it.discount.std)) it.discount.std = [60,10,5];
+  it.discount.std[si] = (isFinite(v) && v >= 0 && v < 100) ? v : 0;
+  _oeUpdateCard(idx);
+}
+window._oeSetStd = _oeSetStd;
+
+function _oeAddStd(idx){
+  var it = window._oeItems[idx];
+  if(!Array.isArray(it.discount.std)) it.discount.std = [60,10,5];
+  it.discount.std.push(0);
+  _oeRenderRows();
+}
+window._oeAddStd = _oeAddStd;
+
+function _oeRemStd(idx){
+  var it = window._oeItems[idx];
+  if(Array.isArray(it.discount.std) && it.discount.std.length > 1) it.discount.std.pop();
+  _oeRenderRows();
+}
+window._oeRemStd = _oeRemStd;
+
+function _oeRemove(idx){
+  window._oeItems.splice(idx, 1);
+  _oeRenderRows();
+}
+window._oeRemove = _oeRemove;
+
+function _saveEditedOrder(){
+  var c = clients[_oeClientId];
+  if(!c) return;
+  var o = c.orders.find(function(x){ return x.id === _oeOrderId; });
+  if(!o) return;
+  // Valida prezzi custom
+  for(var i=0;i<window._oeItems.length;i++){
+    var it=window._oeItems[i]; var d=it.discount||{};
+    if(d.type==='custom'&&(d.customPrice==null||d.customPrice<=0)){
+      alert('Il prodotto "'+it.code+'" ha sconto €/mq attivo ma il prezzo è vuoto. Inseriscilo o scegli un\'altra opzione.'); return;
+    }
+  }
+  o.ref   = document.getElementById('oe-ref').value.trim();
+  o.items = window._oeItems.map(function(it){
+    var out = Object.assign({}, it);
+    // Ricalcola prezzo_unit in base al discount corrente
+    out.prezzo_unit = _oeCalcUnit(it);
+    // Salva discount (con std)
+    if(it.discount && it.discount.type && it.discount.type !== 'none'){
+      out.discount = Object.assign({}, it.discount);
+      if(Array.isArray(it.discount.std)) out.discount.std = it.discount.std.slice();
+    } else {
+      delete out.discount;
+    }
+    return out;
+  });
+  saveClients({immediate:true});
+  closeModal('modal-edit-order');
+  renderOrderDetail();
+  renderClientList();
+}
+window._saveEditedOrder = _saveEditedOrder;
 
 /* ── CONDIZIONI SPECIALI PER CLIENTE ──────────────────────────────────────
    Permette di definire prezzi netti o sconti speciali su combinazioni di
