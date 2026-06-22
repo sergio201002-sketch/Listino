@@ -1391,6 +1391,21 @@ header {
 .oe-price-base { color: var(--mid); }
 .oe-price-base.strike { text-decoration: line-through; }
 .oe-price-final { font-weight: 800; color: var(--green); }
+/* Aggiungi prodotto nell'ordine */
+.oe-add-section { border-top: 2px dashed var(--border); margin-top: 10px; padding-top: 10px; }
+.oe-add-label { font-size: 11px; font-weight: 700; color: var(--mid); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+.oe-add-inp { width: 100%; box-sizing: border-box; border: 1.5px solid var(--border); border-radius: 7px; padding: 9px 12px; font-family: var(--font-body); font-size: 14px; }
+.oe-add-inp:focus { outline: none; border-color: #1A1A1A; }
+.oe-add-results { max-height: 180px; overflow-y: auto; border: 1.5px solid var(--border); border-radius: 7px; margin-top: 4px; display: none; }
+.oe-add-result { display: grid; grid-template-columns: 62px 1fr 60px; align-items: center; gap: 8px; padding: 8px 10px; cursor: pointer; border-bottom: 1px solid var(--border); transition: background 0.1s; font-size: 12px; }
+.oe-add-result:last-child { border-bottom: none; }
+.oe-add-result:hover { background: #F5F5F5; }
+.oe-add-result.already { opacity: 0.45; cursor: default; pointer-events: none; }
+.oe-add-result .ar-code { font-family: var(--font-display); font-weight: 800; font-size: 11px; background: #daeef7; color: #1A6080; padding: 2px 6px; border-radius: 4px; }
+.oe-add-result .ar-info { min-width: 0; }
+.oe-add-result .ar-name { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.oe-add-result .ar-sub { color: var(--mid); font-size: 10.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.oe-add-result .ar-price { text-align: right; font-weight: 700; color: var(--mid); font-size: 11px; }
 
 .od-empty { padding: 60px 20px; text-align: center; color: var(--light); }
 .od-empty .oi { font-size: 40px; margin-bottom: 12px; opacity: 0.2; }
@@ -2884,7 +2899,12 @@ window.FIREBASE_CONFIG = {
     <label style="font-size:11px;font-weight:700;color:var(--mid);display:block;margin-bottom:4px">Riferimento</label>
     <input id="oe-ref" class="modal-input" type="text" placeholder="Es. Preventivo #123" style="padding:9px 12px;margin-bottom:14px"/>
     <div class="oe-list" id="oe-rows"></div>
-    <div class="oe-foot">
+    <div class="oe-add-section">
+      <div class="oe-add-label">+ Aggiungi prodotto</div>
+      <input type="text" id="oe-add-inp" class="oe-add-inp" placeholder="Cerca per codice, serie, colore…" autocomplete="off" oninput="_oeSearchProd(this.value)" onfocus="_oeSearchProd(this.value)"/>
+      <div id="oe-add-results" class="oe-add-results"></div>
+    </div>
+    <div class="oe-foot" style="margin-top:10px">
       <span style="font-size:11.5px;color:var(--mid);font-weight:700" id="oe-count"></span>
       <div style="display:flex;align-items:baseline;gap:8px">
         <span style="font-size:11px;color:var(--mid);font-weight:600">Totale scontato B</span>
@@ -6514,6 +6534,69 @@ function _saveEditedOrder(){
   renderClientList();
 }
 window._saveEditedOrder = _saveEditedOrder;
+
+function _oeSearchProd(q){
+  var res = document.getElementById('oe-add-results');
+  if(!res) return;
+  q = (q||'').trim().toLowerCase();
+  if(!q){ res.style.display='none'; return; }
+  var existing = {};
+  (window._oeItems||[]).forEach(function(it){ existing[it.code]=true; });
+  var matches = PRODUCTS.filter(function(p){
+    return (p.code||'').toLowerCase().includes(q)
+        || (p.series||'').toLowerCase().includes(q)
+        || (p.color||'').toLowerCase().includes(q)
+        || (p.finish||'').toLowerCase().includes(q);
+  }).slice(0,30);
+  if(!matches.length){ res.style.display='none'; return; }
+  var h = '';
+  matches.forEach(function(p){
+    var already = !!existing[p.code];
+    var sub = [p.color, p.finish, p.size ? p.size+' cm' : ''].filter(Boolean).join(' · ');
+    h += '<div class="oe-add-result'+(already?' already':'')+'" onclick="_oeAddProduct(\''+p.code+'\')">';
+    h += '<span class="ar-code">'+_esc(p.code)+'</span>';
+    h += '<div class="ar-info"><div class="ar-name">'+_esc(p.series||'')+'</div><div class="ar-sub">'+_esc(sub)+'</div></div>';
+    h += '<span class="ar-price">'+fmt(p.price)+'/mq'+(already?' ✓':'')+'</span>';
+    h += '</div>';
+  });
+  res.innerHTML = h;
+  res.style.display = 'block';
+}
+window._oeSearchProd = _oeSearchProd;
+
+function _oeAddProduct(code){
+  var p = PRODUCTS.find(function(x){ return x.code===code; });
+  if(!p) return;
+  if((window._oeItems||[]).find(function(x){ return x.code===code; })){ return; }
+  var baseUnit = p.m2_pallet ? p.price * DA : p.price * DA;
+  var autoDisc = p.type==='speciale' ? {type:'std',std:[60],customPrice:null} : {type:'none',customPrice:null};
+  var newItem = {
+    code: p.code, series: p.series, color: p.color||'', finish: p.finish||'',
+    size: p.size||'', mq: 1, price: p.price, m2_pallet: p.m2_pallet||null,
+    prezzo_unit_base: baseUnit, prezzo_unit: _oeCalcUnit({price:p.price,m2_pallet:p.m2_pallet,mq:1,discount:autoDisc}),
+    discount: autoDisc
+  };
+  window._oeItems.push(newItem);
+  // Pulisce ricerca e chiude dropdown
+  var inp = document.getElementById('oe-add-inp');
+  var res = document.getElementById('oe-add-results');
+  if(inp) inp.value = '';
+  if(res) res.style.display = 'none';
+  _oeRenderRows();
+  // Scrolla alla nuova riga
+  setTimeout(function(){
+    var list = document.getElementById('oe-rows');
+    if(list) list.scrollTop = list.scrollHeight;
+  }, 50);
+}
+window._oeAddProduct = _oeAddProduct;
+
+// Chiudi risultati cliccando fuori
+document.addEventListener('click', function(e){
+  var res = document.getElementById('oe-add-results');
+  var inp = document.getElementById('oe-add-inp');
+  if(res && inp && !res.contains(e.target) && e.target !== inp) res.style.display='none';
+});
 
 /* ── CONDIZIONI SPECIALI PER CLIENTE ──────────────────────────────────────
    Permette di definire prezzi netti o sconti speciali su combinazioni di
