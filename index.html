@@ -4465,54 +4465,78 @@ function _renderProductsInner(g,rb,lg){
 
   if(!prods.length){ g.innerHTML=`<div class="empty"><div class="empty-icon"><svg viewBox="0 0 48 48" fill="none" width="44" height="44"><circle cx="21" cy="21" r="13" stroke="currentColor" stroke-width="2.2"/><path d="M31 31l10 10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></div><h3>Nessun prodotto trovato</h3><p>Modifica i filtri di ricerca</p></div>`; return; }
 
-  function _buildFondiHtml(){
-    let h='';
-    if(fondi.length||fondiVariants.length){
-      const fondiTot=fondi.length+fondiVariants.length;
-      h+=`<div class="section-header">
-        <div class="section-icon"><svg viewBox="0 0 24 24" fill="none" width="14" height="14"><rect x="4" y="4" width="16" height="16" rx="1.5" stroke="currentColor" stroke-width="1.8"/></svg></div>
-        <div class="section-title">Fondi</div>
-        <div class="section-count">${fondiTot} prodotti</div>
-      </div>`;
-      h+=fondi.map(cardHTML).join('');
-      const variantSubs=[...new Set(fondiVariants.map(p=>p.subseries))].sort();
-      for(const sub of variantSubs){
-        const vp=fondiVariants.filter(p=>p.subseries===sub);
-        h+=`<div class="section-subheader">
-          <span style="opacity:0.45;font-size:10px">◇</span>
-          <span class="sub-label">VARIANTE ${_esc(sub)}</span>
-          <span class="sub-count">${vp.length} prodotti</span>
-        </div>`;
-        h+=vp.map(cardHTML).join('');
-      }
+  // Costruisce array piatto di stringhe HTML: header + cards
+  var _chunks = [];
+  if(fondi.length||fondiVariants.length){
+    const fondiTot=fondi.length+fondiVariants.length;
+    _chunks.push(`<div class="section-header"><div class="section-icon"><svg viewBox="0 0 24 24" fill="none" width="14" height="14"><rect x="4" y="4" width="16" height="16" rx="1.5" stroke="currentColor" stroke-width="1.8"/></svg></div><div class="section-title">Fondi</div><div class="section-count">${fondiTot} prodotti</div></div>`);
+    fondi.forEach(p=>_chunks.push(cardHTML(p)));
+    const variantSubs=[...new Set(fondiVariants.map(p=>p.subseries))].sort();
+    for(const sub of variantSubs){
+      const vp=fondiVariants.filter(p=>p.subseries===sub);
+      _chunks.push(`<div class="section-subheader"><span style="opacity:0.45;font-size:10px">◇</span><span class="sub-label">VARIANTE ${_esc(sub)}</span><span class="sub-count">${vp.length} prodotti</span></div>`);
+      vp.forEach(p=>_chunks.push(cardHTML(p)));
     }
-    return h;
   }
-  function _buildDecoriHtml(){
-    if(!decori.length) return '';
-    return `<div class="section-header section-decori">
-      <div class="section-icon"><svg viewBox="0 0 24 24" fill="none" width="14" height="14"><path d="M12 3L14.5 9H21L15.5 13L17.5 19L12 15.5L6.5 19L8.5 13L3 9H9.5L12 3Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
-      <div class="section-title">Decori</div>
-      <div class="section-count">${decori.length} prodotti</div>
-    </div>`+decori.map(cardHTML).join('');
+  if(decori.length){
+    _chunks.push(`<div class="section-header section-decori"><div class="section-icon"><svg viewBox="0 0 24 24" fill="none" width="14" height="14"><path d="M12 3L14.5 9H21L15.5 13L17.5 19L12 15.5L6.5 19L8.5 13L3 9H9.5L12 3Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div><div class="section-title">Decori</div><div class="section-count">${decori.length} prodotti</div></div>`);
+    decori.forEach(p=>_chunks.push(cardHTML(p)));
   }
-  function _buildSpecialiHtml(){
-    if(!speciali.length) return '';
-    return `<div class="section-header section-spec">
-      <div class="section-icon">▲</div>
-      <div class="section-title">Pezzi Speciali</div>
-      <div class="section-count">${speciali.length} prodotti</div>
-    </div>`+speciali.map(cardHTML).join('');
+  if(speciali.length){
+    _chunks.push(`<div class="section-header section-spec"><div class="section-icon">▲</div><div class="section-title">Pezzi Speciali</div><div class="section-count">${speciali.length} prodotti</div></div>`);
+    speciali.forEach(p=>_chunks.push(cardHTML(p)));
   }
-  g.innerHTML = _buildFondiHtml();
-  attachGridEvents();
-  requestAnimationFrame(()=>{
-    g.innerHTML += _buildDecoriHtml();
-    requestAnimationFrame(()=>{
-      g.innerHTML += _buildSpecialiHtml();
-      attachGridEvents();
-    });
-  });
+
+  // Render progressivo solo se solo brand selezionato (nessun altro filtro) — altrimenti render normale
+  const _onlyBrand = state.brand && !state.series && !state.size && !state.finish && !state.color && !_listinoSearch;
+
+  if(window._gridObserver){ window._gridObserver.disconnect(); window._gridObserver=null; }
+
+  if(!_onlyBrand){
+    // Render normale: tutto in una volta
+    g.innerHTML = _chunks.join('');
+    attachGridEvents();
+    return;
+  }
+
+  // Render progressivo a chunk da 50
+  const CHUNK = 50;
+  var _offset = 0;
+
+  function _renderChunk(){
+    var slice = _chunks.slice(_offset, _offset + CHUNK);
+    if(!slice.length) return;
+    var frag = document.createElement('div');
+    frag.innerHTML = slice.join('');
+    while(frag.firstChild) g.insertBefore(frag.firstChild, sentinel);
+    _offset += CHUNK;
+    attachGridEvents();
+    if(_offset >= _chunks.length){ sentinel.style.display='none'; if(window._gridObserver){window._gridObserver.disconnect();window._gridObserver=null;} }
+  }
+
+  var sentinel = document.createElement('div');
+  sentinel.style.cssText='height:1px;width:100%';
+  var loadBtn = document.createElement('button');
+  loadBtn.textContent = 'Carica altri prodotti';
+  loadBtn.style.cssText='display:block;margin:18px auto 24px;padding:10px 28px;background:#1A1A1A;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;';
+  loadBtn.onclick = function(){ _renderChunk(); _updateBtn(); };
+  g.innerHTML='';
+  g.appendChild(sentinel);
+
+  _renderChunk();
+
+  function _updateBtn(){
+    if(_offset >= _chunks.length){ loadBtn.remove(); if(window._gridObserver){window._gridObserver.disconnect();window._gridObserver=null;} }
+    else { g.appendChild(loadBtn); }
+  }
+  _updateBtn();
+
+  if(_offset < _chunks.length){
+    window._gridObserver = new IntersectionObserver(function(entries){
+      if(entries[0].isIntersecting){ _renderChunk(); _updateBtn(); }
+    }, {rootMargin:'300px'});
+    window._gridObserver.observe(sentinel);
+  }
 }
 
 function render(){ updateSel(); renderProducts(); markSpecialSize(); }
