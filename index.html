@@ -278,6 +278,8 @@ header {
   display: grid; grid-template-columns: 72px 1fr auto;
   overflow: hidden; box-shadow: var(--shadow);
   transition: border-color 0.22s, box-shadow 0.22s, transform 0.18s;
+  content-visibility: auto;
+  contain-intrinsic-size: 0 200px;
 }
 .card:hover { border-color: rgba(192,16,42,0.4); box-shadow: var(--shadow-hover); transform: translateY(-1px); }
 .card.in-cart { border-color: rgba(26,122,60,0.45); }
@@ -2159,7 +2161,8 @@ header {
   .client-stats-grid { grid-template-columns: 1fr; }
   .stats-page { padding: 16px; }
   .filters-grid { grid-template-columns: 1fr 1fr; }
-  .card { grid-template-columns: 56px 1fr; grid-template-rows: auto auto; }
+  .card { grid-template-columns: 56px 1fr; grid-template-rows: auto auto; animation: none !important; transition: border-color 0.15s, box-shadow 0.15s; transform: none !important; }
+  .card:hover { transform: none !important; }
   .card-ctrl { border-left: none; border-top: 1px solid var(--border); grid-column: 1 / -1; flex-direction: row; align-items: center; padding: 10px 14px; gap: 8px; }
   .mq-wrap { max-width: 120px; }
   .btn-add, .btn-rem { flex: 1; }
@@ -4462,45 +4465,54 @@ function _renderProductsInner(g,rb,lg){
 
   if(!prods.length){ g.innerHTML=`<div class="empty"><div class="empty-icon"><svg viewBox="0 0 48 48" fill="none" width="44" height="44"><circle cx="21" cy="21" r="13" stroke="currentColor" stroke-width="2.2"/><path d="M31 31l10 10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></div><h3>Nessun prodotto trovato</h3><p>Modifica i filtri di ricerca</p></div>`; return; }
 
-  let html='';
-  if(fondi.length||fondiVariants.length){
-    const fondiTot=fondi.length+fondiVariants.length;
-    html+=`<div class="section-header">
-      <div class="section-icon"><svg viewBox="0 0 24 24" fill="none" width="14" height="14"><rect x="4" y="4" width="16" height="16" rx="1.5" stroke="currentColor" stroke-width="1.8"/></svg></div>
-      <div class="section-title">Fondi</div>
-      <div class="section-count">${fondiTot} prodotti</div>
-    </div>`;
-    html+=fondi.map(cardHTML).join('');
-    // Varianti: sub-barre dentro la sezione Fondi, raggruppate per subseries
-    const variantSubs=[...new Set(fondiVariants.map(p=>p.subseries))].sort();
-    for(const sub of variantSubs){
-      const vp=fondiVariants.filter(p=>p.subseries===sub);
-      html+=`<div class="section-subheader">
-        <span style="opacity:0.45;font-size:10px">◇</span>
-        <span class="sub-label">VARIANTE ${_esc(sub)}</span>
-        <span class="sub-count">${vp.length} prodotti</span>
+  function _buildFondiHtml(){
+    let h='';
+    if(fondi.length||fondiVariants.length){
+      const fondiTot=fondi.length+fondiVariants.length;
+      h+=`<div class="section-header">
+        <div class="section-icon"><svg viewBox="0 0 24 24" fill="none" width="14" height="14"><rect x="4" y="4" width="16" height="16" rx="1.5" stroke="currentColor" stroke-width="1.8"/></svg></div>
+        <div class="section-title">Fondi</div>
+        <div class="section-count">${fondiTot} prodotti</div>
       </div>`;
-      html+=vp.map(cardHTML).join('');
+      h+=fondi.map(cardHTML).join('');
+      const variantSubs=[...new Set(fondiVariants.map(p=>p.subseries))].sort();
+      for(const sub of variantSubs){
+        const vp=fondiVariants.filter(p=>p.subseries===sub);
+        h+=`<div class="section-subheader">
+          <span style="opacity:0.45;font-size:10px">◇</span>
+          <span class="sub-label">VARIANTE ${_esc(sub)}</span>
+          <span class="sub-count">${vp.length} prodotti</span>
+        </div>`;
+        h+=vp.map(cardHTML).join('');
+      }
     }
+    return h;
   }
-  if(decori.length){
-    html+=`<div class="section-header section-decori">
+  function _buildDecoriHtml(){
+    if(!decori.length) return '';
+    return `<div class="section-header section-decori">
       <div class="section-icon"><svg viewBox="0 0 24 24" fill="none" width="14" height="14"><path d="M12 3L14.5 9H21L15.5 13L17.5 19L12 15.5L6.5 19L8.5 13L3 9H9.5L12 3Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
       <div class="section-title">Decori</div>
       <div class="section-count">${decori.length} prodotti</div>
-    </div>`;
-    html+=decori.map(cardHTML).join('');
+    </div>`+decori.map(cardHTML).join('');
   }
-  if(speciali.length){
-    html+=`<div class="section-header section-spec">
+  function _buildSpecialiHtml(){
+    if(!speciali.length) return '';
+    return `<div class="section-header section-spec">
       <div class="section-icon">▲</div>
       <div class="section-title">Pezzi Speciali</div>
       <div class="section-count">${speciali.length} prodotti</div>
-    </div>`;
-    html+=speciali.map(cardHTML).join('');
+    </div>`+speciali.map(cardHTML).join('');
   }
-  g.innerHTML=html;
+  g.innerHTML = _buildFondiHtml();
   attachGridEvents();
+  requestAnimationFrame(()=>{
+    g.innerHTML += _buildDecoriHtml();
+    requestAnimationFrame(()=>{
+      g.innerHTML += _buildSpecialiHtml();
+      attachGridEvents();
+    });
+  });
 }
 
 function render(){ updateSel(); renderProducts(); markSpecialSize(); }
