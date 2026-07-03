@@ -5337,11 +5337,20 @@ function cartSearchClear(){
   if(resultsEl){ resultsEl.classList.remove('visible'); resultsEl.innerHTML=''; }
 }
 
+function _copyTextFallback(text){
+  var ta=document.createElement('textarea');
+  ta.value=text; ta.style.cssText='position:fixed;top:0;left:0;opacity:0;';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try{ document.execCommand('copy'); } catch(e){}
+  document.body.removeChild(ta);
+}
 function copyCart(){
-  navigator.clipboard.writeText($('cp-output').textContent).then(()=>{
-    const b=$('btn-copy'); b.textContent='✓ Copiato!'; b.classList.add('ok');
-    setTimeout(()=>{ b.innerHTML='<svg class="btn-ic" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="8" y="6" width="12" height="14" rx="2" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M16 6V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Copia</span>'; b.classList.remove('ok'); },2000);
-  });
+  var text=$('cp-output').textContent;
+  var b=$('btn-copy');
+  function _ok(){ b.textContent='✓ Copiato!'; b.classList.add('ok'); setTimeout(()=>{ b.innerHTML='<svg class="btn-ic" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="8" y="6" width="12" height="14" rx="2" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M16 6V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Copia</span>'; b.classList.remove('ok'); },2000); }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(_ok).catch(()=>{ _copyTextFallback(text); _ok(); });
+  } else { _copyTextFallback(text); _ok(); }
 }
 
 // ── SAVE ORDER ────────────────────────────────────────────────────────────────
@@ -6345,7 +6354,9 @@ function copyOrderText(orderId){
   // Riadatta gli items al formato che vuole buildOrderTextLines (gli passa {product, mq})
   const items = order.items.map(i => ({ product: i, mq: i.mq }));
   const text = buildOrderTextLines(items, clientName, order.ref || '', _orderRecipient);
-  navigator.clipboard.writeText(text).then(()=>alert('Testo copiato!'));
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>alert('Testo copiato!')).catch(()=>{ _copyTextFallback(text); alert('Testo copiato!'); });
+  } else { _copyTextFallback(text); alert('Testo copiato!'); }
 }
 
 function deleteOrder(clientId, orderId){
