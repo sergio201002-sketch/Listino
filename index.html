@@ -4500,42 +4500,55 @@ function _renderProductsInner(g,rb,lg){
   }
 
   // Render progressivo a chunk da 50
+  // IMPORTANTE: attachGridEvents() clona e sostituisce il grid, rendendo stale
+  // i riferimenti. Per evitarlo: lo chiamiamo UNA VOLTA SOLA su un grid vuoto,
+  // poi aggiungiamo i nodi direttamente senza riaggancio eventi (usiamo event delegation).
   const CHUNK = 50;
   var _offset = 0;
+  var _sentinelId = '__grid_sentinel__';
+
+  g.innerHTML = '<div id="'+_sentinelId+'" style="height:1px;width:100%"></div>';
+  attachGridEvents(); // una volta sola su grid vuoto — clona e sostituisce
+
+  var loadBtn = document.createElement('button');
+  loadBtn.textContent = 'Carica altri prodotti';
+  loadBtn.style.cssText='display:block;margin:18px auto 24px;padding:10px 28px;background:#1A1A1A;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;';
+
+  function _getSentinel(){ return document.getElementById(_sentinelId); }
+  function _getGrid(){ return document.getElementById('grid'); }
 
   function _renderChunk(){
     var slice = _chunks.slice(_offset, _offset + CHUNK);
     if(!slice.length) return;
     var frag = document.createElement('div');
     frag.innerHTML = slice.join('');
-    while(frag.firstChild) g.insertBefore(frag.firstChild, sentinel);
+    var cur = _getGrid();
+    var s = _getSentinel();
+    while(frag.firstChild) cur.insertBefore(frag.firstChild, s);
     _offset += CHUNK;
-    attachGridEvents();
-    if(_offset >= _chunks.length){ sentinel.style.display='none'; if(window._gridObserver){window._gridObserver.disconnect();window._gridObserver=null;} }
+    _updateBtn();
+    if(_offset >= _chunks.length){
+      if(s) s.style.display='none';
+      if(window._gridObserver){window._gridObserver.disconnect();window._gridObserver=null;}
+    }
   }
 
-  var sentinel = document.createElement('div');
-  sentinel.style.cssText='height:1px;width:100%';
-  var loadBtn = document.createElement('button');
-  loadBtn.textContent = 'Carica altri prodotti';
-  loadBtn.style.cssText='display:block;margin:18px auto 24px;padding:10px 28px;background:#1A1A1A;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;';
-  loadBtn.onclick = function(){ _renderChunk(); _updateBtn(); };
-  g.innerHTML='';
-  g.appendChild(sentinel);
+  function _updateBtn(){
+    var cur = _getGrid();
+    if(_offset >= _chunks.length){ loadBtn.remove(); }
+    else if(!loadBtn.parentNode){ cur.appendChild(loadBtn); }
+  }
+
+  loadBtn.onclick = function(){ _renderChunk(); };
 
   _renderChunk();
 
-  function _updateBtn(){
-    if(_offset >= _chunks.length){ loadBtn.remove(); if(window._gridObserver){window._gridObserver.disconnect();window._gridObserver=null;} }
-    else { g.appendChild(loadBtn); }
-  }
-  _updateBtn();
-
   if(_offset < _chunks.length){
     window._gridObserver = new IntersectionObserver(function(entries){
-      if(entries[0].isIntersecting){ _renderChunk(); _updateBtn(); }
+      if(entries[0].isIntersecting) _renderChunk();
     }, {rootMargin:'300px'});
-    window._gridObserver.observe(sentinel);
+    var s0 = _getSentinel();
+    if(s0) window._gridObserver.observe(s0);
   }
 }
 
