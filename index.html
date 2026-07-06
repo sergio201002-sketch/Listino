@@ -3894,26 +3894,43 @@ function switchSettingsTab(tab){
     tabProd.style.color    = '#6B6B6B'; tabProd.style.fontWeight = '600';
     listProd.style.display = 'none'; listSez.style.display = '';
     stats.style.display    = 'none';
+    window._pendingSubseries = Object.assign({}, productSettings.subseriesMode || {});
     renderSezioniTab();
   }
 }
 window.switchSettingsTab = switchSettingsTab;
 
+window._pendingSubseries = null;
+
 function setSubseriesMode(btn){
   const key  = btn.dataset.key;
   const mode = btn.dataset.mode;
   if(!key || !mode) return;
-  if(!productSettings.subseriesMode) productSettings.subseriesMode = {};
+  if(!window._pendingSubseries) window._pendingSubseries = Object.assign({}, productSettings.subseriesMode || {});
   if(mode === 'decoro'){
-    delete productSettings.subseriesMode[key];
+    delete window._pendingSubseries[key];
   } else {
-    productSettings.subseriesMode[key] = mode;
+    window._pendingSubseries[key] = mode;
   }
-  _saveProductSettingsLocal();
+  renderSezioniTab();
+}
+window.setSubseriesMode = setSubseriesMode;
+
+function _saveSezioniChanges(){
+  if(!window._pendingSubseries) return;
+  if(!confirm('Confermi le modifiche alle sezioni e varianti?')) return;
+  productSettings.subseriesMode = Object.assign({}, window._pendingSubseries);
+  prodsetSaveDebounced();
   renderSezioniTab();
   try { renderProducts(); } catch(_){}
 }
-window.setSubseriesMode = setSubseriesMode;
+window._saveSezioniChanges = _saveSezioniChanges;
+
+function _cancelSezioniChanges(){
+  window._pendingSubseries = Object.assign({}, productSettings.subseriesMode || {});
+  renderSezioniTab();
+}
+window._cancelSezioniChanges = _cancelSezioniChanges;
 
 function _renderActiveSettingsTab(){
   if(_settingsTab === 'sezioni') renderSezioniTab();
@@ -3942,7 +3959,10 @@ function renderSezioniTab(){
     if(!bySeries[s]) bySeries[s] = new Set();
     bySeries[s].add(p.subseries);
   }
-  const subMode = productSettings.subseriesMode || {};
+  if(!window._pendingSubseries) window._pendingSubseries = Object.assign({}, productSettings.subseriesMode || {});
+  const subMode = window._pendingSubseries;
+  const savedMode = productSettings.subseriesMode || {};
+  const isDirty = JSON.stringify(subMode) !== JSON.stringify(savedMode);
   const modeLabel = { decoro: 'Decoro', variant: 'Variante', fondo: 'Fondi' };
   const modeColor = { decoro: '#1e2a4a', variant: '#3d1d70', fondo: '#1a1a1a' };
   let html = '<div style="font-size:11px;color:#6B6B6B;margin-bottom:14px;line-height:1.5">'
@@ -3959,8 +3979,13 @@ function renderSezioniTab(){
     for(const sub of subs){
       const key = series + '::' + sub;
       const cur = subMode[key] || 'decoro';
-      html += '<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #F5F5F5">';
-      html += '<div style="flex:1;font-size:12px;font-weight:600;color:#252525">' + _esc(sub) + '</div>';
+      const saved = savedMode[key] || 'decoro';
+      const changed = cur !== saved;
+      html += '<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #F5F5F5'
+        + (changed ? ';background:#FFFBF0' : '') + '">';
+      html += '<div style="flex:1;font-size:12px;font-weight:600;color:#252525">' + _esc(sub)
+        + (changed ? ' <span style="font-size:10px;color:#B07A00;font-weight:500">modificato</span>' : '')
+        + '</div>';
       html += '<div style="display:flex;gap:4px">';
       for(const mode of ['decoro','variant','fondo']){
         const active = cur === mode;
@@ -3976,6 +4001,12 @@ function renderSezioniTab(){
       html += '</div></div>';
     }
     html += '</div>';
+  }
+  if(isDirty){
+    html += '<div style="position:sticky;bottom:0;background:#fff;border-top:1.5px solid #E5E5E5;padding:12px 0 4px;display:flex;gap:8px;justify-content:flex-end;margin-top:8px">'
+      + '<button onclick="_cancelSezioniChanges()" style="padding:8px 18px;border-radius:6px;border:1.5px solid #D0D0D0;background:#fff;color:#555;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font-body)">Annulla</button>'
+      + '<button onclick="_saveSezioniChanges()" style="padding:8px 22px;border-radius:6px;border:none;background:#C8102E;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body)">Salva modifiche</button>'
+      + '</div>';
   }
   el.innerHTML = html;
 }
