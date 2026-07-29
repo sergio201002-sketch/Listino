@@ -1433,7 +1433,7 @@ header {
 .no-selection { display: flex; align-items: center; justify-content: center; height: 300px; color: var(--mid); font-family: var(--font-body); font-size: 14px; font-weight: 600; text-align: center; }
 
 /* Modal */
-.modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; }
+.modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: flex-start; justify-content: center; overflow-y: scroll; -webkit-overflow-scrolling: touch; padding: 20px 16px; }
 #modal-save-esp { z-index: 350; }
 #modal-save-order { z-index: 350; }
 .disc-options { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px; }
@@ -1460,7 +1460,8 @@ header {
   .disc-pill { font-size: 11.5px; padding: 9px 6px; }
 }
 .modal-bg.open { display: flex; animation: fadeIn 0.2s ease; }
-.modal { background: white; border-radius: 16px; padding: 28px; width: min(420px, 92vw); box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 32px 80px rgba(0,0,0,0.16); border: 1px solid var(--border); }
+.modal { background: white; border-radius: 16px; padding: 28px; width: min(420px, 92vw); margin: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 32px 80px rgba(0,0,0,0.16); border: 1px solid var(--border); }
+#esp-order-items-list { max-height: 220px; overflow-y: scroll; -webkit-overflow-scrolling: touch; border-radius: 8px; }
 .modal h3 { font-family: var(--font-display); letter-spacing: -0.02em; font-size: 19px; font-weight: 700; margin-bottom: 16px; color: var(--dark); }
 .modal-input { width: 100%; border: 1.5px solid var(--border); border-radius: 8px; padding: 10px 14px; font-family: var(--font-body); font-size: 14px; color: var(--dark); margin-bottom: 14px; box-sizing: border-box; background: var(--bg); transition: border-color 0.2s, background 0.2s, box-shadow 0.2s; }
 .modal-input:focus { outline: none; border-color: var(--red); background: white; box-shadow: 0 0 0 3px rgba(192,16,42,0.07); }
@@ -2917,7 +2918,7 @@ window.FIREBASE_CONFIG = {
         <label style="font-size:11px;font-weight:700;color:var(--mid)">Prodotti da aggiungere</label>
         <button onclick="_espToggleAll()" style="font-size:10px;font-weight:700;color:var(--red);background:none;border:none;cursor:pointer;font-family:var(--font-body);letter-spacing:0.04em" id="esp-toggle-all-btn">Deseleziona tutti</button>
       </div>
-      <div id="esp-order-items-list" style="border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--bg)"></div>
+      <div id="esp-order-items-list" style="border:1px solid var(--border);background:var(--bg)"></div>
     </div>
 
     <label style="font-size:11px;font-weight:700;color:var(--mid);display:block;margin-bottom:4px">Cliente</label>
@@ -5697,6 +5698,10 @@ function openSaveOrderToEsp(clientId, orderId){
   var desc = $('esp-modal-desc');
   desc.style.display = 'none';
   wrap.style.display = 'block';
+  list.style.maxHeight = '240px';
+  list.style.overflowY = 'scroll';
+  list.style.webkitOverflowScrolling = 'touch';
+  list.style.borderRadius = '8px';
   list.innerHTML = o.items.filter(function(x){return x&&x.code;}).map(function(x, i){
     return '<div class="esp-item-row esp-item-checked" data-idx="'+i+'" onclick="_espItemToggle(this)" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.12s">'
       + '<div class="esp-item-chk" style="width:16px;height:16px;border:1.5px solid var(--border2);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--red);border-color:var(--red)">'
