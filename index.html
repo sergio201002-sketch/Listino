@@ -2708,6 +2708,10 @@ window.FIREBASE_CONFIG = {
         style="flex-shrink:0;width:38px;align-self:flex-start;height:38px;border:1.5px solid var(--border);background:var(--white);border-radius:var(--radius);cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:var(--mid);letter-spacing:0.02em;transition:all 0.15s">
         C
       </button>
+      <button type="button" id="btn-sconti" onclick="toggleSconti()" title="Mostra sconti nel testo ordine"
+        style="flex-shrink:0;width:38px;align-self:flex-start;height:38px;border:1.5px solid var(--border);background:var(--white);border-radius:var(--radius);cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:var(--mid);letter-spacing:0.02em;transition:all 0.15s">
+        S
+      </button>
     </div>
 
     <div class="cp-actions">
@@ -3213,6 +3217,34 @@ function buildOrderTextLines(items, clientName, ref, recipient, campioni){
 window.buildOrderTextLines = buildOrderTextLines;
 
 /* Aggiorna il testo dentro cp-output usando il cliente/ref scelti */
+let _scontiOn = false;
+function _buildOrderTextConSconti(cartValido, cliName){
+  const lines = [];
+  const hasRec = !!(_orderRecipient && _orderRecipient.trim());
+  if(hasRec){ lines.push('Buongiorno ' + _orderRecipient.trim()); lines.push(''); }
+  let headline = _campioniMode ? 'Ordinare campioni per' : 'Ordinare';
+  if(cliName) headline += (_campioniMode ? ' ' : ' x ') + cliName;
+  if(_cartRef && _cartRef.trim()) headline += ' con riferimento ' + _cartRef.trim();
+  headline += ' :';
+  lines.push(headline);
+  lines.push('');
+  cartValido.forEach(it => {
+    const p = it.product;
+    const mq = it.mq != null ? it.mq : (p && p.mq);
+    const parts = [];
+    if(p.series) parts.push(toT(p.series));
+    if(p.subseries) parts.push(p.subseries);
+    if(p.color)  parts.push(p.color);
+    if(p.finish) parts.push(p.finish);
+    if(p.size)   parts.push(p.size + ' cm');
+    const qtyStr = _campioniMode ? '1pz' : ((parseFloat(mq)||0) + 'mq');
+    const discStr = _discountStr(it);
+    lines.push(parts.join(' ') + ' - ' + (p.code||'') + ' - ' + qtyStr + (discStr ? ' - ' + discStr : ''));
+  });
+  lines.push('');
+  lines.push('Grazie, saluti');
+  return lines.join('\n');
+}
 function _renderCartOutput(){
   const out = document.getElementById('cp-output');
   if(out){
@@ -3220,7 +3252,8 @@ function _renderCartOutput(){
     if(!cartValido.length){ out.textContent = ''; }
     else {
       const cliName = (_cartClientId && clients[_cartClientId]) ? clients[_cartClientId].name : '';
-      out.textContent = buildOrderTextLines(cartValido, cliName, _cartRef, _orderRecipient, _campioniMode);
+      if(_scontiOn) out.textContent = _buildOrderTextConSconti(cartValido, cliName);
+      else out.textContent = buildOrderTextLines(cartValido, cliName, _cartRef, _orderRecipient, _campioniMode);
     }
   }
   // Aggiorna anche le preview dei pannelli collassati
@@ -5522,6 +5555,91 @@ function _copyTextFallback(text){
   try{ document.execCommand('copy'); } catch(e){}
   document.body.removeChild(ta);
 }
+/* Restituisce la stringa sconto applicata a un item del carrello */
+function _discountStr(item){
+  if(!item || !item.product) return '';
+  const p = item.product;
+  const d = item.discount || {type:'none'};
+  const cid = (typeof _cartClientId !== 'undefined') ? _cartClientId : '';
+  // Regola cliente specifica
+  if((d.type === 'none' || !d.type) && cid){
+    const rule = _findClientRule(cid, p);
+    if(rule){
+      if(rule.effect === 'net' && typeof rule.netPrice === 'number')
+        return 'con prezzo netto € ' + rule.netPrice.toFixed(2).replace('.',',') + '/mq';
+      if(rule.effect === 'std' && Array.isArray(rule.std) && rule.std.length)
+        return 'con sconto ' + rule.std.map(s=>'-'+s+'%').join(' ');
+      if(rule.effect === 'pct' && typeof rule.pct === 'number')
+        return 'con sconto aggiuntivo -' + rule.pct + '%';
+    }
+  }
+  // Sconto manuale sull'item
+  if(d.type === 'std' && Array.isArray(d.std) && d.std.length)
+    return 'con sconto ' + d.std.map(s=>'-'+s+'%').join(' ');
+  if(d.type === 'custom' && typeof d.customPrice === 'number')
+    return 'con prezzo netto € ' + d.customPrice.toFixed(2).replace('.',',') + '/mq';
+  if(d.type === 'pct5') {
+    const base = p.m2_pallet && parseFloat(item.mq) >= p.m2_pallet ? '-60% -10% -10%' : '-60% -10% -5%';
+    return 'con sconto ' + base + ' -5%';
+  }
+  if(d.type === 'pct10') {
+    const base = p.m2_pallet && parseFloat(item.mq) >= p.m2_pallet ? '-60% -10% -10%' : '-60% -10% -5%';
+    return 'con sconto ' + base + ' -10%';
+  }
+  // Sconto standard DA/DB
+  if(p.m2_pallet && parseFloat(item.mq) >= p.m2_pallet)
+    return 'con sconto -60% -10% -10%';
+  return 'con sconto -60% -10% -5%';
+}
+window._discountStr = _discountStr;
+
+function copyCartConSconti(){
+  const cartValido = cart.filter(x => x && x.product && x.product.code);
+  if(!cartValido.length) return;
+  const cliName = (_cartClientId && clients[_cartClientId]) ? clients[_cartClientId].name : '';
+  const lines = [];
+  const hasRec = !!(_orderRecipient && _orderRecipient.trim());
+  if(hasRec){ lines.push('Buongiorno ' + _orderRecipient.trim()); lines.push(''); }
+  let headline = _campioniMode ? 'Ordinare campioni per' : 'Ordinare';
+  if(cliName) headline += (_campioniMode ? ' ' : ' x ') + cliName;
+  if(_cartRef && _cartRef.trim()) headline += ' con riferimento ' + _cartRef.trim();
+  headline += ' :';
+  lines.push(headline);
+  lines.push('');
+  cartValido.forEach(it => {
+    const p = it.product;
+    const mq = it.mq != null ? it.mq : (p && p.mq);
+    const parts = [];
+    if(p.series) parts.push(toT(p.series));
+    if(p.subseries) parts.push(p.subseries);
+    if(p.color)  parts.push(p.color);
+    if(p.finish) parts.push(p.finish);
+    if(p.size)   parts.push(p.size + ' cm');
+    const qtyStr = _campioniMode ? '1pz' : ((parseFloat(mq)||0) + 'mq');
+    const discStr = _discountStr(it);
+    lines.push(parts.join(' ') + ' - ' + (p.code||'') + ' - ' + qtyStr + (discStr ? ' - ' + discStr : ''));
+  });
+  lines.push('');
+  lines.push('Grazie, saluti');
+  const text = lines.join('\n');
+  const b = $('btn-copy-sconti');
+  function _ok(){ b.textContent='✓ Copiato!'; b.classList.add('ok'); setTimeout(()=>{ b.innerHTML='<svg class="btn-ic" viewBox="0 0 24 24" fill="none" style="width:13px;height:13px"><rect x="8" y="6" width="12" height="14" rx="2" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M16 6V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span>+ Sconti</span>'; b.classList.remove('ok'); },2000); }
+  if(navigator.clipboard){ navigator.clipboard.writeText(text).then(_ok).catch(()=>{ _copyFallback(text); _ok(); }); }
+  else { _copyFallback(text); _ok(); }
+}
+window.copyCartConSconti = copyCartConSconti;
+function toggleSconti(){
+  _scontiOn = !_scontiOn;
+  const btn = document.getElementById('btn-sconti');
+  if(btn){
+    btn.style.background = _scontiOn ? 'var(--red)' : 'var(--white)';
+    btn.style.color = _scontiOn ? '#fff' : 'var(--mid)';
+    btn.style.borderColor = _scontiOn ? 'var(--red)' : 'var(--border)';
+  }
+  _renderCartOutput();
+}
+window.toggleSconti = toggleSconti;
+
 function copyCart(){
   var text=$('cp-output').textContent;
   var b=$('btn-copy');
