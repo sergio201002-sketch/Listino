@@ -2794,12 +2794,30 @@ window.FIREBASE_CONFIG = {
       </div>
       <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
         <div style="flex:1 1 45%">
-          <label class="save-order-lbl">Formati (opz.)</label>
+          <label class="save-order-lbl">Formati inclusi (opz.)</label>
           <input type="text" class="modal-input" id="cr-sizes" placeholder="Es. 60x60, 30x60" style="margin-bottom:0"/>
+        </div>
+        <div style="flex:1 1 45%">
+          <label class="save-order-lbl">Formati esclusi (opz.)</label>
+          <input type="text" class="modal-input" id="cr-exclude-sizes" placeholder="Es. 120x120, 60x120" style="margin-bottom:0"/>
         </div>
         <div style="flex:1 1 45%">
           <label class="save-order-lbl">Finiture (opz.)</label>
           <input type="text" class="modal-input" id="cr-finishes" placeholder="Es. Naturale R10 Rett." style="margin-bottom:0"/>
+        </div>
+      </div>
+      <div style="margin-bottom:8px">
+        <label class="save-order-lbl">Tipo prodotto (opz. — lascia tutto vuoto = tutti)</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
+          <label style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;color:var(--dark);background:var(--bg);user-select:none">
+            <input type="checkbox" id="cr-type-fondo" style="accent-color:var(--red);width:15px;height:15px"/> Fondi
+          </label>
+          <label style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;color:var(--dark);background:var(--bg);user-select:none">
+            <input type="checkbox" id="cr-type-decoro" style="accent-color:var(--red);width:15px;height:15px"/> Decori
+          </label>
+          <label style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;color:var(--dark);background:var(--bg);user-select:none">
+            <input type="checkbox" id="cr-type-speciale" style="accent-color:var(--red);width:15px;height:15px"/> Pezzi speciali
+          </label>
         </div>
       </div>
 
@@ -7135,8 +7153,11 @@ window._crEffectChange = _crEffectChange;
 
 function _resetClientRuleForm(){
   _crEditingRuleId = null;
-  ['cr-name','cr-net-price','cr-std-1','cr-std-2','cr-std-3','cr-pct-val','cr-sizes','cr-finishes'].forEach(function(id){
+  ['cr-name','cr-net-price','cr-std-1','cr-std-2','cr-std-3','cr-pct-val','cr-sizes','cr-exclude-sizes','cr-finishes'].forEach(function(id){
     var el = document.getElementById(id); if(el) el.value = '';
+  });
+  ['cr-type-fondo','cr-type-decoro','cr-type-speciale'].forEach(function(id){
+    var el = document.getElementById(id); if(el) el.checked = false;
   });
   var brandSel = document.getElementById('cr-brand'); if(brandSel) brandSel.value = '';
   _crBrandChange();
@@ -7155,16 +7176,23 @@ function _saveClientRule(){
   var brand = document.getElementById('cr-brand').value || '';
   var series = document.getElementById('cr-series').value || '';
   var sizesRaw = (document.getElementById('cr-sizes').value || '').trim();
+  var excludeSizesRaw = (document.getElementById('cr-exclude-sizes').value || '').trim();
   var finishesRaw = (document.getElementById('cr-finishes').value || '').trim();
   var effect = (document.querySelector('input[name="cr-effect"]:checked')||{}).value || 'net';
   // Crea la regola
+  var productTypes = [];
+  if(document.getElementById('cr-type-fondo') && document.getElementById('cr-type-fondo').checked) productTypes.push('fondo');
+  if(document.getElementById('cr-type-decoro') && document.getElementById('cr-type-decoro').checked) productTypes.push('decoro');
+  if(document.getElementById('cr-type-speciale') && document.getElementById('cr-type-speciale').checked) productTypes.push('speciale');
   var rule = {
     id: _crEditingRuleId || uid(),
     name: nm || ('Condizione ' + ((_getClientRules(_crEditingClientId).length||0)+1)),
     brand: brand,
     series: series,
     sizes: sizesRaw ? sizesRaw.split(',').map(function(s){return s.trim();}).filter(Boolean) : [],
+    excludeSizes: excludeSizesRaw ? excludeSizesRaw.split(',').map(function(s){return s.trim();}).filter(Boolean) : [],
     finishes: finishesRaw ? finishesRaw.split(',').map(function(s){return s.trim().toLowerCase();}).filter(Boolean) : [],
+    productTypes: productTypes,
     effect: effect
   };
   if(effect === 'net'){
@@ -7205,7 +7233,12 @@ function _editClientRule(rid){
   _crBrandChange();
   document.getElementById('cr-series').value = rule.series || '';
   document.getElementById('cr-sizes').value = (rule.sizes||[]).join(', ');
+  document.getElementById('cr-exclude-sizes').value = (rule.excludeSizes||[]).join(', ');
   document.getElementById('cr-finishes').value = (rule.finishes||[]).join(', ');
+  var pt = rule.productTypes || [];
+  var elF = document.getElementById('cr-type-fondo'); if(elF) elF.checked = pt.indexOf('fondo') !== -1;
+  var elD = document.getElementById('cr-type-decoro'); if(elD) elD.checked = pt.indexOf('decoro') !== -1;
+  var elS = document.getElementById('cr-type-speciale'); if(elS) elS.checked = pt.indexOf('speciale') !== -1;
   var radio = document.querySelector('input[name="cr-effect"][value="'+(rule.effect||'net')+'"]');
   if(radio) radio.checked = true;
   _crEffectChange();
@@ -7244,7 +7277,12 @@ function _renderClientRulesList(){
     if(r.brand) crit.push('<b>'+toT(r.brand)+'</b>');
     if(r.series) crit.push(toT(r.series));
     if(r.sizes && r.sizes.length) crit.push(r.sizes.join('/'));
+    if(r.excludeSizes && r.excludeSizes.length) crit.push('<span style="color:#C8102E">esclusi: '+r.excludeSizes.join('/')+'</span>');
     if(r.finishes && r.finishes.length) crit.push(r.finishes.join('/'));
+    if(r.productTypes && r.productTypes.length){
+      var typeLabels = r.productTypes.map(function(t){ return t==='fondo'?'Fondi':t==='decoro'?'Decori':'Spec.'; });
+      crit.push('<span style="background:#FFF0F2;color:#C8102E;border-radius:4px;padding:0 4px;font-size:10px">'+typeLabels.join('+'+'</span><span style="background:#FFF0F2;color:#C8102E;border-radius:4px;padding:0 4px;font-size:10px;margin-left:2px">')+'</span>');
+    }
     var critStr = crit.length ? crit.join(' · ') : '<i>Tutti i prodotti</i>';
     var effStr = '';
     if(r.effect === 'net') effStr = '<span style="color:#1A7A3C;font-weight:800">Netto '+fmt(r.netPrice||0)+'/mq</span>';
@@ -7262,6 +7300,11 @@ function _renderClientRulesList(){
 }
 
 /* Restituisce la regola applicabile (la prima) a un prodotto per il cliente specificato */
+function _productTypeOf(p){
+  if(p.type === 'speciale') return 'speciale';
+  if(p.type === 'fondo' && p.subseries) return 'decoro';
+  return 'fondo';
+}
 function _findClientRule(cid, product){
   if(!cid || !product || !clients[cid]) return null;
   var rules = _getClientRules(cid);
@@ -7270,7 +7313,9 @@ function _findClientRule(cid, product){
     if(r.brand && product.brand !== r.brand) continue;
     if(r.series && product.series !== r.series) continue;
     if(r.sizes && r.sizes.length && !r.sizes.some(function(s){return (product.size||'').toLowerCase() === s.toLowerCase();})) continue;
+    if(r.excludeSizes && r.excludeSizes.length && r.excludeSizes.some(function(s){return (product.size||'').toLowerCase() === s.toLowerCase();})) continue;
     if(r.finishes && r.finishes.length && !r.finishes.some(function(f){return (product.finish||'').toLowerCase().indexOf(f) !== -1;})) continue;
+    if(r.productTypes && r.productTypes.length && r.productTypes.indexOf(_productTypeOf(product)) === -1) continue;
     return r;
   }
   return null;
