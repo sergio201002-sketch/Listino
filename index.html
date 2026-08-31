@@ -2845,14 +2845,17 @@ window.FIREBASE_CONFIG = {
       <!-- Input "std" -->
       <div class="cr-effect-input" id="cr-eff-std" style="display:none">
         <label class="save-order-lbl">Sconti composti (3 step)</label>
-        <div style="display:flex;align-items:center;gap:4px">
-          <input type="number" min="0" max="99" class="modal-input" id="cr-std-1" placeholder="60" style="margin-bottom:0;width:70px;text-align:right"/>
+        <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
+          <input type="number" min="0" max="99" class="modal-input" id="cr-std-1" placeholder="60" style="margin-bottom:0;width:65px;text-align:right"/>
           <span>%</span>
           <span style="color:#6B3FA0;font-weight:800">+</span>
-          <input type="number" min="0" max="99" class="modal-input" id="cr-std-2" placeholder="10" style="margin-bottom:0;width:70px;text-align:right"/>
+          <input type="number" min="0" max="99" class="modal-input" id="cr-std-2" placeholder="10" style="margin-bottom:0;width:65px;text-align:right"/>
           <span>%</span>
           <span style="color:#6B3FA0;font-weight:800">+</span>
-          <input type="number" min="0" max="99" class="modal-input" id="cr-std-3" placeholder="5" style="margin-bottom:0;width:70px;text-align:right"/>
+          <input type="number" min="0" max="99" class="modal-input" id="cr-std-3" placeholder="5" style="margin-bottom:0;width:65px;text-align:right"/>
+          <span>%</span>
+          <span style="color:#6B3FA0;font-weight:800">+</span>
+          <input type="number" min="0" max="99" class="modal-input" id="cr-std-4" placeholder="0" style="margin-bottom:0;width:65px;text-align:right"/>
           <span>%</span>
         </div>
       </div>
@@ -7153,7 +7156,7 @@ window._crEffectChange = _crEffectChange;
 
 function _resetClientRuleForm(){
   _crEditingRuleId = null;
-  ['cr-name','cr-net-price','cr-std-1','cr-std-2','cr-std-3','cr-pct-val','cr-sizes','cr-exclude-sizes','cr-finishes'].forEach(function(id){
+  ['cr-name','cr-net-price','cr-std-1','cr-std-2','cr-std-3','cr-std-4','cr-pct-val','cr-sizes','cr-exclude-sizes','cr-finishes'].forEach(function(id){
     var el = document.getElementById(id); if(el) el.value = '';
   });
   ['cr-type-fondo','cr-type-decoro','cr-type-speciale'].forEach(function(id){
@@ -7203,8 +7206,9 @@ function _saveClientRule(){
     var s1 = parseFloat(document.getElementById('cr-std-1').value) || 0;
     var s2 = parseFloat(document.getElementById('cr-std-2').value) || 0;
     var s3 = parseFloat(document.getElementById('cr-std-3').value) || 0;
-    if(s1 === 0 && s2 === 0 && s3 === 0){ alert('Inserisci almeno uno sconto non nullo.'); return; }
-    rule.std = [s1, s2, s3];
+    var s4 = parseFloat(document.getElementById('cr-std-4').value) || 0;
+    if(s1 === 0 && s2 === 0 && s3 === 0 && s4 === 0){ alert('Inserisci almeno uno sconto non nullo.'); return; }
+    rule.std = [s1, s2, s3, s4].filter(function(v){ return v > 0; });
   } else if(effect === 'pct'){
     var pv = parseFloat(document.getElementById('cr-pct-val').value);
     if(!isFinite(pv) || pv <= 0 || pv >= 100){ alert('Inserisci uno sconto % valido (0-99).'); return; }
@@ -7247,6 +7251,7 @@ function _editClientRule(rid){
     document.getElementById('cr-std-1').value = (rule.std||[])[0] || '';
     document.getElementById('cr-std-2').value = (rule.std||[])[1] || '';
     document.getElementById('cr-std-3').value = (rule.std||[])[2] || '';
+    document.getElementById('cr-std-4').value = (rule.std||[])[3] || '';
   }
   if(rule.effect === 'pct') document.getElementById('cr-pct-val').value = rule.pct || '';
   var btn = document.querySelector('#cr-form .btn-modal-ok'); if(btn) btn.textContent = '✓ Salva modifiche';
