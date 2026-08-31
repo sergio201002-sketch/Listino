@@ -5168,7 +5168,8 @@ function _updateCartItemTotalsOnly(code){
   const finalTot  = cartItemFinalTot(item);
   const d     = item.discount || {type:'none'};
   const dType = d.type || 'none';
-  const hasDisc = (dType==='pct5'||dType==='pct10'||(dType==='custom'&&d.customPrice!==null)||(dType==='std'&&Array.isArray(d.std)&&d.std.length));
+  const _cr = (dType==='none' && _cartClientId) ? _findClientRule(_cartClientId, p) : null;
+  const hasDisc = (dType==='pct5'||dType==='pct10'||(dType==='custom'&&d.customPrice!==null)||(dType==='std'&&Array.isArray(d.std)&&d.std.length)||!!_cr);
   const noPriceYet = (dType==='custom'&&d.customPrice===null);
 
   const totEl   = document.getElementById('ci-tot-'       + code);
@@ -5187,6 +5188,11 @@ function _updateCartItemTotalsOnly(code){
     if(dType==='pct10') badge='<span class="ci-disc-badge">−10%</span>';
     if(dType==='custom'&&d.customPrice!==null) badge='<span class="ci-disc-badge custom">'+fmt(d.customPrice)+'/mq</span>';
     if(dType==='std'&&Array.isArray(d.std)&&d.std.length) badge='<span class="ci-disc-badge std">'+d.std.map(v=>'−'+v+'%').join(' ')+'</span>';
+    if(_cr){
+      if(_cr.effect==='net') badge='<span class="ci-disc-badge custom" title="'+_esc(_cr.name)+'">Netto '+fmt(_cr.netPrice||0)+'/mq</span>';
+      else if(_cr.effect==='std') badge='<span class="ci-disc-badge std" title="'+_esc(_cr.name)+'">'+(_cr.std||[]).map(v=>'−'+v+'%').join(' ')+'</span>';
+      else if(_cr.effect==='pct') badge='<span class="ci-disc-badge" title="'+_esc(_cr.name)+'">−'+_cr.pct+'%</span>';
+    }
     badgeEl.innerHTML = badge;
   }
 }
@@ -5260,7 +5266,9 @@ function updateCartUI(){
     const finalTot = cartItemFinalTot(item);
     const d = item.discount || {type:'none', customPrice:null};
     const dType = d.type || 'none';
-    const hasDisc = (dType === 'pct5' || dType === 'pct10' || (dType === 'custom' && d.customPrice !== null) || (dType === 'std' && Array.isArray(d.std) && d.std.some(v=>v>0)));
+    // Controlla se una regola cliente si applica quando non c'è sconto esplicito
+    const _clientRule = (dType === 'none' && _cartClientId) ? _findClientRule(_cartClientId, p) : null;
+    const hasDisc = (dType === 'pct5' || dType === 'pct10' || (dType === 'custom' && d.customPrice !== null) || (dType === 'std' && Array.isArray(d.std) && d.std.some(v=>v>0)) || !!_clientRule);
     const noPriceYet = (dType === 'custom' && d.customPrice === null);
 
     // Badge sconto in header
@@ -5270,6 +5278,11 @@ function updateCartUI(){
     if(dType === 'custom' && d.customPrice !== null) discBadge = '<span class="ci-disc-badge custom">'+fmt(d.customPrice)+'/mq</span>';
     if(dType === 'std' && Array.isArray(d.std) && d.std.length){
       discBadge = '<span class="ci-disc-badge std">'+d.std.map(v=>'−'+v+'%').join(' ')+'</span>';
+    }
+    if(_clientRule){
+      if(_clientRule.effect === 'net') discBadge = '<span class="ci-disc-badge custom" title="'+_esc(_clientRule.name)+'">Netto '+fmt(_clientRule.netPrice||0)+'/mq</span>';
+      else if(_clientRule.effect === 'std') discBadge = '<span class="ci-disc-badge std" title="'+_esc(_clientRule.name)+'">'+(_clientRule.std||[]).map(v=>'−'+v+'%').join(' ')+'</span>';
+      else if(_clientRule.effect === 'pct') discBadge = '<span class="ci-disc-badge" title="'+_esc(_clientRule.name)+'">−'+_clientRule.pct+'%</span>';
     }
 
     // Info bancali da mettere sotto il valore mq
