@@ -2214,16 +2214,12 @@ header {
     flex-wrap: wrap;
     gap: 8px;
   }
-  .logo { min-width: 0; }
+  .logo { min-width: 0; max-width: calc(100% - 108px); }
   .logo-sub { display: none; }
-  /* I 3 pulsanti (refresh, account, settings) ora sono figli diretti di header,
-     restano sulla prima riga con il logo */
-  #manual-refresh-btn, #account-hbtn, #settings-hbtn {
-    flex-shrink: 0;
-    padding: 6px 7px;
-  }
-  /* logo prende lo spazio disponibile nella prima riga */
-  .logo { flex: 1; }
+  /* I 3 pulsanti restano visivamente sulla riga del logo via position:absolute */
+  #manual-refresh-btn { position: absolute; top: 10px; right: 98px; padding: 6px 7px; }
+  #account-hbtn       { position: absolute; top: 10px; right: 56px; padding: 6px 7px; }
+  #settings-hbtn      { position: absolute; top: 10px; right: 14px; padding: 6px 7px; }
   /* header-right va sulla seconda riga, width 100% */
   .header-right {
     width: 100%;
@@ -2341,21 +2337,21 @@ window.FIREBASE_CONFIG = {
       <div class="logo-sub">Emilgroup · 2026.02</div>
     </div>
   </div>
-  <button id="manual-refresh-btn" onclick="manualRefresh()" title="Aggiorna dal cloud" style="background:rgba(255,255,255,0.08);border:none;border-radius:5px;padding:7px 9px;cursor:pointer;color:rgba(255,255,255,0.7);display:flex;align-items:center;justify-content:center;transition:all 0.15s;-webkit-tap-highlight-color:rgba(255,255,255,0.2);touch-action:manipulation;min-width:32px;min-height:32px;" onmouseover="this.style.background='rgba(255,255,255,0.16)';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.7)'">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-    </button>
-  <button id="account-hbtn" onclick="openAccount()" title="Account" style="background:rgba(255,255,255,0.08);border:none;border-radius:5px;padding:6px 8px;cursor:pointer;color:rgba(255,255,255,0.85);display:flex;align-items:center;justify-content:center;transition:all 0.15s;-webkit-tap-highlight-color:rgba(255,255,255,0.2);touch-action:manipulation;min-width:34px;min-height:34px;" onmouseover="this.style.background='rgba(255,255,255,0.16)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg>
-    </button>
-  <button id="settings-hbtn" onclick="openSettings()" title="Impostazioni prodotti" style="background:rgba(255,255,255,0.08);border:none;border-radius:5px;padding:6px 8px;cursor:pointer;color:rgba(255,255,255,0.7);display:flex;align-items:center;justify-content:center;transition:all 0.15s;-webkit-tap-highlight-color:rgba(255,255,255,0.2);touch-action:manipulation;min-width:34px;min-height:34px;" onmouseover="this.style.background='rgba(255,255,255,0.16)';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.7)'">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-    </button>
   <div class="header-right">
     <span class="sync-status sync-idle" id="sync-status"></span>
     <div id="listino-version-toggle" style="display:flex;gap:2px;background:rgba(255,255,255,0.08);border-radius:7px;padding:3px;flex-shrink:0" title="Scegli versione listino prezzi">
       <button id="btn-listino-2025" onclick="setListinoVersion('2025')" title="Attuale (2025)" style="font-size:10px;font-weight:800;padding:4px 8px;border-radius:5px;border:1.5px solid rgba(255,255,255,0.9);background:rgba(255,255,255,0.92);color:#C8102E;cursor:pointer;transition:all 0.15s;white-space:nowrap;min-height:30px"><span class="vt-full">2025</span><span class="vt-short">1</span></button>
       <button id="btn-listino-2026" onclick="setListinoVersion('2026')" title="1° Dicembre (2026)" style="font-size:10px;font-weight:800;padding:4px 8px;border-radius:5px;border:1.5px solid rgba(255,255,255,0.2);background:transparent;color:rgba(255,255,255,0.65);cursor:pointer;transition:all 0.15s;white-space:nowrap;min-height:30px"><span class="vt-full">2026</span><span class="vt-short">2</span></button>
     </div>
+    <button id="manual-refresh-btn" onclick="manualRefresh()" title="Aggiorna dal cloud" style="background:rgba(255,255,255,0.08);border:none;border-radius:5px;padding:7px 9px;cursor:pointer;color:rgba(255,255,255,0.7);display:flex;align-items:center;justify-content:center;transition:all 0.15s;-webkit-tap-highlight-color:rgba(255,255,255,0.2);touch-action:manipulation;min-width:32px;min-height:32px;" onmouseover="this.style.background='rgba(255,255,255,0.16)';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.7)'">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+    </button>
+    <button id="account-hbtn" onclick="openAccount()" title="Account" style="background:rgba(255,255,255,0.08);border:none;border-radius:5px;padding:6px 8px;cursor:pointer;color:rgba(255,255,255,0.85);display:flex;align-items:center;justify-content:center;transition:all 0.15s;-webkit-tap-highlight-color:rgba(255,255,255,0.2);touch-action:manipulation;min-width:34px;min-height:34px;" onmouseover="this.style.background='rgba(255,255,255,0.16)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg>
+    </button>
+    <button id="settings-hbtn" onclick="openSettings()" title="Impostazioni prodotti" style="background:rgba(255,255,255,0.08);border:none;border-radius:5px;padding:6px 8px;cursor:pointer;color:rgba(255,255,255,0.7);display:flex;align-items:center;justify-content:center;transition:all 0.15s;-webkit-tap-highlight-color:rgba(255,255,255,0.2);touch-action:manipulation;min-width:34px;min-height:34px;" onmouseover="this.style.background='rgba(255,255,255,0.16)';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.7)'">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
     <nav class="nav-tabs">
       <button class="nav-tab active" onclick="showPage('listino',this)">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -5660,10 +5656,18 @@ function cartSearchClear(){
 
 function _copyTextFallback(text){
   var ta=document.createElement('textarea');
-  ta.value=text; ta.style.cssText='position:fixed;top:0;left:0;opacity:0;';
-  document.body.appendChild(ta); ta.focus(); ta.select();
-  try{ document.execCommand('copy'); } catch(e){}
+  ta.value=text; ta.style.cssText='position:fixed;top:0;left:0;width:2em;height:2em;opacity:0;border:none;outline:none;';
+  ta.contentEditable=true; ta.readOnly=false;
+  document.body.appendChild(ta);
+  // iOS: usa Selection API invece di select()
+  if(/ipad|iphone|ipod/i.test(navigator.userAgent)){
+    var rng=document.createRange(); rng.selectNodeContents(ta);
+    var sel=window.getSelection(); if(sel){sel.removeAllRanges();sel.addRange(rng);}
+    ta.setSelectionRange(0,999999);
+  } else { ta.focus(); ta.select(); }
+  var ok=false; try{ ok=document.execCommand('copy'); } catch(e){}
   document.body.removeChild(ta);
+  return ok;
 }
 /* Restituisce la stringa sconto applicata a un item del carrello */
 function _discountStr(item){
@@ -5848,10 +5852,23 @@ window._bulkAddToCart = _bulkAddToCart;
 function copyCart(){
   var text=$('cp-output').textContent;
   var b=$('btn-copy');
-  function _ok(){ b.textContent='✓ Copiato!'; b.classList.add('ok'); setTimeout(()=>{ b.innerHTML='<svg class="btn-ic" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="8" y="6" width="12" height="14" rx="2" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M16 6V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Copia</span>'; b.classList.remove('ok'); },2000); }
+  var _SVG='<svg class="btn-ic" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="8" y="6" width="12" height="14" rx="2" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M16 6V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  function _ok(){ b.innerHTML=_SVG+'<span>✓ Copiato!</span>'; b.classList.add('ok'); setTimeout(function(){ b.innerHTML=_SVG+'<span>Copia</span>'; b.classList.remove('ok'); },2000); }
+  function _selectFallback(){
+    // Copia fallita (pagina non a fuoco dopo minimizzazione): seleziona il testo nel box
+    var el=$('cp-output');
+    if(el){ try{ var r=document.createRange(); r.selectNodeContents(el); var s=window.getSelection(); if(s){s.removeAllRanges();s.addRange(r);} }catch(e){} }
+    b.innerHTML=_SVG+'<span>↑ Tieni premuto</span>';
+    b.style.background='#d97706';
+    setTimeout(function(){ b.innerHTML=_SVG+'<span>Copia</span>'; b.style.background=''; b.classList.remove('ok'); },3500);
+  }
   if(navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(text).then(_ok).catch(()=>{ _copyTextFallback(text); _ok(); });
-  } else { _copyTextFallback(text); _ok(); }
+    navigator.clipboard.writeText(text).then(_ok).catch(function(){
+      if(_copyTextFallback(text)){ _ok(); } else { _selectFallback(); }
+    });
+  } else {
+    if(_copyTextFallback(text)){ _ok(); } else { _selectFallback(); }
+  }
 }
 
 // ── SAVE ORDER ────────────────────────────────────────────────────────────────
