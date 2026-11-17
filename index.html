@@ -2093,6 +2093,8 @@ header {
 .btn-add-campione:hover{border-color:var(--red);color:var(--red);}
 .btn-del-esp{background:none;border:1.5px solid transparent;color:var(--mid);font-size:14px;cursor:pointer;padding:8px 11px;border-radius:6px;flex-shrink:0;min-width:40px;min-height:40px;display:inline-flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:rgba(200,16,46,0.25);touch-action:manipulation;}
 .btn-del-esp:hover,.btn-del-esp:active{color:var(--red);background:var(--red-l);border-color:var(--red);}
+.btn-estrai-cod{background:none;border:1.5px solid var(--border);color:var(--mid);border-radius:5px;padding:5px 10px;font-family:var(--font-body);font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;-webkit-tap-highlight-color:rgba(61,111,168,0.18);touch-action:manipulation;flex-shrink:0;}
+.btn-estrai-cod:hover{border-color:#3D6FA8;color:#3D6FA8;background:#DCE7F3;}
 .esp-items-wrap{padding:10px 14px;}
 .esp-add-bar{display:flex;gap:8px;margin-bottom:12px;}
 .esp-search-wrap{position:relative;flex:1;}
@@ -3059,6 +3061,18 @@ window.FIREBASE_CONFIG = {
   </div>
 </div>
 
+<!-- MODAL: estrai codici espositore -->
+<div class="modal-bg" id="modal-codici-esp">
+  <div class="modal" style="max-width:480px">
+    <h3 id="modal-codici-title">Codici espositore</h3>
+    <textarea id="modal-codici-text" style="width:100%;min-height:220px;font-family:var(--font-body);font-size:13px;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;resize:vertical;background:var(--bg);color:var(--dark);box-sizing:border-box;margin-bottom:14px;" readonly></textarea>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeModal('modal-codici-esp')">Chiudi</button>
+      <button class="btn-modal-ok" id="btn-copia-codici" onclick="_copyCodiciModal()">Copia</button>
+    </div>
+  </div>
+</div>
+
 <!-- ACCOUNT OVERLAY (Firebase login) -->
 <div id="account-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:400;align-items:center;justify-content:center;padding:18px;font-family:var(--font-body)">
   <div style="background:#fff;border-radius:14px;max-width:380px;width:100%;padding:22px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
@@ -3269,7 +3283,7 @@ function buildOrderTextLines(items, clientName, ref, recipient, campioni){
   const lines = [];
   const hasRec = !!(recipient && recipient.trim());
   if(hasRec){
-    lines.push('Buongiorno ' + recipient.trim());
+    lines.push(_saluto() + ' ' + recipient.trim());
     lines.push('');
   }
   if(campioni){
@@ -3309,12 +3323,20 @@ function buildOrderTextLines(items, clientName, ref, recipient, campioni){
 }
 window.buildOrderTextLines = buildOrderTextLines;
 
+/* Saluto in base all'ora: 5-12 Buongiorno, 12-18 Buon pomeriggio, 18-5 Buonasera */
+function _saluto(){
+  const h = new Date().getHours();
+  if(h >= 5 && h < 12) return 'Buongiorno';
+  if(h >= 12 && h < 18) return 'Buon pomeriggio';
+  return 'Buonasera';
+}
+
 /* Aggiorna il testo dentro cp-output usando il cliente/ref scelti */
 let _scontiOn = false;
 function _buildOrderTextConSconti(cartValido, cliName){
   const lines = [];
   const hasRec = !!(_orderRecipient && _orderRecipient.trim());
-  if(hasRec){ lines.push('Buongiorno ' + _orderRecipient.trim()); lines.push(''); }
+  if(hasRec){ lines.push(_saluto() + ' ' + _orderRecipient.trim()); lines.push(''); }
   let headline = _campioniMode ? 'Ordinare campioni per' : 'Ordinare';
   if(cliName) headline += (_campioniMode ? ' ' : ' x ') + cliName;
   if(_cartRef && _cartRef.trim()) headline += ' con riferimento ' + _cartRef.trim();
@@ -5713,7 +5735,7 @@ function copyCartConSconti(){
   const cliName = (_cartClientId && clients[_cartClientId]) ? clients[_cartClientId].name : '';
   const lines = [];
   const hasRec = !!(_orderRecipient && _orderRecipient.trim());
-  if(hasRec){ lines.push('Buongiorno ' + _orderRecipient.trim()); lines.push(''); }
+  if(hasRec){ lines.push(_saluto() + ' ' + _orderRecipient.trim()); lines.push(''); }
   let headline = _campioniMode ? 'Ordinare campioni per' : 'Ordinare';
   if(cliName) headline += (_campioniMode ? ' ' : ' x ') + cliName;
   if(_cartRef && _cartRef.trim()) headline += ' con riferimento ' + _cartRef.trim();
@@ -7649,7 +7671,10 @@ function _renderInv(c){
     h+='<button class="btn-add-esp" style="background:#3D6FA8;margin-left:4px" data-cid="'+c.id+'" onclick="_addEspRot10(this.dataset.cid)">+ 120×120 girevole</button>';
   }
   h+='<button class="btn-add-esp" style="background:var(--dark);margin-left:4px;display:inline-flex;align-items:center;gap:6px" data-cid="'+c.id+'" onclick="_exportXls(this.dataset.cid)"><svg viewBox="0 0 24 24" fill="none" width="14" height="14"><path d="M12 4v12M7 11l5 5 5-5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 18v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Esporta XLS</button>';
-  if(tot>0)h+='<span style="font-size:11px;color:var(--mid)">'+tot+' campion'+(tot===1?'e':'i')+' \u00b7 '+esps.length+' espositore'+(esps.length===1?'':'i')+'</span>';
+  if(tot>0){
+    h+='<button class="btn-add-esp" style="background:#3D6FA8;margin-left:4px;display:inline-flex;align-items:center;gap:6px" data-cid="'+c.id+'" onclick="_estraiCodiciTutti(this.dataset.cid)"><svg viewBox="0 0 24 24" fill="none" width="14" height="14"><rect x="7" y="3" width="10" height="13" rx="1.5" stroke="currentColor" stroke-width="1.7"/><path d="M4 7v13a1 1 0 0 0 1 1h10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M10 9h4M10 12h4M10 15h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Tutti i codici</button>';
+    h+='<span style="font-size:11px;color:var(--mid)">'+tot+' campion'+(tot===1?'e':'i')+' \u00b7 '+esps.length+' espositore'+(esps.length===1?'':'i')+'</span>';
+  }
   h+='</div>';
   if(!esps.length){
     h+='<div class="inv-empty"><div class="ie">\uD83C\uDFF7\uFE0F</div><p>Nessun espositore</p><span>Crea il primo espositore sopra.</span></div>';
@@ -7665,6 +7690,57 @@ function _renderInv(c){
   return h+'</div>';
 }
 
+function _estraiCodiciEsp(cid, eid){
+  var esps = _getEsps(cid);
+  var esp = esps.find(function(e){ return e.id === eid; });
+  if(!esp) return;
+  var codes = (esp.items||[]).map(function(it){ return it.code||''; }).filter(Boolean);
+  if(!codes.length){ alert('Nessun codice in questo espositore.'); return; }
+  _showCodiciModal(esp.name||'Espositore', codes.join('\n'));
+}
+window._estraiCodiciEsp = _estraiCodiciEsp;
+
+function _estraiCodiciTutti(cid){
+  var esps = _getEsps(cid);
+  if(!esps.length){ alert('Nessun espositore.'); return; }
+  var parts = [];
+  esps.forEach(function(e){
+    var codes = (e.items||[]).map(function(it){ return it.code||''; }).filter(Boolean);
+    if(codes.length){
+      parts.push('── ' + (e.name||'Espositore') + ' ──');
+      codes.forEach(function(c){ parts.push(c); });
+      parts.push('');
+    }
+  });
+  if(!parts.length){ alert('Nessun codice trovato.'); return; }
+  _showCodiciModal('Tutti gli espositori', parts.join('\n').replace(/\n$/, ''));
+}
+window._estraiCodiciTutti = _estraiCodiciTutti;
+
+function _showCodiciModal(title, text){
+  $('modal-codici-title').textContent = title;
+  $('modal-codici-text').value = text;
+  var btn = $('btn-copia-codici');
+  if(btn){ btn.textContent='Copia'; btn.style.background=''; }
+  $('modal-codici-esp').classList.add('open');
+  setTimeout(function(){ try{ $('modal-codici-text').select(); }catch(_){} }, 150);
+}
+window._showCodiciModal = _showCodiciModal;
+
+function _copyCodiciModal(){
+  var text = $('modal-codici-text').value;
+  var btn = $('btn-copia-codici');
+  var ta = $('modal-codici-text');
+  function _ok(){ btn.textContent='✓ Copiato!'; btn.style.background='var(--green)'; setTimeout(function(){ btn.textContent='Copia'; btn.style.background=''; }, 2000); }
+  function _fail(){ try{ ta.select(); }catch(_){} btn.textContent='↑ Tieni premuto'; btn.style.background='#d97706'; setTimeout(function(){ btn.textContent='Copia'; btn.style.background=''; }, 3500); }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(_ok).catch(function(){ if(_copyTextFallback(text)){ _ok(); } else { _fail(); } });
+  } else {
+    if(_copyTextFallback(text)){ _ok(); } else { _fail(); }
+  }
+}
+window._copyCodiciModal = _copyCodiciModal;
+
 function _renderEsp(cid,e){
   var isRot = _isGridEsp(e);
   var cl=e.collapsed?' esp-collapsed':'', n=e.items.length;
@@ -7678,6 +7754,7 @@ function _renderEsp(cid,e){
   h+='<div class="esp-count" id="espc-'+e.id+'">'+n+(isRot?'/'+totalSlots:'')+' campion'+(n===1?'e':'i')+(isRot?' inseriti':'')+'</div>';
   h+='</div>';
   if(!isRot) h+='<button class="btn-add-campione" data-eid="'+e.id+'" onclick="_focSrch(this.dataset.eid)">+ Campione</button>';
+  h+='<button class="btn-estrai-cod" data-cid="'+cid+'" data-eid="'+e.id+'" onclick="_estraiCodiciEsp(this.dataset.cid,this.dataset.eid)" title="Estrai codici"><svg viewBox="0 0 24 24" fill="none" width="13" height="13"><rect x="7" y="3" width="10" height="13" rx="1.5" stroke="currentColor" stroke-width="1.7"/><path d="M4 7v13a1 1 0 0 0 1 1h10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M10 9h4M10 12h4M10 15h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Codici</button>';
   h+='<button class="btn-del-esp" data-cid="'+cid+'" data-eid="'+e.id+'" onclick="_delEsp(this.dataset.cid,this.dataset.eid)">\uD83D\uDDD1</button>';
   h+='</div>';
   h+='<div class="esp-items-wrap">';
